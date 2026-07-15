@@ -1,0 +1,18 @@
+%% Copyright 2015-2026 The Khronos Group Inc.
+%% SPDX-License-Identifier: Apache-2.0
+
+%%
+%% This style is derived from the docbook one.
+%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{asciidoc}[2008/06/05 AsciiDoc DocBook Style]
+%% Just use the original package and pass the options.
+\RequirePackageWithOptions{docbook}
+
+% For DocBook literallayout elements, see `./dblatex/dblatex-readme.txt`.
+\usepackage{alltt}
+\usepackage{title}
+\usepackage{bookmark}
+\bookmarksetup{
+  numbered,
+}

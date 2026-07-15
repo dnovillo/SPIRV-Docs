@@ -1,0 +1,47 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+changes:
+
+=== Changes from Version 1.3, Revision 6
+
+- Reserve Tokens for:
+ * SPV_INTEL_media_block_io
+ * SPV_NV_cooperative_matrix
+ * SPV_INTEL_device_side_avc_motion_estimation, partially. See the SPV_INTEL_device_side_avc_motion_estimation
+   extension specification for a full listing of tokens.
+
+- Fixed Issues:
+ * Khronos SPIR-V Issue #406: <<Scope_-id-, Scope>> values must come from the table of scope values.
+ * Khronos SPIR-V Issue #419: <<Validation, Validation rules>> include *AtomicCounter* in the list of
+   storage classes allowed for pointer operands to an *OpFunctionCall*.
+ * Khronos SPIR-V Issue #325: <<OpPhi, *OpPhi*>> clarifications regarding parent dominance, in the
+   instruction and the <<Validation, validation rules>>, and forward references in the
+   <<LogicalLayout, Logical Layout section>>.
+ * Khronos SPIR-V Issue #415: Remove the non-writable storage classes *PushConstant* and *Input*
+   from the *FPRoundingMode* decoration <<ShaderValidation, shader validation rule>>.
+ * Khronos SPIR-V Issue #404: Clarify when <<OpGroupNonUniformShuffleXor, *OpGroupNonUniformShuffleXor*>>,
+   <<OpGroupNonUniformShuffleUp, *OpGroupNonUniformShuffleUp*>>, and
+   <<OpGroupNonUniformShuffleDown, *OpGroupNonUniformShuffleDown*>> are valid or result in undefined values.
+ * Khronos SPIR-V Issue #393: Be more clear that <<OpConvertUToPtr, *OpConvertUToPtr*>>
+   and <<OpConvertPtrToU, *OpConvertPtrToU*>> operate only on unsigned scalar integers.
+ * Khronos SPIR-V Issue #416: Result are undefined for all <<Bit, Shift instructions>> for shifts amounts
+   equal to the bit width of the operand.
+ * Khronos SPIR-V Issue #399: Refine the definition of a <<VariablePointer, variable pointer>>,
+   particularly for function parameters receiving a variable pointer.
+ * Khronos SPIR-V Issue #441: Clarify that <<Atomic, atomic instruction's>> _Scope <id>_ must be a valid memory scope.
+   More generally, all _Scope <id>_ operands are now either _Memory_ or _Execution_.
+ * Khronos SPIR-V Issue #426: Be more direct about undefined behavior for non-uniform control flow in
+   <<OpControlBarrier, *OpControlBarrier*>> and the <<OpGroupAsyncCopy, *OpGroup...*>> instructions that discuss this.
+
+- Deprecate
+ * Khronos SPIR-V Issue #429: Deprecate <<OpDecorationGroup, *OpDecorationGroup*>>,
+   <<OpGroupDecorate, *OpGroupDecorate*>>, and <<OpGroupMemberDecorate, *OpGroupMemberDecorate*>>
+
+- Editorial
+ * Add more clarity that the full <<ClientAPI, client API describes the execution environment>>
+  (there is not a separate specification from the client API specification).

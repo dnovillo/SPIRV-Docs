@@ -1,0 +1,31 @@
+version = 1
+
+[[annotations]]
+group = "WhitePaper"
+path = [ "documentation/**/*" ]
+SPDX-FileCopyrightText = "2015-2026 LunarG, Inc."
+SPDX-License-Identifier = "CC-BY-4.0"
+
+[[annotations]]
+group = "JsonCpp Distribution Files"
+path = [ "tools/spirv/jsoncpp/**" ]
+SPDX-FileCopyrightText = "2007-2010 Baptiste Lepilleur"
+SPDX-License-Identifier = "LicenseRef-JsonCpp"
+
+[[annotations]]
+group = "Spec Outputs"
+path = [ "**/*.html", "**/*.pdf" ]
+SPDX-FileCopyrightText = "2015-2026 The Khronos Group Inc."
+SPDX-License-Identifier = "LicenseRef-KhronosSpecCopyright"
+
+[[annotations]]
+group = "Spec Images, Generated Markup, and Example Source"
+path = [ "specs/**/*.png", "specs/**/*.svg", "specs/auto*.adoc", "specs/binary.adoc", "specs/boilerplate.adoc", "specs/GLSLGenerated.adoc", "specs/OpenCLGenerated.adoc", "specs/examples/*" ]
+SPDX-FileCopyrightText = "2015-2026 The Khronos Group Inc."
+SPDX-License-Identifier = "CC-BY-4.0"
+
+[[annotations]]
+group = "Published Spec Output Copyright"
+path = [ "specs/copyright-spec.adoc" ]
+SPDX-FileCopyrightText = "2015-2026 The Khronos Group Inc."
+SPDX-License-Identifier = "LicenseRef-KhronosSpecCopyright"

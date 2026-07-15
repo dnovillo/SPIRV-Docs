@@ -1,0 +1,111 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+changes:
+
+=== Changes from Version 0.99, Revision 31
+
+- Added the *PushConstant* <<Storage_Class, Storage Class>>.
+- Added <<OpIAddCarry, *OpIAddCarry*>>, <<OpISubBorrow, *OpISubBorrow*>>, <<OpUMulExtended, *OpUMulExtended*>>, and <<OpSMulExtended, *OpSMulExtended*>>.
+- Added <<OpInBoundsPtrAccessChain, *OpInBoundsPtrAccessChain*>>.
+- Added the <<Decoration,Decoration>> *NoContraction* to prevent combining multiple operations into a single operation (bug 14396).
+- Added sparse texturing (14486):
+  * Added *OpImageSparse...* for accessing images that might not be resident.
+  * Added *MinLod* functionality for accessing images with a minimum level of detail.
+- Added back the *Alignment* <<Decoration, Decoration>>, for the *Kernel* capability (14505).
+- Added a *Nontemporal* <<Memory_Operands, Memory Operand>> (14566).
+- <<StructuredControlFlow, Structured control flow>> changes:
+  * Changed structured loops to have a structured continue _Continue Target_ in <<OpLoopMerge,*OpLoopMerge*>> (14422).
+  * Added rules for how "fall through" works with *OpSwitch* (13579).
+  * Added definitions for what is "inside" a structured control-flow construct (14422).
+- Added *SubpassData* <<Dim,Dim>> to support input targets written by a previous subpass as an output target (14304).  This is also a <<Decoration,Decoration>>
+  and a <<Capability, Capability>>, and can be used by some image ops to read the input target.
+- Added <<OpTypeForwardPointer,*OpTypeForwardPointer*>> to establish the Storage Class of a forward reference to a pointer type (13822).
+- Improved Debuggability
+  * Changed <<OpLine,*OpLine*>> to not have a target _<id>_, but instead be placed immediately preceding the instruction(s) it is annotating (13905).
+  * Added <<OpNoLine,*OpNoLine*>> to terminate the affect of *OpLine* (13905).
+  * Changed <<OpSource,*OpSource*>> to include the source code:
+    ** Allow multiple occurrences.
+    ** Be mixed in with the <<OpString,*OpString*>> instructions.
+    ** Optionally consume an <<OpString,*OpString*>> result to say which file it is annotating.
+    ** Optionally include the source text corresponding to that <<OpString,*OpString*>>.
+    ** Included adding <<OpSourceContinued,*OpSourceContinued*>> for source text that is too long for a single instruction.
+- Added a large number of <<Capabilities,Capabilities>> for subsetting functionality (14520, 14453), including 8-bit integer support for OpenCL kernels.
+- Added *VertexIndex* and *InstanceIndex* <<BuiltIn, BuiltIn>> <<Decoration,Decorations>> (14255).
+- Added *GenericPointer* capability that allows the ability to use the *Generic* <<Storage_Class, Storage Class>> (14287).
+- Added *IndependentForwardProgress* <<Execution_Mode, Execution Mode>> (14271).
+- Added <<OpAtomicFlagClear,*OpAtomicFlagClear*>> and <<OpAtomicFlagTestAndSet,*OpAtomicFlagTestAndSet*>> instructions (14315).
+- Changed <<OpEntryPoint,*OpEntryPoint*>> to take a list of *Input* and *Output* _<id>_ for declaring the entry point's interface.
+- Fixed internal bugs
+  * 14411 Added missing documentation for mad_sat OpenCL extended instructions (enums existed, just the documentation was missing)
+  * 14241 Removed shader capability requirement from *OpImageQueryLevels* and *OpImageQuerySamples*.
+  * 14241 Removed unneeded OpImageQueryDim instruction.
+  * 14241 Filled in _TBD_ section for OpAtomicCompareExchangeWeek
+  * 14366 All <<OpSampledImage,*OpSampledImage*>> must appear before uses of sampled images (and still in the first block of the entry point).
+  * 14450 DeviceEnqueue capability is required for OpTypeQueue and OpTypeDeviceEvent
+  * 14363 OpTypePipe is opaque - moved packet size and alignment to opcodes
+  * 14367 Float16Buffer capability clarified
+  * 14241 Clarified how <<OpSampledImage,*OpSampledImage*>> can be used
+  * 14402 Clarified <<OpTypeImage,*OpTypeImage*>> encodings for OpenCL extended instructions
+  * 14569 Removed mention of non-existent OpFunctionDecl
+  * 14372 Clarified usage of <<OpGenericPtrMemSemantics,*OpGenericPtrMemSemantics*>>
+  * 13801 Clarified the *SpecId* <<Decoration,Decoration>> is just for constants
+  * 14447 Changed literal values of <<Memory_Semantics_-id-, Memory Semantic>> enums to match OpenCL/C++11 atomics, and made the <<Memory_Semantics_-id-, Memory Semantic>> *None* and *Relaxed* be aliases
+  * 14637 Removed subgroup scope from <<OpGroupAsyncCopy,*OpGroupAsyncCopy*>> and <<OpGroupWaitEvents,*OpGroupWaitEvents*>>
+
+=== Changes from Version 0.99, Revision 32
+
+- Added *UnormInt101010_2* to the <<Image_Channel_Data_Type, Image Channel Data Type>> table.
+- Added place holder for C++11 atomic _Consume_ Memory Semantics along with an explicit AcquireRelease memory semantic.
+
+- Fixed internal bugs:
+  * 14690 <<OpSwitch,*OpSwitch*>> _literal_ width (and hence number of operands) is determined by the type of _Selector_, and be rigorous about how sub-32-bit literals are stored.
+  * 14485 The client API owns the semantics of built-ins that only have "pass through" semantics WRT SPIR-V.
+  * 14862 Removed the *IndependentForwardProgress* <<Execution_Mode, Execution Mode>>.
+
+- Fixed public bugs:
+  * 1387 Don't describe result type of <<OpImageWrite,*OpImageWrite*>>.
+
+=== Changes from Version 1.00, Revision 1
+
+- Adjusted <<Capability, Capabilities>>:
+  * Split geometry-stream functionality into its own *GeometryStreams* capability (14873).
+  * Have *InputAttachmentIndex* to depend on *InputAttachment* instead of *Shader* (14797).
+  * Merge *AdvancedFormats* and *StorageImageExtendedFormats* into just *StorageImageExtendedFormats* (14824).
+  * Require *StorageImageReadWithoutFormat* and *StorageImageWriteWithoutFormat* to read and write storage images with an *Unknown* <<Image_Format, Image Format>>.
+  * Removed the *ImageSRGBWrite* capability.
+
+- Clarifications
+  * *RelaxedPrecision* <<Decoration, Decoration>> can be applied to *OpFunction* (14662).
+
+- Fixed internal bugs:
+  * 14797 The literal argument was missing for the *InputAttachmentIndex* <<Decoration, Decoration>>.
+  * 14547 Remove the *FragColor* <<BuiltIn, BuiltIn>>, so that no implicit broadcast is implied.
+  * 13292 Make statements about "Volatile" be more consistent with the memory model specification (non-functional change).
+  * 14948 Remove image-"Query" overloading on image/sampled-image type and "fetch" on non-sampled images, by adding the <<OpImage,*OpImage*>> instruction to get the image from a sampled image.
+  * 14949 Make consistent placement between *OpSource* and *OpSourceExtension* in the <<LogicalLayout, logical layout>> of a module.
+  * 14865 Merge *WorkgroupLinearId* with *LocalInvocationId* <<BuiltIn, BuiltIn>> <<Decoration,Decorations>>.
+  * 14806 Include 3D images for <<OpImageQuerySize,*OpImageQuerySize*>>.
+  * 14325 Removed the *Smooth* <<Decoration,Decoration>>.
+  * 12771 Make the version word formatted as: "0 | Major Number | Minor Number | 0" in the <<PhysicalLayout, physical layout>>.
+  * 15035 Allow <<OpTypeImage,*OpTypeImage*>> to use a _Depth_ operand of 2 for not indicating a depth or non-depth image.
+  * 15009 Split the *OpenCL* <<Source_Language,Source Language>> into two: *OpenCL_C* and *OpenCL_CPP*.
+  * 14683 <<OpSampledImage,*OpSampledImage*>> instructions can only be the consuming block, for scalars, and directly consumed by an image lookup or query instruction.
+  * 14325 mutual exclusion validation rules of <<Execution_Mode, Execution Modes>> and <<Decoration,Decorations>>
+  * 15112 add definitions for <<Invocation,invocation>>, <<DynamicallyUniform,dynamically uniform>>, and <<UniformControlFlow, uniform control flow>>.
+
+- Renames
+  * *InputTargetIndex* <<Decoration,Decoration>> {rightarrow} *InputAttachmentIndex*
+  * *InputTarget* <<Capability,Capability>> {rightarrow} *InputAttachment*
+  * *InputTarget* <<Dim,Dim>> {rightarrow} *SubpassData*
+  * *WorkgroupLocal* <<Storage_Class, Storage Class>> {rightarrow} *Workgroup*
+  * *WorkgroupGlobal* <<Storage_Class, Storage Class>> {rightarrow} *CrossWorkgroup*
+  * *PrivateGlobal* <<Storage_Class, Storage Class>> {rightarrow} *Private*
+  * *OpAsyncGroupCopy* {rightarrow} <<OpGroupAsyncCopy, *OpGroupAsyncCopy*>>
+  * *OpWaitGroupEvents* {rightarrow} <<OpGroupWaitEvents, *OpGroupWaitEvents*>>
+  * *InputTriangles* <<Execution_Mode, Execution Mode>> {rightarrow} *Triangles*
+  * *InputQuads* <<Execution_Mode, Execution Mode>> {rightarrow} *Quads*
+  * *InputIsolines* <<Execution_Mode, Execution Mode>> {rightarrow}  *Isolines*

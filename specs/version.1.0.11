@@ -1,0 +1,21 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+changes:
+
+=== Changes from Version 1.00, Revision 10
+
+ - Add *HLSL* <<Source_Language, *source language*>>.
+ - Add *StorageBuffer* <<Storage_Class, *storage class*>>.
+ - Add *StorageBuffer16BitAccess*,  *UniformAndStorageBuffer16BitAccess*, *VariablePointersStorageBuffer*, and *VariablePointers* <<Capability, capabilities>>.
+ - Khronos SPIR-V issue #163: Be more clear that <<OpTypeStruct, *OpTypeStruct*>> allows zero members.
+   Also affects *ArrayStride* and *Offset* decoration <<Validation, validation rules>>.
+ - Khronos SPIR-V issue #159: List allowed *AtomicCounter* instructions with the *AtomicStorage* <<Capability, capability>> rather than the validation rules.
+ - Khronos SPIR-V issue #36: Describe more clearly the type of _ND Range_ in <<OpGetKernelNDrangeSubGroupCount, *OpGetKernelNDrangeSubGroupCount*>>,
+   <<OpGetKernelNDrangeMaxSubGroupSize, *OpGetKernelNDrangeMaxSubGroupSize*>>, and <<OpEnqueueKernel, *OpEnqueueKernel*>>.
+ - Khronos SPIR-V issue #128: Be clear the <<OpDot, *OpDot*>> operates only on vectors.
+ - Khronos SPIR-V issue #80: Loop headers must dominate their continue target. See <<StructuredControlFlow, Structured Control Flow>>.
+ - Khronos SPIR-V issue #150 allow *UniformConstant* <<Storage_Class, storage-class>> variables to have initializers, depending on the client API.

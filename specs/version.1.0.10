@@ -1,0 +1,22 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+changes:
+
+=== Changes from Version 1.00, Revision 9
+
+ - Khronos Vulkan issue #652: Remove statements about matrix offsets and padding. These are described correctly in the Vulkan API specifications.
+ - Khronos SPIR-V issue #113: Remove the "By Default" statements in <<FP_Rounding_Mode, FP Rounding Mode>>.
+   These should be properly specified by the client API.
+ - Add extension enumerants for
+   * SPV_KHR_16bit_storage
+   * SPV_KHR_device_group
+   * SPV_KHR_multiview
+   * SPV_NV_sample_mask_override_coverage
+   * SPV_NV_geometry_shader_passthrough
+   * SPV_NV_viewport_array2
+   * SPV_NV_stereo_view_rendering
+   * SPV_NVX_multiview_per_view_attributes

@@ -1,0 +1,51 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+changes:
+
+=== Changes from Version 1.00, Revision 2
+
+- Updated example at the end of Section 1 to conform to the KHR_vulkan_glsl extension and treat OpTypeBool as an abstract type.
+
+- Adjusted <<Capability, Capabilities>>:
+  * *MatrixStride* depends on *Matrix* (15234).
+  * *Sample*, *SampleId*, *SamplePosition*, and *SampleMask* depend on *SampleRateShading* (15234).
+  * *ClipDistance* and *CullDistance* <<BuiltIn, BuiltIns>> depend on, respectively, *ClipDistance* and *CullDistance* (1407, 15234).
+  * *ViewportIndex* depends on *MultiViewport* (15234).
+  * *AtomicCounterMemory* should be the *AtomicStorage* (15234).
+  * *Float16* has no dependencies (15234).
+  * *Offset* <<Decoration,Decoration>> should only be for *Shader* (15268).
+  * *Generic* <<Storage_Class, Storage Class>> is supposed to need the *GenericPointer* <<Capability, Capability>> (14287).
+  * Remove capability restriction on the *BuiltIn* <<Decoration, Decoration>> (15248).
+
+- Fixed internal bugs:
+  * 15203 Updated description of *SampleMask* <<BuiltIn, BuiltIn>> to include "Input or output...", not just "Input..."
+  * 15225 Include no re-association as a constraint required by the *NoContraction* <<Decoration, Decoration>>.
+  * 15210 Clarify <<OpPhi, *OpPhi*>> semantics that operand values only come from parent blocks.
+  * 15239 Add <<OpImageSparseRead,OpImageSparseRead>>, which was missing (supposed to be 12 sparse-image instructions, but only 11 got incorporated, this adds the 12th).
+  * 15299 Move <<OpUndef,*OpUndef*>> back to the Miscellaneous section.
+  * 15321 <<OpTypeImage,*OpTypeImage*>> does not have a _Depth_ restriction when used with *SubpassData*.
+  * 14948 Fix the *Lod* <<Image_Operands, Image Operands>> to allow both integer and floating-point values.
+  * 15275 Clarify specific storage classes allowed for atomic operations under universal validation rules "Atomic access rules".
+  * 15501 Restrict *Patch* <<Decoration, Decoration>> to one of the tessellation execution models.
+  * 15472 Reserved use of *OpImageSparseSampleProjImplicitLod*, *OpImageSparseSampleProjExplicitLod*,
+          *OpImageSparseSampleProjDrefImplicitLod*, and *OpImageSparseSampleProjDrefExplicitLod*.
+  * 15459 Clarify what makes different aggregate types in <<TypesVariables, "Types and Variables">>.
+  * 15426 Don't require <<OpQuantizeToF16, *OpQuantizeToF16*>> to preserve NaN patterns.
+  * 15418 Don't set both *Acquire* and *Release* bits in <<Memory_Semantics_-id-, Memory Semantics>>.
+  * 15404 <<OpFunction, *OpFunction*>> _Result <id>_ can only be used by *OpFunctionCall*, *OpEntryPoint*, and decoration instructions.
+  * 15437 Restrict element type for <<OpTypeRuntimeArray, *OpTypeRuntimeArray*>> by adding a definition of <<Concrete, concrete>> types.
+  * 15403 Clarify <<OpTypeFunction, *OpTypeFunction*>> can only be consumed by <<OpFunction, *OpFunction*>>
+          and functions can only return concrete and abstract types.
+
+- Improved accuracy of the opcode word count in each instruction regarding which operands are optional.
+  For sampling operations with explicit LOD, this included not marking the required LOD operands as optional.
+
+- Clarified that when *NonWritable*, *NonReadable*, *Volatile*, and *Coherent* <<Decoration, Decorations>> are applied to the *Uniform* storage class, the *BufferBlock* decoration must be present.
+
+- Fixed external bugs:
+  * 1413 (see internal 15275)
+  * 1417 Added definitions for block, <<Dominate, dominate>>, post dominate, CFG, and <<BackEdge, back edge>>.  Removed use of "dominator tree".

@@ -1,0 +1,34 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+changes:
+
+=== Changes from Version 1.3, Revision 2
+
+- New enumarents:
+  * For SPV_KHR_8bit_storage
+
+- Fixed Issues:
+  * Add definition of <<MemoryObjectDeclaration, Memory Object Declaration>>.
+  * Khronos SPIR-V Issue #275: Clarify the meaning of *Aliased* and *Restrict* in the <<AliasingSection, Aliasing>> section.
+  * Khronos SPIR-V Issue #315: Be more specific about where many <<Decoration, decorations>> are allowed, particularly for *OpFunctionParameter*.
+    Includes being clear that the *BuiltIn* decoration does not apply to *OpFunctionParamater*.
+  * Khronos SPIR-V Issue #348: Clarify <<Remainder, _remainder_>> descriptions in
+    <<OpFRem, *OpFRem*>>, <<OpFMod, *OpFMod*>>, <<OpSRem, *OpSRem*>>, and <<OpSMod, *OpSMod*>>.
+  * Khronos SPIR-V Issue #342: State the *DepthReplacing* <<Execution_Mode, execution-mode>> behavior more specifically.
+  * Khronos SPIR-V Issue #341: More specific wording for depth-hint <<Execution_Mode, execution modes>> *DepthGreater*,
+    *DepthLess*, and *DepthUnchanged*.
+  * Khronos SPIR-V Issues #276 and #311: Take more care with unreachable blocks in <<StructuredControlFlow, structured control flow>>
+    and how to branch into a construct.
+  * Khronos SPIR-V Issue #320: Include *OpExecutionModeId* in the <<LogicalLayout, logical layout>>.
+  * Khronos SPIR-V Issue #238: Fix description of <<OpImageQuerySize, *OpImageQuerySize*>> to correct
+   _Sampled Type_ {rightarrow} _Sampled_ and list the correct set of dimensions.
+  * Khronos SPIR-V Issue #346: Remove ordered rule for structures in the <<MemoryLayout, memory layout>>: Vulkan allows out-of-order *Offset* layouts.
+  * Khronos SPIR-V Issue #322: Allow <<OpImageQuerySize, *OpImageQuerySize*>> to query the size of a *NonReadable* image.
+  * Khronos SPIR-V Issue #244: Be more clear about the connections between <<Dim, dimensionalities>> and capabilities,
+    and in referring to them from <<OpImageRead, *OpImageRead*>> and <<OpImageWrite, *OpImageWrite*>>.
+  * Khronos SPIR-V Issue #333: Be clear about overflow behavior for <<OpIAdd, *OpIAdd*>>, <<OpISub, *OpISub*>>, and <<OpIMul, *OpIMul*>>.

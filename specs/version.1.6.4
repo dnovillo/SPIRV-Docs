@@ -1,0 +1,49 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+author: Victor Lomüller, Codeplay
+changes:
+
+=== Changes from Version 1.6, Revision 3
+
+- Reserve enumerants for:
+ * SPV_KHR_float_controls2
+ * SPV_KHR_maximal_reconvergence
+ * SPV_KHR_quad_control
+ * SPV_KHR_relaxed_extended_instruction
+ * SPV_EXT_replicated_composites
+ * SPV_INTEL_fpga_cluster_attributes
+ * SPV_INTEL_masked_gather_scatter
+ * SPV_INTEL_maximum_registers
+ * SPV_QCOM_image_processing2
+ * SPV_NV_shader_atomic_fp16_vector
+ * SPV_NV_raw_access_chains
+
+- Other changes from public headers
+ * Enforce Core, KHR, EXT, Vendor ordering conventions for aliased names
+ * Added <<Source_Language, source languages>> Zig
+ * Removed the *Kernel* enabling capability from <<Image_Channel_Order, Image Channel Order>> and <<Image_Channel_Data_Type, Image Channel Data Type>>.
+
+- Fix Khronos SPIR-V Issues:
+ * #638: Clarify that most <<Execution_Mode,execution modes>> must be applied at most once to a given <<EntryPoint,entry point>>.
+ * #766: Clarify the texel value type for the *ZeroExtend* and *SignExtend*
+         <<Image_Operands,image operands>>.
+ * #724: Clarify that the <<Storage_Class,storage class>> must match
+         when performing an <<OpBitcast,*OpBitcast*>> between two <<OpTypePointer,*OpTypePointer*>>.
+         Clarify that the behavior is undefined when using the result of a bit cast between a scalar
+         and a pointer (<<OpBitcast,*OpBitcast*>> and <<OpConvertUToPtr,*OpConvertUToPtr*>>) if
+         the <<Storage_Class,storage class>> scalar.
+ * Add optional operand for <<OpTypeFloat, *OpTypeFloat*>> to specify bit pattern of values.
+   Clarify that OpFConvert operates on different types not just width.
+   Clarify the following uses IEEE 754 floating-points:
+     `OpQuantizeToF16`, <<Image_Operands, Image Operands>> taking <<Floating,_floating-point type_>> operands,
+     *VecTypeHint*, *DenormPreserve*, *DenormFlushToZero*, *SignedZeroInfNanPreserve*, *RoundingModeRTE* and *RoundingModeRTZ* <<Execution_Mode, execution mode>>,
+     <<Derivative, Derivative instructions>>, *Float16Buffer*, *Float16* and *Int64* <<Capability, capabilities>>.
+   Clarify that <<OpIsNan, *OpIsNan*>>, <<OpIsInf, *OpIsInf*>>, <<OpIsFinite, *OpIsFinite*>>, <<OpOrdered, *OpOrdered*>> and <<OpUnordered, *OpUnordered*>> results depends on the floating-point encoding.
+ * #767: Rework the *Function* <<Storage_Class,Storage Class>> definition.
+         Clarify the memory is visible across all functions and not just the declaring function.
+         Clarify that an <<OpVariable,*OpVariable*>> with a *Function* <<Storage_Class,Storage Class>> is only allocated from its declaration until reaching a <<FunctionTermination, function termination instruction>>.

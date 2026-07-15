@@ -1,0 +1,47 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+author: Victor Lomüller, Codeplay
+changes:
+
+=== Changes from Version 1.6, Revision 5
+
+- Reserve enumerants for:
+  * SPV_KHR_bfloat16
+  * SPV_EXT_float8
+  * SPV_ARM_graph
+  * SPV_ARM_tensors
+  * SPV_INTEL_bindless_images
+  * SPV_INTEL_function_variants
+  * SPV_INTEL_int4
+  * SPV_INTEL_task_sequence
+  * SPV_INTEL_ternary_bitwise_function
+  * SPV_INTEL_tensor_float32_conversion
+  * SPV_NV_linear_swept_spheres
+  * SPV_NV_cluster_acceleration_structure
+  * SPV_NV_cooperative_vector
+  * SPV_QCOM_cooperative_matrix_conversion
+  * SPV_QCOM_tile_shading
+  * <<Image_Channel_Data_Type, Image Channel Data Type>> for cl_ext_image_unsigned_10x6_12x4_14x2
+
+- Fix Khronos SPIR-V Issues:
+  * #843: Clarify that *OpShiftRightArithmetic* fills the bits according to the most-significant bit of _Base_.
+  * !336: Clarify that Aligned <<Memory_Operands,*Memory Operands*>> must be a power of two.
+  * Khronos Vulkan Issue #4193: Clarify runtime array must be last struct member by memory layout.
+  * !334: Clarify <<OpArrayLength, *OpArrayLength*>> does not access the array contents.
+  * #859: Clarify that the _Level of Detail_ operand of <<OpImageQuerySizeLod, *OpImageQuerySizeLod*>> is a 32-bit <<Integer,integer type>> scalar.
+  * #860: Clarify that *Bias*, *Lod*, *Grad*, *ConstOffset*, *Offset*, *Sample*, *MinLod* and *Biais* <<Image_Operands, Image Operands>> uses 32-bit <<Integer,integer>> or <<Floating,floating point>> types.
+  * #865: Clarify <<OpUndef, *OpUndef*>> causes undefined behavior if used as an operand to <<OpBranchConditional, *OpBranchConditional*>> and <<OpSwitch, *OpSwitch*>>.
+  * !350: Clarify that variable pointers on arrays of blocks are disallowed.
+
+- Fix Github SPIRV-Headers Issues:
+  * #487: State that *Unknown* <<Image_Format,_Image Format_>> can also be used if *Kernel* capability is declared.
+  * #510: Header fix to stop enabling *PerTaskNV* with SPV_EXT_mesh_shader
+
+- Fix Github SPIRV-Registry Issues:
+  * #336: Fix <<Remainder,remainder>> definition, 'q' is an integer.
+  * #313: Clarify the definition of <<DynamicInstance, dynamic instance>> and which threads form the same tangle.

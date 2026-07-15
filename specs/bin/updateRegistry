@@ -1,0 +1,29 @@
+#!/usr/bin/bash
+# Copyright 2015-2026 The Khronos Group Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+DEST=~/GitHub/Registry-Root-SPIR-V
+VERSION=unified1
+
+# specs directory
+
+cp GLSL.std.450.html $DEST/specs/$VERSION
+cp GLSL.std.450.pdf $DEST/specs/$VERSION
+
+cp OpenCL.std.html $DEST/specs/$VERSION/OpenCL.ExtendedInstructionSet.100.html
+cp OpenCL.std.pdf $DEST/specs/$VERSION/OpenCL.ExtendedInstructionSet.100.pdf
+
+cp DebugInfo.html $DEST/specs/$VERSION
+cp DebugInfo.pdf $DEST/specs/$VERSION
+
+cp OpenCL.DebugInfo.100.html $DEST/specs/$VERSION/OpenCL.DebugInfo.100.html
+cp OpenCL.DebugInfo.100.pdf $DEST/specs/$VERSION/OpenCL.DebugInfo.100.pdf
+
+cp SPIRV.html $DEST/specs/$VERSION
+cp SPIRV.pdf $DEST/specs/$VERSION
+
+cp MachineReadableGrammar.html $DEST/specs/$VERSION
+cp MachineReadableGrammar.pdf $DEST/specs/$VERSION
+
+# specs/images
+# cp images/* $DEST/specs/$VERSION/images

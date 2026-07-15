@@ -1,0 +1,28 @@
+#!/usr/bin/bash
+# Copyright 2015-2026 The Khronos Group Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+DEST=/cygdrive/c/Users/john/KhronosSVN/SPIRV/trunk/Version1.3Rev1
+
+mkdir -p $DEST
+cp SPIRV.pdf $DEST
+cp SPIRV.html $DEST
+cp SPIRV.mobile.html $DEST
+
+#cp GLSL.std.450.pdf $DEST
+#cp GLSL.std.450.html $DEST
+#cp GLSL.std.450.mobile.html $DEST
+
+cp MachineReadableGrammar.pdf $DEST
+cp MachineReadableGrammar.html $DEST
+
+mkdir -p $DEST/images
+cp images/* $DEST/images
+
+mkdir -p $DEST/headers
+cp ../headers/* $DEST/headers
+cp ../tools/spirv/spirv.core.grammar.json $DEST/headers
+#cp ../tools/spirv/extinst.glsl.std.450.grammar.json $DEST/headers
+
+#mkdir -p $DEST/memorymodel
+#cp ../memorymodel/SPIR-V-execution-and-memory-model-rev6.pdf $DEST/memorymodel

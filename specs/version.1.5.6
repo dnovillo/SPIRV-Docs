@@ -1,0 +1,70 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+changes:
+
+=== Changes from Version 1.5, Revision 5
+
+- Ported the specification itself to use asciidoctor instead of asciidoc.
+- Reserve enumerants for the extensions:
+ * SPV_INTEL_float_controls2
+ * SPV_INTEL_vector_compute
+ * SPV_INTEL_arbitrary_precision_floating_point
+ * SPV_INTEL_usm_storage_classes
+ * SPV_INTEL_unstructured_loop_controls
+ * SPV_KHR_subgroup_uniform_control_flow
+ * SPV_KHR_linkonce_odr
+ * SPV_KHR_expect_assume
+ * SPV_EXT_shader_atomic_float_min_max
+ * SPV_KHR_integer_dot_product
+ * SPV_KHR_bit_instructions
+ * SPV_NV_ray_tracing_motion_blur
+ * SPV_INTEL_optnone
+ * SPV_NV_bindless_texture
+- Add *CPP_for_OpenCL* <<Source_Language, *source language*>>.
+- Clarify that <<OpFDiv, *OpFDiv*>> has a defined result when the divisor is 0. (MR !195.)
+- Fix <<Execution_Mode, execution-mode>> table to show all 3 operands for *LocalSizeHintId*.
+- Fix GitHub SPIRV-Registry issues:
+ * #79: Clarify the definitions of *StorageImageMultisample* and *ImageMSArray* <<Capability, capabilities>>.
+- Fix Khronos issues:
+ * #351: <<OpUDiv, *OpUDiv*>> and <<OpUMod, *OpUMod*>> have undefined behavior if the divisor is 0.
+ * #621: Clarify the definition of the _Sampled_ operand for <<OpTypeImage,*OpTypeImage*>>.
+ * #611: Clarifying <<Literal, string literals>> are case sensitive for comparisons.
+ * #615: Clarify *Block* and *BufferBlock* <<Decoration,decorations>>.
+ * #654: Clarify that the *ZeroExtend* <<Image_Operands, image operand>> is not valid with signed types.
+ * #623: Clarify <<OpAccessChain,*OpAccessChain*>> doesn't create any extra restrictions.
+ * #647: Clarify *NoWrite* and *NoReadWrite* <<Function_Parameter_Attribute, function parameter attributes>>
+   apply to the pointer, not to the underlying memory.
+ * #585: Clarify that <<OpCopyObject, *OpCopyObject*>> cannot have result type *OpTypeVoid*.
+ * #614: Clarify that <<OpUndef, *OpUndef*>>, <<OpPhi, *OpPhi*>>, and <<OpReturnValue, *OpReturnValue*>>
+         cannot have result type *OpTypeVoid*.
+ * #115: Clarify the <<ShaderValidation,Shader validation rules>> for when <<OpSelectionMerge,*OpSelectionMerge*>> and
+         <<OpLoopMerge,*OpLoopMerge*>> instructions are necessary.
+ * #656: Clarify the _<id>_-based rules for operands apply only to operands that are _<id>s_,
+         in the <<OpSpecConstantOp, *OpSpecConstantOp*>> instruction.
+ * #627: Clarify the places that the <<RelaxedPrecisionSection, *RelaxedPrecision*>> decoration must apply to.
+ * #549: Clarify the *VariablePointers* and *VariablePointersStorageBuffer* <<Capability, capabilities>>
+         enable additional features for logical pointers, but keep other prohibitions.
+         Also that the *VariablePointers* and *VariablePointersStorageBuffer* <<Capability, capabilities>>
+         allow a pointer to be an operand to <<OpReturnValue,*OpReturnValue*>>.
+ * #640: Add parenthetical note in <<StructuredControlFlow, structured control flow>> about reconverging before reaching a merge block.
+ * #656: Clarify the _<id>_-based rules for <<OpSpecConstantOp, *OpSpecConstantOp*>> operands apply only to operands that are _<id>s_.
+ * #651: Add a <<Validation, validation rule>> that the workgroup size cannot have a dimension with the value zero statically.
+ * #580: Clarify that *SubpassInput* is not valid as the _Dim_ operand of <<OpTypeSampledImage,*OpTypeSampledImage*>>,
+         and that sampled images with a _Dim_ of *Buffer* are not valid in <<Image,image sampling instructions>>.
+ * #619: Add a <<Validation, validation rule>> that *LocalSize*, *LocalSizeId*, *LocalSizeHint*, and *LocalSizeHintId*
+         can't be used at the same time.
+ * #663: Restrict <<OpSwitch,*OpSwitch*>> from being used to directly break or continue in a
+         <<StructuredControlFlow,structured loop>>.
+ * #678: Allow the *AliasedPointer* and *RestrictPointer* <<Decoration,decorations>> to
+         apply to <<MemoryObjectDeclaration,memory object declarations>>.
+ * #682: Clarify that the *VariablePointersStorageBuffer* <<Capability, capability>> is sufficient
+         to compare pointers that point into different storage buffers using <<OpPtrEqual, *OpPtrEqual*>>
+         and <<OpPtrNotEqual, *OpPtrNotEqual*>>.
+- Changes from public headers
+ * PR #240: Remove the *Kernel* capability from <<FP_Fast_Math_Mode, fast-math flags>>.
+ * PR #257: Remove the *Shader* implicit declaration from <<Capability, SPV_EXT_shader_atomic_float_add capabilities>>.

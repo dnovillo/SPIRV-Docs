@@ -1,0 +1,274 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+:main-spec:
+include::{specs}/auto.intro.adoc[]
+include::{specs}/boilerplate.adoc[]
+
+include::{specs}/copyright-spec.adoc[]
+
+// "<<<" means use a page break when going to PDF or printer
+<<<
+[float]
+=== Contributors and Acknowledgments
+
+*Editors*
+
+include::{specs}/auto.intro.author.adoc[]
+
+*Contributors*
+
+[none]
+* Connor Abbott, Intel
+* Ben Ashbaugh, Intel
+* Alexey Bader, Intel
+* Alan Baker, Google
+* Dan Baker, Oxide Games
+* Kenneth Benzie, Codeplay
+* Jeff Bolz, NVIDIA
+* Stuart Brady, Arm
+* Gordon Brown, Codeplay
+* Pat Brown, NVIDIA
+* Nate Cesario, LunarG
+* Diana Po-Yu Chen, MediaTek
+* Stephen Clarke, Imagination
+* Joshua Davis, Unity
+* Hugo Devillers, University of Saarland
+* Patrick Doane, Blizzard Entertainment
+* Alastair Donaldson, Google
+* Yuehai Du, Qualcomm
+* Stefanus Du Toit, Google
+* Faith Ekstrand, Collabora
+* Gregory Fischer, LunarG
+* Theresa Foley, Intel
+* Spencer Fricke, Samsung
+* Ben Gaster, Qualcomm
+* Alexander Galazin, ARM
+* Christopher Gautier, ARM
+* Arcady Goldmints, LunarG
+* Jeremy Hayes, LunarG
+* Tobias Hector, AMD
+* Nicolai Hahnle, AMD
+* Neil Henning, AMD
+* Kerch Holt, NVIDIA
+* Lee Howes, Qualcomm
+* Samuel Huang, Mediatek
+* Marty Johnson, Khronos
+* Roy Ju, MediaTek
+* Baldur Karlsson, Valve
+* Ronan Keryell, Xilinx
+* John Kessenich, Google
+* Wooyoung Kim, Qualcomm
+* Vasileios Klimis, Imperial College London
+* Daniel Koch, NVIDIA
+* Ashwin Kolhe, NVIDIA
+* Tim Kong, Samsung
+* Raun Krisch, Intel
+* Graeme Leese, Broadcom
+* Yuan Lin, NVIDIA
+* Yaxun Liu, AMD
+* Victor Lomuller, Codeplay
+* Timothy Lottes, Epic Games
+* John McDonald, Valve
+* Mariusz Merecki, Intel
+* David Neto, Google
+* Boaz Ouriel, Intel
+* Kevin Petit, Arm
+* Robert Quill, Imagination Technologies
+* Christophe Riccio, Unity
+* Andrew Richards, Codeplay
+* Ian Romanick, Intel
+* Graham Sellers, AMD
+* Simon Waters, Samsung
+* Robert Simpson, Qualcomm
+* Pradyuman Singh, NVIDIA
+* Bartosz Sochacki, Intel
+* Nikos Stavropoulos, Think Silicon
+* Brian Sumner, AMD
+* John Wickerson, Imperial College London
+* Andrew Woloszyn, Google
+* Robin Voetter, StreamHPC
+* Ruihao Zhang, Qualcomm
+* Weifeng Zhang, Qualcomm
+
+
+== Introduction
+
+NOTE: Up-to-date HTML and PDF versions of this specification may be found at the https://www.khronos.org/registry/spir-v/[Khronos SPIR-V Registry].  (https://www.khronos.org/registry/spir-v/)
+
+[abstract]
+--
+
+Abstract
+
+SPIR-V is a simple binary intermediate language for graphical shaders and compute kernels.
+A SPIR-V module contains multiple entry points with potentially shared functions in the entry point's call trees.
+Each function contains a control-flow graph (CFG) of basic blocks, with optional instructions to express structured control flow.
+Load/store instructions are used to access declared variables, which includes all input/output (IO).
+Intermediate results bypassing load/store use static single-assignment (SSA) representation.
+Data objects are represented logically, with hierarchical type information:  There is no flattening of aggregates or assignment to physical register banks, etc.
+Selectable addressing models establish whether general pointer operations may be used, or if memory access is purely logical.
+--
+
+This document fully defines *SPIR-V*, a Khronos-standard binary intermediate language for representing graphical-shader
+stages and compute kernels for multiple client APIs.
+
+This is a <<Unified, unified specification>>, specifying all versions since and including version 1.0.
+
+=== Goals
+
+SPIR-V has the following goals:
+
+- Provide a simple binary intermediate language for all functionality appearing in Khronos shaders/kernels.
+- Have a concise, transparent, self-contained specification (sections <<Specification, Specification>> and <<Binary, Binary Form>>).
+- Map easily to other intermediate languages.
+- Be the form passed by a client API into a driver to set shaders/kernels.
+- Support multiple execution environments, specified by client APIs.
+- Can be targeted by new front ends for novel high-level languages.
+- Allow the first steps of compilation and reflection to be done offline.
+- Be low-level enough to require a reverse-engineering step to reconstruct source code.
+- Improve portability by enabling shared tools to generate or operate on it.
+- Reduce compile time during application run time.  (Eliminating most of the compile time during application run time is not a goal of this intermediate language.
+Target-specific register allocation and scheduling are still expected to take significant time.)
+- Allow some optimizations to be done offline.
+
+[[ClientAPI]]
+=== Execution Environment and Client API
+
+SPIR-V is adaptable to multiple execution environments:
+A SPIR-V module is consumed by an execution environment, as specified by a client API.
+The full set of rules needed to consume SPIR-V in a particular environment comes from
+the combination of SPIR-V and that environment's client API specification.
+The client API specifies its SPIR-V execution environment as well as extra rules, limitations, capabilities, etc.
+required by the form of SPIR-V it can validly consume.
+
+[[About]]
+=== About This Document
+
+This document aims to:
+
+- Specify everything needed to create and consume non-extended SPIR-V, minus:
+  * Extended instruction sets, which are imported and come with their own specifications.
+  * Client API-specific rules, which are documented in client API specifications.
+- Separate expository and specification language.
+  The specification-proper is in <<Specification, Specification>> and <<Binary, Binary Form>>.
+
+==== Versioning
+
+The specification covers multiple versions of SPIR-V, as described in the <<Unified, unified section>>.
+It has followed a _Major_._Minor_._Revision_ versioning scheme,
+with the specification's stated version being the most recent version of SPIR-V.
+
+_Major_ and _Minor_ (but not _Revision_) <<PhysicalLayout, are declared within a SPIR-V module>>.
+
+_Major_ is reserved for future use and has been fixed at 1.
+_Minor_ changes have signified additions, deprecation, and removal of features.
+_Revision_ changes have included clarifications, bug fixes,
+and <<Deprecation, deprecation>> (but not removal) of existing features.
+
+=== Extendability
+
+SPIR-V can be extended by multiple vendors or parties simultaneously:
+
+- Using the <<OpExtension,*OpExtension*>> instruction to add semantics,
+  which are described in an extension specification.
+- Reserving (registering) ranges of the token values, as described further below.
+- Aided by instruction skipping, also further described below.
+
+*Enumeration Token Values.* It is easy to extend all the types, storage classes, opcodes, decorations, etc. by adding to the token values.
+
+*Registration.* Ranges of token values in the <<Binary, Binary Form>> section can be pre-allocated to numerous vendors/parties.
+This allows combining multiple independent extensions without conflict.
+To register ranges, use the https://github.com/KhronosGroup/SPIRV-Headers repository,
+and submit pull requests against the include/spirv/spir-v.xml file.
+
+*Extended Instructions.* Sets of extended instructions can be provided and specified in separate specifications.
+Multiple sets of extended instructions can be imported without conflict, as the extended instructions are selected by {set id, instruction number} pairs.
+
+*Instruction Skipping.* Tools are encouraged to skip opcodes for features they are not required to process.
+This is trivially enabled by the <<WordCount, word count>> in an instruction, which makes it easier to add new instructions without breaking existing tools.
+
+=== Debuggability
+
+SPIR-V can decorate, with a text string, virtually anything created in the shader: types, variables, functions, etc.
+This is required for externally visible symbols, and also allowed for naming the result of any instruction.
+This can be used to aid in understandability when disassembling or debugging lowered versions of SPIR-V.
+
+Location information (file names, lines, and columns) can be interleaved with the instruction stream to track the origin of each instruction.
+
+=== Design Principles
+
+*Regularity.*  All instructions start with a word count.  This allows walking a SPIR-V module without decoding each opcode.
+All instructions have an opcode that dictates for all operands what kind of operand they are.  For instructions with a
+variable number of operands, the number of variable operands is known by subtracting the number of non-variable  words
+from the instruction's word count.
+
+*Non Combinatorial.*  There is no combinatorial type explosion or need for large encode/decode tables for types.
+Rather, types are parameterized.  Image types declare their dimensionality, arrayness, etc. all orthogonally, which greatly simplify code.
+This is done similarly for other types.  It also applies to opcodes.  Operations are orthogonal to scalar/vector size, but not
+to integer vs. floating-point differences.
+
+*Modeless.*  After a given execution model (e.g., pipeline stage) is specified, internal operation is essentially modeless:
+Generally, it follows the rule: "same spelling, same semantics", and does not have mode bits that modify semantics.
+If a change to SPIR-V modifies semantics, it should use a different spelling. This makes consumers of SPIR-V much more robust.
+There are execution modes declared, but these generally affect the way the module interacts with its execution environment, not its internal semantics.
+Capabilities are also declared, but this is to declare the subset of functionality that is used, not to change any semantics of what is used.
+
+*Declarative.*  SPIR-V declares externally-visible modes like "writes depth", rather than having rules that require deduction from full shader inspection.
+It also explicitly declares what addressing modes, execution model, extended instruction sets, etc. will be used.
+See <<Capabilities, Language Capabilities>> for more information.
+
+*SSA.*  All results of intermediate operations are strictly SSA.
+However, declared variables reside in memory and use load/store for access, and such variables can be stored to multiple times.
+
+*IO.*  Some storage classes are for input/output (IO) and, fundamentally,
+IO is done through load/store of variables declared in these storage classes.
+
+=== Static Single Assignment (SSA)
+
+SPIR-V includes a phi instruction to allow the merging together of intermediate results from split control flow.
+This allows split control flow without load/store to memory.
+SPIR-V is flexible in the degree to which load/store is used; it is possible to use control flow with no phi-instructions,
+while still staying in SSA form, by using memory load/store.
+
+Some storage classes are for IO and, fundamentally, IO is done through load/store,
+and initial load and final store won't be eliminated.
+Other storage classes are shader local and can have their load/store eliminated.
+It can be considered an optimization to largely eliminate such loads/stores by moving them into intermediate results in SSA form.
+
+=== Built-In Variables
+
+SPIR-V identifies built-in variables from a high-level language with an enumerant decoration.
+This assigns any unusual semantics to the variable.
+Built-in variables are otherwise declared with their correct SPIR-V type and treated the same as any other variable.
+
+[[SpecializationIntro]]
+=== Specialization
+
+_Specialization_ enables offline creation of a portable SPIR-V module
+based on constant values that won't be known until a later point in time.  For example, to size a
+fixed array with a constant not known during creation of a module, but known when the module will be
+lowered to the target architecture.
+
+See <<SpecializationSection, Specialization>> in the next section for more details.
+
+<<<
+=== Example
+
+The SPIR-V form is binary, not human readable, and fully described in <<Binary, Binary Form>>.  This is an example disassembly to give a basic idea of what SPIR-V looks like:
+
+GLSL fragment shader:
+
+[source,glsl]
+----
+include::{examples}/example.frag[]
+----
+
+
+Corresponding SPIR-V:
+
+[source]
+----
+include::{examples}/exampleFragDisassembled.txt[]
+----
+

@@ -1,0 +1,39 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+changes:
+
+=== Changes from Version 1.3, Revision 5
+
+- Reserve Tokens for:
+* SPV_KHR_no_integer_wrap_decoration
+* SPV_KHR_float_controls
+
+- Fixed Issues:
+* Khronos SPIR-V Issue #352: Remove from <<OpFunction, *OpFunction*>> the statement limiting the use its result.
+  This does not result in any change in intent; it only avoids any past and potential future contradictions.
+* Khronos SPIR-V Issue #308: Don't allow runtime-sized arrays to be loaded or copied by <<OpLoad, *OpLoad*>> or <<OpCopyMemory, *OpCopyMemory*>>.
+* Include back-edge blocks in the list of blocks that can branch outside their own construct in the
+  <<StructuredControlFlow, structured control-flow rules>>.
+* Khronos OpenGL API issue #77: Clarify the *OriginUpperLeft* and *OriginLowerLeft* <<Execution_Mode, execution modes>> apply only to *FragCoord*.
+* State the *XfbStride* and *Stream* restrictions in the <<Validation, Universal Validation Rules>>.
+* Khronos SPIR-V Issue #357: The _Memory Operands_ of <<OpCopyMemory, *OpCopyMemory*>> and <<OpCopyMemorySized, *OpCopyMemorySized*>>
+  applies to both _Source_ and _Target_.
+* Khronos SPIR-V Issue #385: Be more clear what type _<id>_ must be the same in <<OpCopyMemory, *OpCopyMemory*>>.
+* Khronos SPIR-V Issue #359: <<OpAccessChain, *OpAccessChain*>> and <<OpPtrAccessChain, *OpPtrAccessChain*>> do indexing with signed indexes,
+  and *OpPtrAccessChain* is allowed to compute addresses of elements one past the end of an array.
+* Khronos SPIR-V Issue #367: <<Validation, General validation rules>> allow the **Function** storage class for atomic access,
+  while the <<ShaderValidation, shader-specific validation rules>> do not.
+* Khronos SPIR-V Issue #382: In <<OpTypeFunction, *OpTypeFunction*>>, disallow parameter types from being *OpTypeVoid*.
+* Khronos SPIR-V Issue #374: <<BuiltIn, Built-in>> decorations can also apply to a constant instruction.
+
+- Editorial:
+* Make it more clear in <<OpVariable, *OpVariable*>> what _Storage Classes_ must be the same.
+* Remove references to specific APIs, and instead generally refer only to "client API"s. Note that the previous lists of APIs was nonnormative.
+* State the *FPRoundingMode* decoration rule more clearly in the section listing <<ShaderValidation,  Validation Rules for Shader Capabilities>>.
+* Don't say "value preserving" in the <<Conversion, Conversion>> instructions. These now convert the "value numerically".
+* State variable-pointer <<Validation, validation rules>> more clearly.

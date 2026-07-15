@@ -1,0 +1,66 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+author: Victor Lomüller, Codeplay
+changes:
+
+=== Changes from Version 1.6, Revision 4
+
+- Reserve enumerants for:
+ * SPV_ARM_cooperative_matrix_layouts
+ * SPV_EXT_arithmetic_fence
+ * SPV_EXT_optnone
+ * SPV_KHR_untyped_pointers
+ * SPV_INTEL_subgroup_buffer_prefetch
+ * SPV_INTEL_2d_block_io
+ * SPV_INTEL_subgroup_matrix_multiply_accumulate
+ * SPV_NV_cooperative_matrix2
+ * SPV_NV_tensor_addressing
+ * Rust <<Source_Language, source language>>
+
+- Updated SPV_AMDX_shader_enqueue enumerants
+
+- Fix Khronos SPIR-V Issues:
+ * #798: Clarify that *ArrayStride* applies objects in *PhysicalStorageBuffer* when computing the new address with <<OpPtrAccessChain, *OpPtrAccessChain*>>.
+         State the explicit layout requirement in each relevant <<Storage_Class, storage classes>> entry.
+ * #808: Add definition for _hint_ and clarify that the following bits are hints:
+  ** <<Selection_Control,Selection Control>>: *Flatten* and *DontFlatten*
+  ** <<Loop_Control,Loop Control>>: *Unroll*, *DontUnroll*, *PeelCount* and *PartialCount*
+  ** <<Function_Control,Function Control>>: *Inline* and *DontInline*
+ * #813: Allow mismatching _Depth_ for <<OpSampledImage, *OpSampledImage*>>
+ * #809: Clarify structure with members decorated with *UserSemantic* can be used with any storage class.
+ * #811: Refactor validation rules for *MakeTexelVisible*, *MakeTexelAvilable*, *MakePointerVisible*, *MakePointerAvailable*:
+  ** Remove mentions in universal validation rules
+  ** Make *MakeTexelVisible*, *MakeTexelAvilable*, *MakePointerVisible*, *MakePointerAvailable* description more generic to also capture instruction described in extensions
+ * #797: No longer print duplicated tokens in enum and mask values. Instead aliases are printed between parentheses.
+ * !321: Remove point of execution reachability paragraph from group operation as it is already implied by dynamic instance. Non semantic change.
+ * !323: Turn the validation rules for explicit layout into a new <<ExplicitLayout,term>> definition.
+ * #831: Fix use of _element_ instead of _column_ in <<OpAccessChain, *OpAccessChain*>>
+ * #837: Fix use of _Memory_ scope operand in <<Atomic,atomic instruction>> descriptions.
+ * #815: Clarify that an <<ImageTerm,_image_>> is a handle and does not represent directly the memory holding the texels.
+ * #827: Lift the requirements to add *AliasedPointer* and *RestrictPointer* <<Decoration,decorations>>
+         on memory object declarations with holding *PhysicalStorageBuffer* pointers.
+ * #833: Remove entries for *OpImageSparseSampleProjImplicitLod*, *OpImageSparseSampleProjExplicitLod*,
+         *OpImageSparseSampleProjDrefImplicitLod*, *OpImageSparseSampleProjDrefExplicitLod*.
+         The instructions had no definition since 1.0.3, enums are still reserved and kept in the grammar.
+ * #691 / #832:
+  ** Introduce <<Scope,scope>>, <<Tangle, tangle>>, <<TangledInvocations, tangle invocations>>
+     and <<ScopeRestrictedTangle, scope restricted tangle>> terms.
+  ** Remove use of _group_ for invocations.
+  ** Fix missing <<OpGroupReserveReadPipePackets, *OpGroupReserveReadPipePackets*>>,
+     <<OpGroupReserveWritePipePackets, *OpGroupReserveWritePipePackets*>>,
+     <<OpGroupCommitReadPipe, *OpGroupCommitReadPipe*>> and
+     <<OpGroupCommitWritePipe, *OpGroupCommitWritePipe*>> instructions from <<TangledInstruction, tangled instructions>> list.
+  ** Reworded <<TangledInstruction, tangled instructions>> to better define which
+     invocations are involved in the operation by replacing use of active and inactive invocations as well as group.
+  ** Specify that for tangled instructions all invocations in the <<ScopeRestrictedTangle, scope restricted tangle>>
+     must reach the instruction before executing it.
+  ** Remove _as if all invocations execute simultaneously_ wording in favor of
+     a wording based on <<ProgramOrder, _program order_>>. State the program ordering requirement
+     on all affected instruction.
+  ** Clarify that no dynamic instances program order after an <<OpControlBarrier, *OpControlBarrier*>>
+     can be executed until all invocations in the <<ScopeRestrictedTangle, scope restricted tangle>> executed the dynamic instance.

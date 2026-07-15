@@ -1,0 +1,87 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+changes:
+
+=== Changes from Version 1.6, Revision 2
+
+- Reserve enumerants for:
+ * SPV_KHR_ray_tracing_position_fetch
+ * SPV_QCOM_image_processing
+ * SPV_ARM_core_builtins
+ * SPV_NV_shader_invocation_reorder
+ * SPV_NV_displacement_micromap
+ * SPV_AMDX_shader_enqueue
+ * SPV_INTEL_fp_max_error
+ * SPV_INTEL_kernel_attributes
+ * SPV_INTEL_cache_controls
+ * SPV_INTEL_global_variable_fpga_decorations
+ * SPV_INTEL_global_variable_host_access
+ * SPV_INTEL_bfloat16_conversion
+ * SPV_INTEL_runtime_aligned
+ * SPV_INTEL_fpga_argument_interfaces
+ * SPV_INTEL_fpga_dsp_control
+ * SPV_INTEL_fpga_invocation_pipelining_attributes
+ * SPV_INTEL_fpga_latency_control
+ * SPV_INTEL_fpga_loop_controls
+ * SPV_INTEL_fpga_memory_attributes
+ * SPV_EXT_image_raw10_raw12
+ * SPV_EXT_shader_tile_image
+ * SPV_EXT_mesh_shader
+ * SPV_EXT_opacity_micromap
+
+- Other changes from public headers
+ * Added <<Source_Language, source languages>> HERO_C, NZSL, WGSL, and Slang
+ * Removed the *Kernel* enabling capability from the <<Sampler_Addressing_Mode, sampler addressing modes>>.
+
+- Fix SPIR-V Registry issues:
+ * #72: Be consistent in <<OpTypeBool, *OpTypeBool*>> that SPIR-V can support Booleans in the *UniformConstant* storage class.
+ * #197: Clarify that <<OpQuantizeToF16,*OpQuantizeToF16*>> must flush denormalized values to 0.
+
+- Fix Khronos SPIR-V issues:
+ * #689: Clarify use of *OpPhi* on *OpTypeImage* in the <<Validation, universal validation rules>>.
+ * #708: Remove unused definitions of Break Block, Continue Block and Return Block.
+ * #707: Clarify that using a bad _Direction_ in <<OpGroupNonUniformQuadSwap,*OpGroupNonUniformQuadSwap*>>
+         is invalid SPIR-V.
+ * #712: Clarify multiple *UserSemantic* <<Decoration, decorations>> can apply to a variable or structure member.
+ * #731: Clarify that <<AliasingSection,aliasing>> is based on dynamic execution.
+ * #736: Clarify that <<OpArrayLength,*OpArrayLength*>> may have a logical pointer operand in the <<Validation, universal validation rules>>.
+ * #737: Clarify <<Validation,validation rule>> restricting <<OpConstantNull,*OpConstantNull*>> from pointing into
+         the *PhysicalStorageBuffer* <<Storage_Class, storage class>>.
+ * #738: Restrict <<OpImageQueryLevels, *OpImageQueryLevels*>> and <<OpImageQueryLod, *OpImageQueryLod*>> images to have MS of 0.
+ * #295: Clarify that the *ZeroExtend* and *SignExtend* <<Image_Operands, image operands>> are not valid together.
+ * #753: Clarify that *GroupNonUniformQuad* instructions are not affected by their execution scopes, and require the value to be
+         <<Subgroup, subgroup>>.
+ * #754: Modify _ClusterSize_ operands to refer to the size of the group of invocations participating in the instruction
+         instead of always talking about *SubgroupSize*.
+ * #755: Clarify set of invocations affected by a group operation:
+   ** Add definition of group (invocations).
+   ** Add definition of <<Workgroup, workgroup>>.
+   ** Link to new definitions throughout the specification.
+   ** Define sizes of <<Quad, quad>>, <<Subgroup, subgroup>>, and <<Workgroup, workgroup>>.
+   ** Modify description of _Execution Scope_ to clarify that it identifies the group an instruction affects.
+   ** Remove restrictions on _Execution Scope_ for most instructions, leaving it up to client APIs to restrict them.
+   ** Clarify that <<Non-Uniform, non-uniform instructions>> require the value of _Execution Scope_ to be <<Subgroup, subgroup>>.
+   ** Clarify that *GroupNonUniformQuad* instructions are not affected by their execution scopes.
+ * #757: Restrict the type of ballot bit sets to be 4-component vectors of 32-bit unsigned integers in
+         <<Non-Uniform,Non-Uniform Instructions>>.
+ * #758: Add the definition of a <<Cluster, cluster>>.
+ * #772: Clarify that <<OpPtrAccessChain,*OpPtrAccessChain*>> does not dereference any pointer.
+ * #750: Update <<Validation,validation rules>> to reflect support for image and sampler array non-uniform indexing.
+
+- Khronos SPIR-V MRs:
+ * #261: Clarify that _Sampled_ operand for <<OpImageSparseFetch, *OpImageSparseFetch*>> is restricted to 1,
+  bringing it in line with the constraint for <<OpImageFetch, *OpImageFetch*>>.
+ * #280: <<OpControlBarrier, Control barriers>> wait only for active invocations.
+
+- Deprecations:
+ * Issue #756: Deprecated the use of <<BuiltIn, *BuiltIn*>> to decorate a constant to set its value
+   and removed the deprecation of the *WorkgroupSize* <<BuiltIn, built-in>>.
+   That is, *WorkgroupSize* is kept but no longer marked as deprecated (it is still required by OpenCL).
+   The use of <<BuiltIn, *BuiltIn*>> to decorate a constant to set its value was only for *WorkgroupSize*,
+   which has been superseded by the *LocalSizeId* <<Execution_Mode, execution mode>>.
+ * MR #277: Deprecated *Simple* <<Memory_Model, memory model>> in favor of *GLSL450*.

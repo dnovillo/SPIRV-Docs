@@ -1,0 +1,40 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+changes:
+
+=== Changes from Version 1.5, Revision 2
+
+- Reserve enumerants for SPV_KHR_ray_query and SPV_KHR_ray_tracing.
+- Khronos MR #164: Subtract all exits from what a construct contains, not just the construct's merge block.
+  See <<StructuredControlFlow, the Structured Control Flow section>>.
+- Khronos Issues #394 and #473: More clearly state that the _<id>_ declared by an <<OpTypeForwardPointer,
+  *OpTypeForwardPointer*>> can be consumed by any <<Type-Declaration, type-declaration instruction>> that
+  can legally consume the type of _<id>_. Also consolidated the rules for this within the instruction itself.
+- Khronos Vulkan Issue #1951: Clarify that the *SampledImageArrayDynamicIndexing* <<Capability, capability>>
+  applies to dynamic indexing of image, sampler and sampled image objects.
+- Khronos Issue #523: Label as memory <<Scope_-id-, Scope>> the additional operand for each of
+  ** *MakeTexelAvailable* and *MakeTexelVisible* <<Image_Operands, image operands>>, and
+  ** *MakePointerAvailable* and *MakePointerVisible* <<Memory_Operands, memory operands>>.
+- Khronos Issue #529: Allow the scope of <<UniformControlFlow, uniform control flow>> to be defined by the client API.
+- Khronos Issue #530: Allow the definition of <<DerivativeGroup, derivative group>> to be set by the client API.
+- Khronos Issue #293: Editorial simplification and clarification of different types under <<TypesVariables, Types and Variables>>.
+- Khronos Issue #506: Add to the definition of **Pure** under <<Function_Control, Function Control>> that assuming it
+  computes the same results also requires the same global state.
+- Khronos Issue #539: Clarify out-of-bounds indexes for <<OpAccessChain, *OpAccessChain*>>.
+- Khronos Issue #550: Include **OpUndef** in the allowed constituents for <<OpSpecConstantComposite, **OpSpecConstantComposite**>>.
+- Khronos Issue #389: Be more clear which instructions can be updated with a specialization constant in
+  <<SpecializationSection, the specialization section>>.
+- Khronos Issue #544: Be more concise with <<OpLabel, **OpLabel**>> language.
+- Khronos Issue #245: State that _D~ref~_ operands must be 32-bit scalar floats in the <<Image, image instructions>>.
+- Khronos Issue #457: Change rule for <<OpUnreachable, **OpUnreachable**>> to being that behavior is undefined if it is executed.
+- Khronos Issue #231: Explicitly state that the component numbers 0, 1, 2, and 3 are 32-bit scalar integers for
+  <<OpImageGather, **OpImageGather**>> and <<OpImageSparseGather, **OpImageSparseGather**>>.
+- Khronos Issue #534: State where *OpNoLine* can be in the <<LogicalLayout, logical layout>> and with <<OpPhi, *OpPhi*>>.
+- Khronos MR #168: Add definitions of <<Quad, quad>> and <<QuadIndex, quad index>>,
+  used by <<OpGroupNonUniformQuadBroadcast, *OpGroupNonUniformQuadBroadcast*>>
+  and <<OpGroupNonUniformQuadSwap, *OpGroupNonUniformQuadSwap*>>.

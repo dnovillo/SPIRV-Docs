@@ -1,0 +1,1279 @@
+[cols="2",width="100%"]
+|=====
+2+|*Round* +
+ +
+Result is the value equal to the nearest whole number to _x_. The fraction 0.5 rounds in a direction chosen by the implementation, presumably the direction that is fastest. This includes the possibility that *Round* _x_ is the same value as *RoundEven* _x_ for all values of _x_.
+
+ round({plusmn}0) = {plusmn}0
+
+ round({plusmn}Inf) = {plusmn}Inf.
+
+ The operand _x_ must be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 1
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*RoundEven* +
+ +
+Result is the value equal to the nearest whole number to _x_. A fractional part of 0.5 rounds toward the nearest even whole number. (Both 3.5 and 4.5 for _x_ round to 4.0.)
+
+ roundEven({plusmn}0) = {plusmn}0.
+
+ roundEven({plusmn}Inf) = {plusmn}Inf.
+
+ The operand _x_ must be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 2
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*Trunc* +
+ +
+Result is the value equal to the nearest whole number to _x_ whose absolute value is not larger than the absolute value of _x_.
+
+ trunc({plusmn}0) = {plusmn}0.
+
+ trunc({plusmn}Inf) = {plusmn}Inf.
+
+ The operand _x_ must be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 3
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*FAbs* +
+ +
+Result is _+0.0_ if _x_ is _{plusmn}0.0_, _x_ if _x > 0.0_, and _-x_ if _x < 0.0_.
+
+ fabs({plusmn}0) = +0.0.
+
+ fabs({plusmn}Inf) = {plusmn}Inf.
+
+ The operand _x_ must be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 4
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*SAbs* +
+ +
+Result is _x_ if _x {ge} 0_; otherwise result is -_x_, where _x_ is interpreted as a signed integer.
+
+ _Result Type_ and the type of _x_ must both be integer scalar or integer vector types. _Result Type_ and operand types must have the same number of components with the same component width. Results are computed per component.
+
+This instruction can be decorated with *NoSignedWrap*.
+| 5
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*FSign* +
+ +
+Result is _1.0_ if _x > 0_, _-1.0_ if _x < 0_, _+0.0_ if _x = +0.0_, and _{plusmn}0.0_ if _x = -0.0_. fsign({plusmn}Inf) = {plusmn}1 If _x_ = _{plusmn}NaN_, the result can be any of _{plusmn}1.0_ or _{plusmn}0.0_, regardless of whether shader_float_controls is in use.
+
+ The operand _x_ must be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 6
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*SSign* +
+ +
+Result is 1 if _x > 0_, _0_ if _x = 0_, or _-1_ if _x < 0_, where _x_ is interpreted as a signed integer.
+
+ _Result Type_ and the type of _x_ must both be integer scalar or integer vector types. _Result Type_ and operand types must have the same number of components with the same component width. Results are computed per component.
+| 7
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*Floor* +
+ +
+Result is the value equal to the nearest whole number that is less than or equal to _x_.
+
+ floor({plusmn}0) = {plusmn}0.
+
+ floor({plusmn}Inf) = {plusmn}Inf.
+
+ The operand _x_ must be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 8
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*Ceil* +
+ +
+Result is the value equal to the nearest whole number that is greater than or equal to _x_.
+
+ ceil({plusmn}0) = {plusmn}0.
+
+ ceil({plusmn}Inf) = {plusmn}Inf.
+
+ The operand _x_ must be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 9
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="87%"]
+|=====
+2+|*Fract* +
+ +
+Result is _x_ - *floor* _x_.
+
+ fract({plusmn}0) = +0.
+
+ fract({plusmn}Inf) = NaN.
+
+ The operand _x_ must be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 10
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="94%"]
+|=====
+2+|*Radians* +
+ +
+Converts _degrees_ to radians, i.e., _degrees_ * {pi} / 180.
+
+ The operand _degrees_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of _degrees_ must be the same type. Results are computed per component.
+| 11
+ | _<id>_ +
+_degrees_
+|=====
+[cols="2",width="94%"]
+|=====
+2+|*Degrees* +
+ +
+Converts _radians_ to degrees, i.e., _radians_ * 180 / {pi}.
+
+ The operand _radians_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of _radians_ must be the same type. Results are computed per component.
+| 12
+ | _<id>_ +
+_radians_
+|=====
+[cols="2",width="94%"]
+|=====
+2+|*Sin* +
+ +
+The standard trigonometric sine of _x_ radians.
+
+ sin({plusmn}Inf) = NaN.
+
+ The operand _x_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 13
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="95%"]
+|=====
+2+|*Cos* +
+ +
+The standard trigonometric cosine of _x_ radians.
+
+ cos({plusmn}Inf) = NaN.
+
+ The operand _x_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 14
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="95%"]
+|=====
+2+|*Tan* +
+ +
+The standard trigonometric tangent of _x_ radians.
+
+ tan({plusmn}Inf) = NaN.
+
+ The operand _x_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 15
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*Asin* +
+ +
+Arc sine. Result is an angle, in radians, whose sine is _x_. The range of result values is [-{pi} / 2, {pi} / 2]. The resulting value is NaN if *abs* _x_ > 1.
+
+ The operand _x_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 16
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*Acos* +
+ +
+Arc cosine. Result is an angle, in radians, whose cosine is _x_. The range of result values is [0, {pi}]. The resulting value is NaN if *abs* _x_ > 1.
+
+ The operand _x_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 17
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*Atan* +
+ +
+Arc tangent. Result is an angle, in radians, whose tangent is _y_over_x_. The range of result values is [-{pi} / 2, {pi} / 2].
+
+ The operand _y_over_x_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of _y_over_x_ must be the same type. Results are computed per component.
+| 18
+ | _<id>_ +
+_y_over_x_
+|=====
+[cols="2",width="92%"]
+|=====
+2+|*Sinh* +
+ +
+Hyperbolic sine of _x_ radians.
+
+ sinh({plusmn}Inf) = {plusmn}Inf.
+
+ The operand _x_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 19
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="90%"]
+|=====
+2+|*Cosh* +
+ +
+Hyperbolic cosine of _x_ radians.
+
+ cosh({plusmn}Inf) = Inf.
+
+ The operand _x_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 20
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="92%"]
+|=====
+2+|*Tanh* +
+ +
+Hyperbolic tangent of _x_ radians.
+
+ tanh({plusmn}Inf) = {plusmn}1.
+
+ The operand _x_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 21
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="99%"]
+|=====
+2+|*Asinh* +
+ +
+Arc hyperbolic sine; result is the inverse of *sinh*.
+
+ asinh({plusmn}Inf) = {plusmn}Inf.
+
+ The operand _x_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 22
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*Acosh* +
+ +
+Arc hyperbolic cosine; Result is the non-negative inverse of *cosh*. The resulting value is NaN if _x_ < 1.
+
+ acosh(Inf) = Inf.
+
+ The operand _x_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 23
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*Atanh* +
+ +
+Arc hyperbolic tangent; result is the inverse of tanh. The resulting value is NaN if *abs* _x_ {ge} 1.
+
+ The operand _x_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 24
+ | _<id>_ +
+_x_
+|=====
+[cols="3",width="100%"]
+|=====
+3+|*Atan2* +
+ +
+Arc tangent. Result is an angle, in radians, whose tangent is _y_ / _x_. The signs of _x_ and _y_ are used to determine what quadrant the angle is in. The range of result values is  [-{pi}, {pi}]. The resulting value is _poison_ if _x_ and _y_ are both 0.
+
+ The operand _x_ and _y_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of all operands must be the same type. Results are computed per component.
+| 25
+ | _<id>_ +
+_y_ | _<id>_ +
+_x_
+|=====
+[cols="3",width="100%"]
+|=====
+3+|*Pow* +
+ +
+Result is _x_ raised to the _y_ power; _x_^_y_^. The resulting value is _poison_ if _x_ < 0. Result is _poison_ if _x_ = 0 and _y_ {le} 0.
+
+ The operand _x_ and _y_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of all operands must be the same type. Results are computed per component.
+| 26
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*Exp* +
+ +
+Result is the natural exponentiation of _x_; _e_^_x_^.
+
+ exp(Inf) = Inf.
+
+ exp(-Inf) = +0.
+
+ The operand _x_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 27
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*Log* +
+ +
+Result is the natural logarithm of _x_, i.e., the value _y_ which satisfies the equation _x_ = _e_^_y_^. The resulting value is NaN if _x_ < 0.
+
+ log(Inf) = Inf.
+
+ log(1.0) = +0.
+
+ log({plusmn}0) = -Inf.
+
+ The operand _x_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 28
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="97%"]
+|=====
+2+|*Exp2* +
+ +
+Result is 2 raised to the _x_ power; 2^_x_^.
+
+ exp2(Inf) = Inf.
+
+ exp2(-Inf) = +0.
+
+ The operand _x_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 29
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*Log2* +
+ +
+Result is the base-2 logarithm of _x_, i.e., the value _y_ which satisfies the equation  _x_ = 2^_y_^. The resulting value is NaN if _x_ < 0.
+
+ log(Inf) = Inf.
+
+ log(1.0) = +0.
+
+ log({plusmn}0) = -Inf.
+
+ The operand _x_ must be a              scalar or vector whose component type is 16-bit or 32-bit floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 30
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*Sqrt* +
+ +
+Result is the square root of _x_. The resulting value is NaN if _x_ < 0.
+
+ sqrt(Inf) = Inf.
+
+ sqrt({plusmn}0) = {plusmn}0.
+
+ The operand _x_ must be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 31
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*InverseSqrt* +
+ +
+Result is the reciprocal of *sqrt* _x_. The resulting value is NaN if _x_ < 0.
+
+ inversesqrt(Inf) = +0.
+
+ inversesqrt({plusmn}0) = {plusmn}Inf.
+
+ The operand _x_ must be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type. Results are computed per component.
+| 32
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="52%"]
+|=====
+2+|*Determinant* +
+ +
+Result is the determinant of _x_.
+
+The operand _x_ must be a square matrix.
+
+_Result Type_ must be the same type as the component type in the columns of _x_.
+| 33
+ | _<id>_ +
+_x_
+|=====
+[cols="2",width="80%"]
+|=====
+2+|*MatrixInverse* +
+ +
+Result is a matrix that is the inverse of _x_. The resulting values are _poison_ if _x_ is singular or poorly conditioned (nearly singular).
+
+The operand _x_ must be a square matrix.
+
+ _Result Type_ and the type of _x_ must be the same type.
+| 34
+ | _<id>_ +
+_x_
+|=====
+[cols="3",width="100%"]
+|=====
+3+|*Modf* +
+ +
+*Modf* is deprecated, use *ModfStruct* instead.
+
+Result is the fractional part of _x_, and stores through _i_ the whole-number part as a whole-number floating-point value. Both the result and the output parameter have the same sign as _x_.
+
+ The operand _x_ must be a scalar or vector whose component type is floating-point.
+
+The operand _i_ must have a pointer type.
+
+_Result Type_, the type of _x_, and the type _i_ points to must all be the same type and have a floating-point component type. Results are computed per component.
+| 35
+ | _<id>_ +
+_x_ | _<id>_ +
+_i_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*ModfStruct* +
+ +
+Result is a structure containing both the fractional part of _x_ and the whole number part of _x_.
+
+_Result Type_ must be an *OpTypeStruct* with two members. Member 0 holds the fractional part. Member 1 holds the whole number part. Both members get the same sign as _x_.
+
+ modf({plusmn}0) = { {plusmn}0, {plusmn}0 }.
+
+ modf({plusmn}Inf) = { {plusmn}0, {plusmn}Inf }.
+
+ The two members of the returned struct and _x_ must all be the same type. Results are computed per component.
+
+ The operand _x_ must be a scalar or vector whose component type is floating-point.
+| 36
+ | _<id>_ +
+_x_
+|=====
+[cols="3",width="100%"]
+|=====
+3+|*FMin* +
+ +
+Result is _y_ if _y_ < _x_, otherwise _x_. -0 compares less than +0. Which operand is the result if one of the operands is a NaN is implementation-dependent.
+
+ The operands must all be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of all operands must be the same type. Results are computed per component.
+| 37
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+|=====
+[cols="3",width="100%"]
+|=====
+3+|*UMin* +
+ +
+Result is _y_ if _y_ < _x_; otherwise result is _x_, where _x_ and _y_ are interpreted as unsigned integers.
+
+ _Result Type_ and the type of _x_ and _y_ must both be integer scalar or integer vector types. _Result Type_ and operand types must have the same number of components with the same component width. Results are computed per component.
+| 38
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+|=====
+[cols="3",width="100%"]
+|=====
+3+|*SMin* +
+ +
+Result is _y_ if _y_ < _x_; otherwise result is _x_, where _x_ and _y_ are interpreted as signed integers.
+
+ _Result Type_ and the type of _x_ and _y_ must both be integer scalar or integer vector types. _Result Type_ and operand types must have the same number of components with the same component width. Results are computed per component.
+| 39
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+|=====
+[cols="3",width="100%"]
+|=====
+3+|*FMax* +
+ +
+Result is _y_ if _x_ < _y_. otherwise _x_. -0 compares less than +0. Which operand is the result if one of the operands is a NaN is implementation-dependent.
+
+ The operands must all be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of all operands must be the same type. Results are computed per component.
+| 40
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+|=====
+[cols="3",width="100%"]
+|=====
+3+|*UMax* +
+ +
+Result is _y_ if _x_ < _y_; otherwise result is _x_, where _x_ and _y_ are interpreted as unsigned integers.
+
+ _Result Type_ and the type of _x_ and _y_ must both be integer scalar or integer vector types. _Result Type_ and operand types must have the same number of components with the same component width. Results are computed per component.
+| 41
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+|=====
+[cols="3",width="100%"]
+|=====
+3+|*SMax* +
+ +
+Result is _y_ if _x_ < _y_; otherwise result is _x_, where _x_ and _y_ are interpreted as signed integers.
+
+ _Result Type_ and the type of _x_ and _y_ must both be integer scalar or integer vector types. _Result Type_ and operand types must have the same number of components with the same component width. Results are computed per component.
+| 42
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+|=====
+[cols="4",width="100%"]
+|=====
+4+|*FClamp* +
+ +
+Result is min(max(_x_, _minVal_), _maxVal_). The resulting value is _poison_ if _minVal_ > _maxVal_. The semantics used by min() and max() are those of FMin and FMax.
+
+ The operands must all be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of all operands must be the same type. Results are computed per component.
+| 43
+ | _<id>_ +
+_x_ | _<id>_ +
+_minVal_ | _<id>_ +
+_maxVal_
+|=====
+[cols="4",width="100%"]
+|=====
+4+|*UClamp* +
+ +
+Result is min(max(_x_, _minVal_), _maxVal_), where _x_, _minVal_ and _maxVal_ are interpreted as unsigned integers. The resulting value is _poison_ if _minVal_ > _maxVal_.
+
+ _Result Type_ and the type of the operands must both be integer scalar or integer vector types. _Result Type_ and operand types must have the same number of components with the same component width. Results are computed per component.
+| 44
+ | _<id>_ +
+_x_ | _<id>_ +
+_minVal_ | _<id>_ +
+_maxVal_
+|=====
+[cols="4",width="100%"]
+|=====
+4+|*SClamp* +
+ +
+Result is min(max(_x_, _minVal_), _maxVal_), where _x_, _minVal_ and _maxVal_ are interpreted as signed integers. The resulting value is _poison_ if _minVal_ > _maxVal_.
+
+ _Result Type_ and the type of the operands must both be integer scalar or integer vector types. _Result Type_ and operand types must have the same number of components with the same component width. Results are computed per component.
+| 45
+ | _<id>_ +
+_x_ | _<id>_ +
+_minVal_ | _<id>_ +
+_maxVal_
+|=====
+[cols="4",width="89%"]
+|=====
+4+|*FMix* +
+ +
+Result is the linear blend of _x_ and _y_, i.e., _x_ * (1 - _a_) + _y_ * _a_.
+
+ The operands must all be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of all operands must be the same type. Results are computed per component.
+| 46
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_ | _<id>_ +
+_a_
+|=====
+[cols="3",width="81%"]
+|=====
+3+|*Step* +
+ +
+Result is 0.0 if _x_ < _edge_; otherwise result is 1.0.
+
+ The operands must all be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of all operands must be the same type. Results are computed per component.
+| 48
+ | _<id>_ +
+_edge_ | _<id>_ +
+_x_
+|=====
+[cols="4",width="100%"]
+|=====
+4+|*SmoothStep* +
+ +
+Result is 0.0 if _x_ {le} _edge0_ and 1.0 if _x_ {ge} _edge1_ and performs smooth Hermite interpolation between 0 and 1 if _edge0_ < _x_ < _edge1_. This is equivalent to:
+
+_t_ * _t_ * (3 - 2 * _t_), where _t_ = clamp ((_x_ - _edge0_) / (_edge1_ - _edge0_), 0, 1)
+
+The resulting value is _poison_ if _edge0_ {ge} _edge1_.
+
+ The operands must all be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of all operands must be the same type. Results are computed per component.
+| 49
+ | _<id>_ +
+_edge0_ | _<id>_ +
+_edge1_ | _<id>_ +
+_x_
+|=====
+[cols="4",width="71%"]
+|=====
+4+|*Fma* +
+ +
+Computes _a_ * _b_ + _c_.
+
+ The operands must all be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of all operands must be the same type. Results are computed per component.
+| 50
+ | _<id>_ +
+_a_ | _<id>_ +
+_b_ | _<id>_ +
+_c_
+|=====
+[cols="3",width="100%"]
+|=====
+3+|*Frexp* +
+ +
+*Frexp* is deprecated, use *FrexpStruct* instead.
+
+Splits _x_ into a floating-point significand in the range (-1.0, 0.5] or [0.5, 1.0) and an integral exponent of 2, such that:
+
+_x_ = _significand_ * 2^_exponent_^
+
+The _significand_ is the instruction result. An _x_ of _-0.0_ results in a significand _-0.0_, while an _x_ of _0.0_ results in _0.0_. For a floating-point value that is an infinity or is not a number, the significand is _poison_.
+
+ The operand _x_ must be a scalar or vector whose component type is floating-point.
+
+The exponent is returned through the pointer-parameter _exp_. The _exp_ operand must be a pointer to a scalar or vector with integer component type, with 32-bit component width. The number of components in _x_ and what _exp_ points to must be the same. If _x_ is a zero, the exponent is 0.0. If _x_ is an infinity or a NaN, the exponent is _poison_.
+
+_Result Type_ must be the same type as the type of _x_. Results are computed per component.
+| 51
+ | _<id>_ +
+_x_ | _<id>_ +
+_exp_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*FrexpStruct* +
+ +
+Result is a structure containing _x_ split into a floating-point significand in the range (-1.0, 0.5] or [0.5, 1.0) and an integral exponent of 2, such that:
+
+_x_ = _significand_ * 2^_exponent_^
+
+If _x_ is a zero, the exponent is 0.0. If _x_ is an infinity or a NaN, the exponent is _poison_. If _x_ is _0.0_, the significand is _0.0_. If _x_ is _-0.0_, the significand is _-0.0_
+
+_Result Type_ must be an *OpTypeStruct* with two members.  Member 0 must have the same type as the type of _x_. Member 0 holds the significand. Member 1 must be a scalar or vector with integer component type, with 32-bit component width. Member 1 holds the exponent. These two members and _x_ must have the same number of components.
+
+ The operand _x_ must be a scalar or vector whose component type is floating-point.
+| 52
+ | _<id>_ +
+_x_
+|=====
+[cols="3",width="100%"]
+|=====
+3+|*Ldexp* +
+ +
+Builds a floating-point number from _x_ and the corresponding integral exponent of two in _exp_:
+
+_x_ * 2^_exp_^
+
+If this product is too large to be finitely represented in the floating-point type, the resulting value is _poison_. _exp_ is interpreted as a signed integer. If _exp_ is greater than +128 (single precision), +1024 (double precision) or +16 (half precision), the resulting value is _poison_. If _exp_ is less than -126 (single precision), -1022 (double precision) or -14 (half precision), the result may be flushed to zero. Additionally, splitting the value into a significand and exponent using *frexp* and then reconstructing a floating-point value using *ldexp* should yield the original input for zero and all finite non-denormalized values.
+
+ The operand _x_ must be a scalar or vector whose component type is floating-point.
+
+The _exp_ operand must be a scalar or vector with integer component type.  The number of components in _x_ and _exp_ must be the same.
+
+_Result Type_ must be the same type as the type of _x_. Results are computed per component.
+| 53
+ | _<id>_ +
+_x_ | _<id>_ +
+_exp_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*PackSnorm4x8* +
+ +
+First, converts each component of the normalized floating-point value _v_ into 8-bit integer values. These are then packed into the result.
+
+The conversion for component _c_ of _v_ to fixed point is done as follows:
+
+round(clamp(_c_, -1, +1) * 127.0)
+
+The *RelaxedPrecision* Decoration only affects the conversion step of the instruction.
+
+The first component of the vector is written to the least significant bits of the output; the last component is written to the most significant bits.
+
+The _v_ operand must be a vector of 4 components whose type is a 32-bit floating-point.
+
+_Result Type_ must be a 32-bit integer type.
+| 54
+ | _<id>_ +
+_v_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*PackUnorm4x8* +
+ +
+First, converts each component of the normalized floating-point value _v_ into 8-bit integer values. These are then packed into the result.
+
+The conversion for component _c_ of _v_ to fixed point is done as follows:
+
+round(clamp(_c_, 0, +1) * 255.0)
+
+The *RelaxedPrecision* Decoration only affects the conversion step of the instruction.
+
+The first component of the vector is written to the least significant bits of the output; the last component is written to the most significant bits.
+
+The _v_ operand must be a vector of 4 components whose type is a 32-bit floating-point.
+
+_Result Type_ must be a 32-bit integer type.
+| 55
+ | _<id>_ +
+_v_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*PackSnorm2x16* +
+ +
+First, converts each component of the normalized floating-point value _v_ into 16-bit integer values. These are then packed into the result.
+
+The conversion for component _c_ of _v_ to fixed point is done as follows:
+
+round(clamp(_c_, -1, +1) * 32767.0)
+
+The *RelaxedPrecision* Decoration only affects the conversion step of the instruction.
+
+The first component of the vector is written to the least significant bits of the output; the last component is written to the most significant bits.
+
+The _v_ operand must be a vector of 2 components whose type is a 32-bit floating-point.
+
+_Result Type_ must be a 32-bit integer type.
+| 56
+ | _<id>_ +
+_v_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*PackUnorm2x16* +
+ +
+First, converts each component of the normalized floating-point value _v_ into 16-bit integer values. These are then packed into the result.
+
+The conversion for component _c_ of _v_ to fixed point is done as follows:
+
+round(clamp(_c_, 0, +1) * 65535.0)
+
+The *RelaxedPrecision* Decoration only affects the conversion step of the instruction.
+
+The first component of the vector is written to the least significant bits of the output; the last component is written to the most significant bits.
+
+The _v_ operand must be a vector of 2 components whose type is a 32-bit floating-point.
+
+_Result Type_ must be a 32-bit integer type.
+| 57
+ | _<id>_ +
+_v_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*PackHalf2x16* +
+ +
+Result is the unsigned integer obtained by converting the components of a two-component floating-point vector to the 16-bit *OpTypeFloat*, and then packing these two 16-bit integers into a 32-bit unsigned integer. The first vector component specifies the 16 least-significant bits of the result; the second component specifies the 16 most-significant bits.
+
+The *RelaxedPrecision* Decoration only affects the conversion step of the instruction.
+
+The _v_ operand must be a vector of 2 components whose type is a 32-bit floating-point.
+
+_Result Type_ must be a 32-bit integer type.
+| 58
+ | _<id>_ +
+_v_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*PackDouble2x32* +
+ +
+Result is the double-precision value obtained by packing the components of _v_ into a 64-bit value. If an IEEE 754 Inf or NaN is created, it will not signal, and the resulting floating-point value is unspecified. Otherwise, the bit-level representation of _v_ is preserved. The first vector component specifies the 32 least significant bits; the second component specifies the 32 most significant bits.
+
+The _v_ operand must be a vector of 2 components whose type is a 32-bit integer.
+
+_Result Type_ must be a 64-bit floating-point scalar.
+
+Use of this instruction requires declaration of the *Float64* capability.
+| 59
+ | _<id>_ +
+_v_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*UnpackSnorm2x16* +
+ +
+First, unpacks a single 32-bit unsigned integer _p_ into a pair of 16-bit signed integers. Then, each component is converted to a normalized floating-point value to generate the result. The conversion for unpacked fixed-point value _f_ to floating point is done as follows:
+
+clamp(_f_ / 32767.0, -1, +1)
+
+The first component of the result is extracted from the least significant bits of the input; the last component is extracted from the most significant bits.
+
+The *RelaxedPrecision* Decoration only affects the conversion step of the instruction.
+
+The _p_ operand must be a scalar with 32-bit integer type.
+
+_Result Type_ must be a vector of 2 components whose type is 32-bit floating point.
+| 60
+ | _<id>_ +
+_p_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*UnpackUnorm2x16* +
+ +
+First, unpacks a single 32-bit unsigned integer _p_ into a pair of 16-bit unsigned integers. Then, each component is converted to a normalized floating-point value to generate the result. The conversion for unpacked fixed-point value _f_ to floating point is done as follows:
+
+_f_ / 65535.0
+
+The first component of the result is extracted from the least significant bits of the input; the last component is extracted from the most significant bits.
+
+The *RelaxedPrecision* Decoration only affects the conversion step of the instruction.
+
+The _p_ operand must be a scalar with 32-bit integer type.
+
+_Result Type_ must be a vector of 2 components whose type is 32-bit floating point.
+| 61
+ | _<id>_ +
+_p_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*UnpackHalf2x16* +
+ +
+Result is the two-component floating-point vector with components obtained by unpacking a 32-bit unsigned integer into a pair of 16-bit values, interpreting those values as 16-bit floating-point numbers according to the OpenGL Specification, and converting them to 32-bit floating-point values. Subnormal numbers are either preserved or flushed to zero, consistently within an implementation.
+
+ The first component of the vector is obtained from the 16 least-significant bits of _v_; the second component is obtained from the 16 most-significant bits of _v_.
+
+The *RelaxedPrecision* Decoration only affects the conversion step of the instruction.
+
+The _v_ operand must be a scalar with 32-bit integer type.
+
+_Result Type_ must be a vector of 2 components whose type is 32-bit floating point.
+| 62
+ | _<id>_ +
+_v_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*UnpackSnorm4x8* +
+ +
+First, unpacks a single 32-bit unsigned integer _p_ into four 8-bit signed integers. Then, each component is converted to a normalized floating-point value to generate the result. The conversion for unpacked fixed-point value _f_ to floating point is done as follows:
+
+clamp(_f_ / 127.0, -1, +1)
+
+The first component of the result is extracted from the least significant bits of the input; the last component is extracted from the most significant bits.
+
+The *RelaxedPrecision* Decoration only affects the conversion step of the instruction.
+
+The _p_ operand must be a scalar with 32-bit integer type.
+
+_Result Type_ must be a vector of 4 components whose type is 32-bit floating point.
+| 63
+ | _<id>_ +
+_p_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*UnpackUnorm4x8* +
+ +
+First, unpacks a single 32-bit unsigned integer _p_ into four 8-bit unsigned integers. Then, each component is converted to a normalized floating-point value to generate the result. The conversion for unpacked fixed-point value _f_ to floating point is done as follows:
+
+_f_ / 255.0
+
+The first component of the result is extracted from the least significant bits of the input; the last component is extracted from the most significant bits.
+
+The *RelaxedPrecision* Decoration only affects the conversion step of the instruction.
+
+The _p_ operand must be a scalar with 32-bit integer type.
+
+_Result Type_ must be a vector of 4 components whose type is 32-bit floating point.
+| 64
+ | _<id>_ +
+_p_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*UnpackDouble2x32* +
+ +
+Result is the two-component unsigned integer vector representation of _v_. The bit-level representation of _v_ is preserved. The first component of the vector contains the 32 least significant bits of the double; the second component consists of the 32 most significant bits.
+
+The _v_ operand must be a scalar whose type is 64-bit floating point.
+
+_Result Type_ must be a vector of 2 components whose type is a 32-bit integer.
+
+Use of this instruction requires declaration of the *Float64* capability.
+| 65
+ | _<id>_ +
+_v_
+|=====
+[cols="2",width="81%"]
+|=====
+2+|*Length* +
+ +
+Result is the length of vector _x_, i.e., sqrt(_x_ [0] ^2^ + _x_ [1] ^2^ + ...).
+
+ The operand _x_ must be a scalar or vector whose component type is floating-point.
+
+_Result Type_ must be a scalar of the same type as the component type of _x_.
+| 66
+ | _<id>_ +
+_x_
+|=====
+[cols="3",width="82%"]
+|=====
+3+|*Distance* +
+ +
+Result is the distance between _p0_ and _p1_, i.e., length(_p0_ - _p1_).
+
+ The operands must all be a scalar or vector whose component type is floating-point.
+
+_Result Type_ must be a scalar of the same type as the component type of the operands.
+| 67
+ | _<id>_ +
+_p0_ | _<id>_ +
+_p1_
+|=====
+[cols="3",width="100%"]
+|=====
+3+|*Cross* +
+ +
+Result is the cross product of _x_ and _y_, i.e., the resulting components are, in order:
+
+_x_[1] * _y_[2] - _y_[1] * _x_[2]
+
+_x_[2] * _y_[0] - _y_[2] * _x_[0]
+
+_x_[0] * _y_[1] - _y_[0] * _x_[1]
+
+All the operands must be vectors of 3 components of a floating-point type.
+
+ _Result Type_ and the type of all operands must be the same type.
+| 68
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+|=====
+[cols="2",width="72%"]
+|=====
+2+|*Normalize* +
+ +
+Result is the vector in the same direction as _x_ but with a length of 1.
+
+ The operand _x_ must be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of _x_ must be the same type.
+| 69
+ | _<id>_ +
+_x_
+|=====
+[cols="4",width="81%"]
+|=====
+4+|*FaceForward* +
+ +
+If the dot product of _Nref_ and _I_ is negative, the result is _N_, otherwise it is _-N_.
+
+ The operands must all be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of all operands must be the same type.
+| 70
+ | _<id>_ +
+_N_ | _<id>_ +
+_I_ | _<id>_ +
+_Nref_
+|=====
+[cols="3",width="100%"]
+|=====
+3+|*Reflect* +
+ +
+For the incident vector _I_ and surface orientation _N_, returns _I_ - 2 * dot(_N_, _I_) * _N_.
+
+If _N_ is normalized then this corresponds to _I_ reflected from a surface with normal _N_.
+
+ The operands must all be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of all operands must be the same type.
+| 71
+ | _<id>_ +
+_I_ | _<id>_ +
+_N_
+|=====
+[cols="4",width="100%"]
+|=====
+4+|*Refract* +
+ +
+For the incident vector _I_ and surface normal _N_, and the ratio of indices of refraction _eta_, the result is the refraction vector. The result is computed by
+
+k = 1.0 - _eta_ * _eta_ * (1.0 - dot(_N_, _I_) * dot(_N_, _I_))
+
+if k < 0.0 the result is 0.0
+
+otherwise, the result is _eta_ * _I_ - (_eta_ * dot(_N_, _I_) + sqrt(k)) * _N_
+
+This computation assumes the input parameters for the incident vector _I_ and the surface normal _N_ are already normalized.
+
+The type of _I_ and _N_ must be a scalar or vector with a floating-point component type.
+
+The type of _eta_ must be a floating-point scalar.
+
+_Result Type_, the type of _I_, the type of _N_, and the type of _eta_ must all have the same component type.
+| 72
+ | _<id>_ +
+_I_ | _<id>_ +
+_N_ | _<id>_ +
+_eta_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*FindILsb* +
+ +
+Integer least-significant bit.
+
+Results in the bit number of the least-significant 1-bit in the binary representation of _Value_. If _Value_ is 0, the result has all bits set (e.g., -1 if interpreted as signed).
+
+ _Result Type_ and the type of _Value_ must both be integer scalar or integer vector types. _Result Type_ and operand types must have the same number of components with the same component width. Results are computed per component.
+
+This instruction is currently limited to 32-bit width components.
+| 73
+ | _<id>_ +
+_Value_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*FindSMsb* +
+ +
+Signed-integer most-significant bit, with _Value_ interpreted as a signed integer.
+
+For positive numbers, the result is the bit number of the most significant 1-bit. For negative numbers, the result is the bit number of the most significant 0-bit. For a _Value_ of 0 or -1, the result has all bits set (e.g., -1 if interpreted as signed).
+
+ _Result Type_ and the type of _Value_ must both be integer scalar or integer vector types. _Result Type_ and operand types must have the same number of components with the same component width. Results are computed per component.
+
+This instruction is currently limited to 32-bit width components.
+| 74
+ | _<id>_ +
+_Value_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*FindUMsb* +
+ +
+Unsigned-integer most-significant bit.
+
+Results in the bit number of the most-significant 1-bit in the binary representation of _Value_. If _Value_ is 0, the result has all bits set (e.g., -1 if interpreted as signed).
+
+ _Result Type_ and the type of _Value_ must both be integer scalar or integer vector types. _Result Type_ and operand types must have the same number of components with the same component width. Results are computed per component.
+
+This instruction is currently limited to 32-bit width components.
+| 75
+ | _<id>_ +
+_Value_
+|=====
+[cols="2",width="100%"]
+|=====
+2+|*InterpolateAtCentroid* +
+ +
+Result is the value of the input _interpolant_ sampled at a location inside both the fragment and the primitive being processed. The value obtained would be the same value assigned to the input variable if it were decorated as *Centroid*.
+
+ The operand _interpolant_ must be a pointer to the *Input* Storage Class.
+
+ The operand _interpolant_ must be a pointer to a scalar or vector whose component type is 32-bit floating-point.
+
+ This instruction is only valid in the *Fragment* execution model.
+
+ _Result Type_ and the type that _interpolant_ points to must be the same type.
+
+Use of this instruction requires declaration of the *InterpolationFunction* capability.
+| 76
+ | _<id>_ +
+_interpolant_
+|=====
+[cols="3",width="100%"]
+|=====
+3+|*InterpolateAtSample* +
+ +
+Result is the value of the input _interpolant_ variable at the location of sample number _sample_. If sample _sample_ does not exist, the position used to interpolate the input variable is _poison_.
+
+ The operand _interpolant_ must be a pointer to the *Input* Storage Class.
+
+ The operand _interpolant_ must be a pointer to a scalar or vector whose component type is 32-bit floating-point.
+
+ This instruction is only valid in the *Fragment* execution model.
+
+The _sample_ operand must be a scalar 32-bit integer.
+
+ _Result Type_ and the type that _interpolant_ points to must be the same type.
+
+Use of this instruction requires declaration of the *InterpolationFunction* capability.
+| 77
+ | _<id>_ +
+_interpolant_ | _<id>_ +
+_sample_
+|=====
+[cols="3",width="100%"]
+|=====
+3+|*InterpolateAtOffset* +
+ +
+Result is the value of the input _interpolant_ variable sampled at an offset from the center of the fragment specified by _offset_. The two floating-point components of _offset_, give the offset in pixels in the _x_ and _y_ directions, respectively. An _offset_ of (0, 0) identifies the center of the fragment. The range and granularity of offsets supported are implementation-dependent.
+
+ The operand _interpolant_ must be a pointer to the *Input* Storage Class.
+
+ The operand _interpolant_ must be a pointer to a scalar or vector whose component type is 32-bit floating-point.
+
+ This instruction is only valid in the *Fragment* execution model.
+
+The _offset_ operand must be a vector of 2 components of 32-bit floating-point type.
+
+ _Result Type_ and the type that _interpolant_ points to must be the same type.
+
+Use of this instruction requires declaration of the *InterpolationFunction* capability.
+| 78
+ | _<id>_ +
+_interpolant_ | _<id>_ +
+_offset_
+|=====
+[cols="3",width="100%"]
+|=====
+3+|*NMin* +
+ +
+Result is _y_ if _y_ < _x_, otherwise _x_. -0 compares less than +0. If one operand is a NaN, the other operand is the result. If both operands are NaN, the result is a NaN.
+
+ The operands must all be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of all operands must be the same type. Results are computed per component.
+| 79
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+|=====
+[cols="3",width="100%"]
+|=====
+3+|*NMax* +
+ +
+Result is _y_ if _x_ < _y_, otherwise _x_. -0 compares less than +0. If one operand is a NaN, the other operand is the result. If both operands are NaN, the result is a NaN.
+
+ The operands must all be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of all operands must be the same type. Results are computed per component.
+| 80
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+|=====
+[cols="4",width="100%"]
+|=====
+4+|*NClamp* +
+ +
+Result is min(max(_x_, _minVal_), _maxVal_). The resulting value is _poison_ if _minVal_ > _maxVal_. The semantics used by min() and max() are those of NMin and NMax.
+
+ The operands must all be a scalar or vector whose component type is floating-point.
+
+ _Result Type_ and the type of all operands must be the same type. Results are computed per component.
+| 81
+ | _<id>_ +
+_x_ | _<id>_ +
+_minVal_ | _<id>_ +
+_maxVal_
+|=====

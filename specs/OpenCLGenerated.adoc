@@ -1,0 +1,3261 @@
+
+[[Introduction]]
+== Introduction
+
+This is the specification of *OpenCL.std* extended instruction set.
+
+The library is imported into a SPIR-V module in the following manner:
+
+_<ext-inst-id> OpExtInstImport "OpenCL.std"_
+
+The library can only be imported if *Memory Model* is set to *OpenCL*
+
+[[Binary]]
+== Binary Form
+This section contains the semantics and exact form of execution of OpenCL extended instructions using the *OpExtInst* instruction.
+
+In this section we use the following naming conventions:
+
+- _void_ denote an *OpTypeVoid*.
+
+- _half_, _float_ and _double_ denote an *OpTypeFloat* with a width of 16, 32 and 64 bits using the IEEE 754 encoding respectively.
+
+- _i8_, _i16_, _i32_ and _i64_ denote an *OpTypeInt* with a width of 8, 16, 32 and 64 bits respectively.
+
+- _bool_ denotes an *OpTypeBool*.
+
+- _size_t_ denotes an i32 if the *Addressing Model* is *Physical32* and i64 if the *Addressing Model* is *Physical64*.
+
+- _vector(n)_ denotes an *OpTypeVector* where _n_ indicates the component count.
+
+** _vector(n~1~, n~2~, ..., n~i~)_ abbreviates _vector(n~1~)_, _vector(n~2~)_, ... or _vector(n~i~)_.
+
+- _integer_ denotes _i8_, _i16_, _i32_ or _i64_.
+
+- _floating-point_ denotes _half_, _float_, _double_.
+
+- _pointer_(_storage_) denotes an *OpTypePointer* which points to _storage_ *Storage Class*.
+
+** _pointer_(_constant_) denotes an OpTypePointer with *UniformConstant* *Storage Class*.
+
+** _pointer_(_generic_) denotes an OpTypePointer with *Generic* *Storage Class*.
+
+** _pointer_(_global_) denotes an OpTypePointer with *CrossWorkgroup* *Storage Class*.
+
+** _pointer_(_local_) denotes an OpTypePointer with *Workgroup* *Storage Class*.
+
+** _pointer_(_private_) denotes an OpTypePointer with *Function* *Storage Class*.
+
+** _pointer(s~1~, s~2~, ..., s~i~)_ abbreviates _pointer(s~1~)_, _pointer(s~2~)_, ... or _pointer(s~i~)_.
+
+- _image_ defines all types of image memory objects (See https://registry.khronos.org/OpenCL/specs/3.0-unified/html/OpenCL_Env.html#_image_related_data_types[image related data types] section of the OpenCL environment specification).
+
+- _sampler_ a SPIR-V sampler object (See https://registry.khronos.org/OpenCL/specs/3.0-unified/html/OpenCL_Env.html#_image_related_data_types[image related data types] section of the OpenCL environment specification).
+
+<<<
+
+[[Math]]
+=== Math extended instructions
+This section describes the list of external math instructions. The external math instructions are categorized into the following:
+
+- A list of instructions that have scalar or vector argument versions, and,
+
+- A list of instructions that only take scalar float arguments.
+
+The vector versions of the math instructions operate component-wise.  The description is per-component.
+
+The math instructions are not affected by the prevailing rounding mode in the calling environment, and always return the same value as they would if called with the round to nearest even rounding mode.
+
+For environments that allow use of *FPFastMathMode* decorations on *OpExtInst* instructions, *FPFastMathMode* decorations may be applied to the math instructions.
+
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[acos]]*acos* +
+ +
+Compute the arc cosine of _x_.
+
+_Result_ is an angle in radians.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 0
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[acosh]]*acosh* +
+ +
+Compute the inverse hyperbolic cosine of _x_ .  
+
+_Result_ is an angle in radians.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 1
+ | _<id>_ +
+_x_
+
+|=====
+<<<
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[acospi]]*acospi* +
+ +
+Compute *acos*(_x_) / {pi}.
+
+_Result_ is an angle in radians.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 2
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[asin]]*asin* +
+ +
+Compute the arc sine of _x_.
+
+_Result_ is an angle in radians.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 3
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[asinh]]*asinh* +
+ +
+Compute the inverse hyperbolic sine of _x_.
+
+_Result_ is an angle in radians.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 4
+ | _<id>_ +
+_x_
+
+|=====
+<<<
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[asinpi]]*asinpi* +
+ +
+Compute *asin*(_x_) / {pi}.
+
+_Result_ is an angle in radians.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 5
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[atan]]*atan* +
+ +
+Compute the arc tangent of _x_.
+
+_Result_ is an angle in radians.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 6
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[atan2]]*atan2* +
+ +
+Compute the arc tangent of _y_ / _x_.
+
+_Result_ is an angle in radians.
+
+
+_Result Type_, _y_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 7
+ | _<id>_ +
+_y_ | _<id>_ +
+_x_
+
+|=====
+<<<
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[atanh]]*atanh* +
+ +
+Compute the hyperbolic arc tangent of _x_.
+
+_Result_ is an angle in radians.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 8
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[atanpi]]*atanpi* +
+ +
+Compute *atan*(_x_) / {pi}.
+
+_Result_ is an angle in radians.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 9
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[atan2pi]]*atan2pi* +
+ +
+Compute *atan*(_y_, _x_) / {pi}.
+
+_Result_ is an angle in radians.
+
+
+_Result Type_, _y_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 10
+ | _<id>_ +
+_y_ | _<id>_ +
+_x_
+
+|=====
+<<<
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[cbrt]]*cbrt* +
+ +
+Compute the cube root of _x_.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 11
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[ceil]]*ceil* +
+ +
+Round _x_ to integral value using the round to positive infinity rounding mode.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 12
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[copysign]]*copysign* +
+ +
+Returns _x_ with its sign changed to match the sign of _y_.
+
+
+_Result Type_, _x_ and _y_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 13
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[cos]]*cos* +
+ +
+Compute the cosine of _x_ radians.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 14
+ | _<id>_ +
+_x_
+
+|=====
+<<<
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[cosh]]*cosh* +
+ +
+Compute the hyperbolic cosine of _x_ radians.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 15
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[cospi]]*cospi* +
+ +
+Compute *cos*(_x_) / {pi} radians.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 16
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[erfc]]*erfc* +
+ +
+Complementary error function of _x_.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 17
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[erf]]*erf* +
+ +
+Error function of _x_ encountered in integrating the normal distribution.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 18
+ | _<id>_ +
+_x_
+
+|=====
+<<<
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[exp]]*exp* +
+ +
+Compute the base-e exponential of _x_. (i.e. _e_^_x_^)
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 19
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[exp2]]*exp2* +
+ +
+Computes 2 raised to the power of _x_. (i.e. _2_^_x_^)
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 20
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[exp10]]*exp10* +
+ +
+Computes 10 raised to the power of _x_. (i.e. _10_^_x_^)
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 21
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[expm1]]*expm1* +
+ +
+Computes _e_^_x_^ _- 1.0_ .
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 22
+ | _<id>_ +
+_x_
+
+|=====
+<<<
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[fabs]]*fabs* +
+ +
+Compute the absolute value of _x_.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 23
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[fdim]]*fdim* +
+ +
+_x - y_ if _x > y_, _+0_ if _x_ is less than or equal to _y_.
+
+
+_Result Type_, _x_ and _y_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 24
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[floor]]*floor* +
+ +
+Round _x_ to the integral value using the round to negative infinity rounding mode.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 25
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[fma]]*fma* +
+ +
+Compute the correctly rounded floating-point representation of the sum of _c_ with the infinitely precise product of _a_ and _b_. Rounding of intermediate products shall not occur. Edge case results are per the IEEE 754-2008 standard.
+
+
+_Result Type_, _a_, _b_ and _c_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 26
+ | _<id>_ +
+_a_ | _<id>_ +
+_b_ | _<id>_ +
+_c_
+
+|=====
+<<<
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[fmax]]*fmax* +
+ +
+Returns _y_ if _x_ < _y_, otherwise it returns _x_. If one operand is a NaN, *fmax* returns the other argument.  If both arguments are NaNs, *fmax* returns a NaN.
+
+
+_Result Type_, _x_ and _y_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+*Note:* *fmax* behaves as defined by C99 and may not match the IEEE 754-2008 definition for *maxNum* with regard to signaling NaNs. Specifically, signaling NaNs may behave as quiet NaNs| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 27
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[fmin]]*fmin* +
+ +
+Returns _y_ if _y_ < _x_, otherwise it returns _x_. If one operand is a NaN, *fmin* returns the other argument.  If both arguments are NaNs, *fmin* returns a NaN.
+
+
+_Result Type_, _x_ and _y_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+*Note:* *fmin* behaves as defined by C99 and may not match the IEEE 754-2008 definition for *minNum* with regard to signaling NaNs. Specifically, signaling NaNs may behave as quiet NaNs| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 28
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[fmod]]*fmod* +
+ +
+Modulus. Returns _x_ - _y_ * *trunc*(_x_/_y_).
+
+
+_Result Type_, _x_ and _y_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 29
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+<<<
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[fract]]*fract* +
+ +
+Returns *fmin*( _x_ - *floor*(_x_), _0x1.fffffep-1f_ ). *floor*(_x_) is returned in _ptr_.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+_ptr_ must be a _pointer_(_global_, _local_, _private_, _generic_) to _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type, or must be a pointer to the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 30
+ | _<id>_ +
+_x_ | _<id>_ +
+_ptr_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[frexp]]*frexp* +
+ +
+Extract the mantissa and exponent from _x_. The _Result Type_ holds the mantissa, and _exp_ points to the exponent. For each component the mantissa returned is a _floating-point_ with magnitude in the interval [1/2, 1) or 0.  Each component of _x_ equals mantissa returned * 2^exp^.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+_exp_ must be a _pointer_(_global_, _local_, _private_, _generic_) to _i32_ or _vector(2,3,4,8,16)_ of _i32_ values. 
+
+_Result Type_ and _x_ operands must be of the same type. _exp_ operand must point to an _i32_ with the same component count as _Result Type_ and _x_ operands.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 31
+ | _<id>_ +
+_x_ | _<id>_ +
+_exp_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[hypot]]*hypot* +
+ +
+Compute the value of the square root of _x_^2^+ _y_^2^ without undue overflow or underflow.
+
+
+_Result Type_, _x_ and _y_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 32
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+<<<
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[ilogb]]*ilogb* +
+ +
+Return the exponent of _x_ as an _i32_ value.
+
+
+_Result Type_ must be _i32_ or _vector(2,3,4,8,16)_ of _i32_ values. 
+
+_x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+_Result Type_ and _x_ operands must have the same component count.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 33
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[ldexp]]*ldexp* +
+ +
+Multiply _x_ by 2 to the power _k_.
+
+
+_k_ must be _i32_ or _vector(2,3,4,8,16)_ of _i32_ values. 
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+_Result Type_ and _x_ operands must be of the same type. _k_ operand must have the same component count as _Result Type_ and _x_ operands.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 34
+ | _<id>_ +
+_x_ | _<id>_ +
+_k_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[lgamma]]*lgamma* +
+ +
+Log gamma function of _x_. Returns the natural logarithm of the absolute value of the gamma function.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 35
+ | _<id>_ +
+_x_
+
+|=====
+<<<
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[lgamma_r]]*lgamma_r* +
+ +
+Log gamma function of _x_. Returns the natural logarithm of the absolute value of the gamma function. The sign of the gamma function is returned in the _signp_ operand
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+_signp_ must be a _pointer_(_global_, _local_, _private_, _generic_) to _i32_ or _vector(2,3,4,8,16)_ of _i32_ values. 
+
+_Result Type_ and _x_ operands must be of the same type. _signp_ operand must point to an _i32_ with the same component count as _Result Type_ and _x_ operands.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 36
+ | _<id>_ +
+_x_ | _<id>_ +
+_signp_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[log]]*log* +
+ +
+Compute the natural logarithm of _x_.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 37
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[log2]]*log2* +
+ +
+Compute the base 2 logarithm of _x_.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 38
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[log10]]*log10* +
+ +
+Compute the base 10 logarithm of _x_.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 39
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[log1p]]*log1p* +
+ +
+Compute *log~e~*(1.0 + _x_).
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 40
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[logb]]*logb* +
+ +
+Compute the exponent of _x_, which is the integral part of log~r~  \| _x_ \|.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 41
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[mad]]*mad* +
+ +
+Computes _a_ * _b_ + _c_.  *mad* may compute _a_ * _b_ + _c_ with reduced accuracy in the embedded profile - see the OpenCL SPIR-V Environment specification for details. On some hardware the *mad* instruction may provide better performance than the expanded computation of _a_ * _b_ + _c_.
+
+
+_Result Type_, _a_, _b_ and _c_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+*Note:* For some usages, e.g. *mad*(_a_, _b_, -_a_ * _b_), the definition of *mad* is loose enough that almost any result is allowed from *mad* for some values of _a_ and _b_.| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 42
+ | _<id>_ +
+_a_ | _<id>_ +
+_b_ | _<id>_ +
+_c_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[maxmag]]*maxmag* +
+ +
+Returns _x_ if \| _x_ \| > \| _y_ \| , _y_ if \| _y_ \| > \| _x_ \| , otherwise *fmax*(_x_, _y_).
+
+
+_Result Type_, _x_ and _y_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 43
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[minmag]]*minmag* +
+ +
+Returns _x_ if \| _x_ \| < \| _y_ \|, _y_ if \| _y_ \| < \| _x_ \|, otherwise *fmin*(_x_, _y_).
+
+
+_Result Type_, _x_ and _y_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 44
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[modf]]*modf* +
+ +
+Decompose a _floating-point_ number. The *modf* instruction breaks the operand _x_ into integral and fractional parts, each of which has the same sign as the operand. It stores the integral part in the object pointed to by _iptr_
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+_iptr_ must be a _pointer_(_global_, _local_, _private_, _generic_) to _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type, or must be a pointer to the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 45
+ | _<id>_ +
+_x_ | _<id>_ +
+_iptr_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[nan]]*nan* +
+ +
+Returns a quiet NaN. The _nancode_ may be placed in the significand of the resulting NaN.
+
+
+_Result Type_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+_nancode_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+_Result Type_ and _nancode_ operands must have the same component count. The primitive data type size of _nancode_ and _Result Type_ must be equal.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 46
+ | _<id>_ +
+_nancode_
+
+|=====
+<<<
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[nextafter]]*nextafter* +
+ +
+Computes the next representable _floating-point_ value following _x_ in the direction of _y_. Thus, if _y_ is less than _x_, *nextafter* returns the largest representable floating-point number less than _x_.
+
+
+_Result Type_, _x_ and _y_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 47
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[pow]]*pow* +
+ +
+Compute _x_ to the power _y_.
+
+
+_Result Type_, _x_ and _y_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 48
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[pown]]*pown* +
+ +
+Compute _x_ to the power _y_, where _y_ is an _i32_ integer.
+
+
+_y_ must be _i32_ or _vector(2,3,4,8,16)_ of _i32_ values. 
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+_Result Type_ and _x_ operands must be of the same type. _y_ operand must have the same component count as _Result Type_ and _x_ operands.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 49
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[powr]]*powr* +
+ +
+Compute _x_ to the power _y_, where _x_ is {ge} 0.
+
+
+_Result Type_, _x_ and _y_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 50
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[remainder]]*remainder* +
+ +
+Compute the value r such that r = _x_ - n*_y_, where n is the integer nearest the exact value of _x_/_y_. If there are two integers closest to _x_/_y_, n shall be the even one. If r is zero, it is given the same sign as _x_.
+
+
+_Result Type_, _x_ and _y_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 51
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[remquo]]*remquo* +
+ +
+The *remquo* instruction computes the value r such that r = _x_ - k*_y_, where k is the integer nearest the exact value of _x_/_y_.  If there are two integers closest to _x_/_y_, k shall be the even one. If r is zero, it is given the same sign as _x_.  This is the same value that is returned by the *remainder* instruction. *remquo* also calculates at least the lower seven bits of the integral quotient _x_/_y_, and gives that value the same sign as _x_/_y_. It stores this signed value in the object pointed to by _quo_.
+
+
+_Result Type_, _x_ and _y_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+_quo_ must be a _pointer_(_global_, _local_, _private_, _generic_) to _i32_ or _vector(2,3,4,8,16)_ of _i32_ values. 
+
+_Result Type_, _x_ and _y_ operands must be of the same type. _quo_ operand must point to an _i32_ with the same component count as _Result Type_, _x_ and _y_ operands.
+
+| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 52
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_ | _<id>_ +
+_quo_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[rint]]*rint* +
+ +
+Round _x_ to integral value (using round to nearest even rounding mode) in floating-point format.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 53
+ | _<id>_ +
+_x_
+
+|=====
+<<<
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[rootn]]*rootn* +
+ +
+Compute _x_ to the power 1/_y_.
+
+
+_y_ must be _i32_ or _vector(2,3,4,8,16)_ of _i32_ values. 
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+_Result Type_ and _x_ operands must be of the same type. _y_ operand must have the same component count as _Result Type_ and _x_ operands.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 54
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[round]]*round* +
+ +
+Return the integral value nearest to _x_ rounding halfway cases away from zero, regardless of the current rounding direction.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 55
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[rsqrt]]*rsqrt* +
+ +
+Compute inverse square root of _x_.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 56
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[sin]]*sin* +
+ +
+Compute sine of _x_ radians.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 57
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[sincos]]*sincos* +
+ +
+Compute sine and cosine of _x_ radians. The computed sine is the return value and computed cosine is returned in _cosval_.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+_cosval_ must be a _pointer_(_global_, _local_, _private_, _generic_) to _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type, or must be a pointer to the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 58
+ | _<id>_ +
+_x_ | _<id>_ +
+_cosval_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[sinh]]*sinh* +
+ +
+Compute hyperbolic sine of _x_ radians.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 59
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[sinpi]]*sinpi* +
+ +
+Compute _sin_ ({pi} x) radians.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 60
+ | _<id>_ +
+_x_
+
+|=====
+<<<
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[sqrt]]*sqrt* +
+ +
+Compute square root of _x_.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 61
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[tan]]*tan* +
+ +
+Compute tangent of _x_ radians.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 62
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[tanh]]*tanh* +
+ +
+Compute hyperbolic tangent of _x_ radians.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 63
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[tanpi]]*tanpi* +
+ +
+Compute _tan_ ({pi} x) radians.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 64
+ | _<id>_ +
+_x_
+
+|=====
+<<<
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[tgamma]]*tgamma* +
+ +
+Compute the gamma function of _x_.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 65
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[trunc]]*trunc* +
+ +
+Round _x_ to integral value using the round to zero rounding mode.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 66
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[half_cos]]*half_cos* +
+ +
+Compute cosine of _x_ radians. The resulting value is _poison_ if _x_ is not in the range -2^16^ ... +2^16^.ha
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 67
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[half_divide]]*half_divide* +
+ +
+Compute _x_ / _y_.
+
+
+_Result Type_, _x_ and _y_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 68
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+<<<
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[half_exp]]*half_exp* +
+ +
+Compute the base-e exponential of _x_.
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 69
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[half_exp2]]*half_exp2* +
+ +
+Compute the base 2 exponential of _x_.
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 70
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[half_exp10]]*half_exp10* +
+ +
+Compute the base 10 exponential of _x_.
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 71
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[half_log]]*half_log* +
+ +
+Compute the natural logarithm of _x_.
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 72
+ | _<id>_ +
+_x_
+
+|=====
+<<<
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[half_log2]]*half_log2* +
+ +
+Compute the base 2 logarithm of _x_.
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 73
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[half_log10]]*half_log10* +
+ +
+Compute the base 10 logarithm of _x_.
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 74
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[half_powr]]*half_powr* +
+ +
+Compute _x_ to the power _y_, where _x_ is {ge} 0.
+
+
+_Result Type_, _x_ and _y_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 75
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[half_recip]]*half_recip* +
+ +
+Compute the reciprocal of _x_.
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 76
+ | _<id>_ +
+_x_
+
+|=====
+<<<
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[half_rsqrt]]*half_rsqrt* +
+ +
+Compute the inverse square root of _x_.
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 77
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[half_sin]]*half_sin* +
+ +
+Compute the sine of _x_ radians. The resulting value is _poison_ if _x_ is not in the range -2^16^ ... +2^16^.
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 78
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[half_sqrt]]*half_sqrt* +
+ +
+Compute the square root of _x_.
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 79
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[half_tan]]*half_tan* +
+ +
+Compute tangent value of _x_ radians. The resulting values are _poison_ if _x_ is not in the range -2^16^ ... +2^16^.
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 80
+ | _<id>_ +
+_x_
+
+|=====
+<<<
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[native_cos]]*native_cos* +
+ +
+Compute cosine of _x_ radians over an implementation-defined range. The maximum error is implementation-defined.
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+*Note:* This instruction may map to one or more native device instructions and typically has better performance compared to the corresponding non-native instruction. Support for denormal values is implementation-defined for native instructions.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 81
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[native_divide]]*native_divide* +
+ +
+Compute _x_ / _y_ over an implementation-defined range. The maximum error is implementation-defined.
+
+
+_Result Type_, _x_ and _y_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+*Note:* This instruction may map to one or more native device instructions and typically has better performance compared to the corresponding non-native instruction. Support for denormal values is implementation-defined for native instructions.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 82
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[native_exp]]*native_exp* +
+ +
+Compute the base-e exponential of _x_ over an implementation-defined range.  The maximum error is implementation-defined.
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+*Note:* This instruction may map to one or more native device instructions and typically has better performance compared to the corresponding non-native instruction. Support for denormal values is implementation-defined for native instructions.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 83
+ | _<id>_ +
+_x_
+
+|=====
+<<<
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[native_exp2]]*native_exp2* +
+ +
+Compute the base- 2 exponential of _x_ over an implementation-defined range.  The maximum error is implementation-defined..
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+*Note:* This instruction may map to one or more native device instructions and typically has better performance compared to the corresponding non-native instruction. Support for denormal values is implementation-defined for native instructions.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 84
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[native_exp10]]*native_exp10* +
+ +
+Compute the base- 10 exponential of _x_ over an implementation-defined range.  The maximum error is implementation-defined..
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+*Note:* This instruction may map to one or more native device instructions and typically has better performance compared to the corresponding non-native instruction. Support for denormal values is implementation-defined for native instructions.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 85
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[native_log]]*native_log* +
+ +
+Compute natural logarithm of _x_ over an implementation-defined range.  The maximum error is implementation-defined.
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+*Note:* This instruction may map to one or more native device instructions and typically has better performance compared to the corresponding non-native instruction. Support for denormal values is implementation-defined for native instructions.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 86
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[native_log2]]*native_log2* +
+ +
+Compute a base 2 logarithm of _x_ over an implementation-defined range.  The maximum error is implementation-defined. 
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+*Note:* This instruction may map to one or more native device instructions and typically has better performance compared to the corresponding non-native instruction. Support for denormal values is implementation-defined for native instructions.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 87
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[native_log10]]*native_log10* +
+ +
+Compute a base 10 logarithm of _x_ over an implementation-defined range.  The maximum error is implementation-defined.
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+*Note:* This instruction may map to one or more native device instructions and typically has better performance compared to the corresponding non-native instruction. Support for denormal values is implementation-defined for native instructions.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 88
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[native_powr]]*native_powr* +
+ +
+Compute _x_ to the power _y_, where _x_ is {ge} 0.
+
+
+_Result Type_, _x_ and _y_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+*Note:* This instruction may map to one or more native device instructions and typically has better performance compared to the corresponding non-native instruction. Support for denormal values is implementation-defined for native instructions.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 89
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+<<<
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[native_recip]]*native_recip* +
+ +
+Compute reciprocal of _x_ over an implementation-defined range. The range of x and y are implementation-defined. The maximum error is implementation-defined.
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+*Note:* This instruction may map to one or more native device instructions and typically has better performance compared to the corresponding non-native instruction. Support for denormal values is implementation-defined for native instructions.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 90
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[native_rsqrt]]*native_rsqrt* +
+ +
+Compute inverse square root of _x_ over an implementation-defined range.  The maximum error is implementation-defined.
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+*Note:* This instruction may map to one or more native device instructions and typically has better performance compared to the corresponding non-native instruction. Support for denormal values is implementation-defined for native instructions.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 91
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[native_sin]]*native_sin* +
+ +
+Compute sine of _x_ radians over an implementation-defined range.  The maximum error is implementation-defined. 
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+*Note:* This instruction may map to one or more native device instructions and typically has better performance compared to the corresponding non-native instruction. Support for denormal values is implementation-defined for native instructions.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 92
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[native_sqrt]]*native_sqrt* +
+ +
+Compute the square root of _x_ over an implementation-defined range.  The maximum error is implementation-defined.
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+*Note:* This instruction may map to one or more native device instructions and typically has better performance compared to the corresponding non-native instruction. Support for denormal values is implementation-defined for native instructions.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 93
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[native_tan]]*native_tan* +
+ +
+Compute tangent value of _x_ radians over an implementation-defined range.  The maximum error is implementation-defined.
+
+
+_Result Type_ and _x_ must be _float_ or _vector(2,3,4,8,16)_ of _float_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+*Note:* This instruction may map to one or more native device instructions and typically has better performance compared to the corresponding non-native instruction. Support for denormal values is implementation-defined for native instructions.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 94
+ | _<id>_ +
+_x_
+
+|=====
+<<<
+
+[[Integer]]
+=== Integer instructions
+This section describes the list of integer instructions that take scalar or vector arguments. The vector versions of the integer instructions operate component-wise.  The description is per-component.
+
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[s_abs]]*s_abs* +
+ +
+Returns \|_x_\|, where _x_ is treated as signed integer.
+
+
+_Result Type_ and _x_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+This instruction can be decorated with *NoSignedWrap*.| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 141
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[s_abs_diff]]*s_abs_diff* +
+ +
+Returns \| _x_ - _y_ \| without modulo overflow, where _x_ and _y_ are treated as signed integers.
+
+
+_Result Type_, _x_ and _y_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 142
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[s_add_sat]]*s_add_sat* +
+ +
+Returns the saturated value of _x_ + _y_, where _x_ and _y_ are treated as signed integers.
+
+
+_Result Type_, _x_ and _y_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 143
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+<<<
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[u_add_sat]]*u_add_sat* +
+ +
+Returns the saturated value of _x_ + _y_, where _x_ and _y_ are treated as unsigned integers.
+
+
+_Result Type_, _x_ and _y_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 144
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[s_hadd]]*s_hadd* +
+ +
+Returns the value of (_x_ + _y_) >> 1, where _x_ and _y_ are treated as signed integers. The intermediate sum does not modulo overflow.
+
+
+_Result Type_, _x_ and _y_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 145
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[u_hadd]]*u_hadd* +
+ +
+Returns the value of (_x_ + _y_) >> 1, where _x_ and _y_ are treated as unsigned integers. The intermediate sum does not modulo overflow.
+
+
+_Result Type_, _x_ and _y_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 146
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[s_rhadd]]*s_rhadd* +
+ +
+Returns the value of (_x_ + _y_ + 1) >> 1, where _x_ and _y_ are treated as signed integers. The intermediate sum does not modulo overflow.
+
+
+_Result Type_, _x_ and _y_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 147
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[u_rhadd]]*u_rhadd* +
+ +
+Returns the value of (_x_ + _y_ + 1) >> 1, where _x_ and _y_ are treated as unsigned integers. The intermediate sum does not modulo overflow.
+
+
+_Result Type_, _x_ and _y_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 148
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[s_clamp]]*s_clamp* +
+ +
+Returns _s_min_(_s_max_(_x_,_minval_),_maxval_), where _x_, _minval_, and _maxval_ are treated as signed integers. The resulting values are _poison_ if _minval_ > _maxval_.
+
+
+_Result Type_, _x_, _minval_ and _maxval_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 149
+ | _<id>_ +
+_x_ | _<id>_ +
+_minval_ | _<id>_ +
+_maxval_
+
+|=====
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[u_clamp]]*u_clamp* +
+ +
+Returns _u_min_(_u_max_(_x_,_minval_),_maxval_), where _x_, _minval_, and _maxval_ are treated as unsigned integers. The resulting values are _poison_ if _minval_ > _maxval_.
+
+
+_Result Type_, _x_, _minval_ and _maxval_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 150
+ | _<id>_ +
+_x_ | _<id>_ +
+_minval_ | _<id>_ +
+_maxval_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[clz]]*clz* +
+ +
+Returns the number of leading 0 bits in _x_, starting at the most significant bit position. If _x_ is 0, returns the size in bits of the type of _x_ or component type of _x_, if _x_ is a vector.
+
+
+_Result Type_ and _x_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 151
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[ctz]]*ctz* +
+ +
+Returns the count of trailing 0 bits in _x_. If _x_ is 0, returns the size in bits of the type of _x_ or component type of _x_, if _x_ is a vector.
+
+
+_Result Type_ and _x_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 152
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[s_mad_hi]]*s_mad_hi* +
+ +
+Returns _mul_hi_(_a_, _b_) + _c_, where _a_,_b_ and _c_ are treated as signed integers.
+
+
+_Result Type_, _a_, _b_ and _c_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 153
+ | _<id>_ +
+_a_ | _<id>_ +
+_b_ | _<id>_ +
+_c_
+
+|=====
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[u_mad_sat]]*u_mad_sat* +
+ +
+Returns _x_ * _y_ + _z_ and saturates the result where _x_, _y_ and _z_ are treated as unsigned integers.
+
+
+_Result Type_, _x_, _y_ and _z_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 154
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_ | _<id>_ +
+_z_
+
+|=====
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[s_mad_sat]]*s_mad_sat* +
+ +
+Returns _x_ * _y_ + _z_ and saturates the result where _x_, _y_ and _z_ are treated as signed integers.
+
+
+_Result Type_, _x_, _y_ and _z_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 155
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_ | _<id>_ +
+_z_
+
+|=====
+<<<
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[s_max]]*s_max* +
+ +
+Returns _y_ if _x_ < _y_, otherwise it returns _x_, where _x_ and _y_ are treated as signed integers.
+
+
+_Result Type_, _x_ and _y_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 156
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[u_max]]*u_max* +
+ +
+Returns _y_ if _x_ < _y_, otherwise it returns _x_, where _x_ and _y_ are treated as unsigned integers.
+
+
+_Result Type_, _x_ and _y_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 157
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[s_min]]*s_min* +
+ +
+Returns _y_ if _y_ < _x_, otherwise it returns _x_, where _x_ and _y_ are treated as signed integers.
+
+
+_Result Type_, _x_ and _y_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 158
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[u_min]]*u_min* +
+ +
+Returns _y_ if _y_ < _x_, otherwise it returns _x_, where _x_ and _y_ are treated as unsigned integers.
+
+
+_Result Type_, _x_ and _y_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 159
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+<<<
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[s_mul_hi]]*s_mul_hi* +
+ +
+Computes _x_ * _y_ and returns the high half of the product of _x_ and _y_, where _x_ and _y_ are treated as signed integers.
+
+
+_Result Type_, _x_ and _y_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 160
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[rotate]]*rotate* +
+ +
+For each element in _v_, the bits are shifted left by the number of bits given by the corresponding element in _i_. Bits shifted off the left side of the element are shifted back in from the right.
+
+
+_Result Type_, _v_ and _i_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 161
+ | _<id>_ +
+_v_ | _<id>_ +
+_i_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[s_sub_sat]]*s_sub_sat* +
+ +
+Returns the saturated value of _x_ - _y_, where _x_ and _y_ are treated as signed integers.
+
+
+_Result Type_, _x_ and _y_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 162
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[u_sub_sat]]*u_sub_sat* +
+ +
+Returns the saturated value of _x_ - _y_, where _x_ and _y_ are treated as unsigned integers.
+
+
+_Result Type_, _x_ and _y_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 163
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+<<<
+[cols="2*1,6*3",width="100%"]
+|=====
+8+|[[u_upsample]]*u_upsample* +
+ +
+If _hi_ and _lo_ component type is i8:
+
+Result = ((upcast...to i16)_hi_ << 8) \| _lo_
+
+If _hi_ and _lo_ component type is i16:
+
+Result = ((upcast...to i32)_hi_ << 16) \| _lo_
+
+If _hi_ and _lo_ component i32:
+
+Result = ((upcast...to i64)_hi_ << 32) \| _lo_
+
+_hi_ and _lo_ are treated as unsigned integers.
+
+
+_hi_ and _lo_ must be _i8_, _i16_ or _i32_ or _vector(2,3,4,8,16)_ of _i8_, _i16_ or _i32_ values. 
+
+_Result Type_ must be _i16_, _i32_ or _i64_ or _vector(2,3,4,8,16)_ of _i16_, _i32_ or _i64_ values. 
+
+_hi_ and _lo_ operands must be of the same type. If _hi_ and _lo_ component type is i8, the _Result Type_ component type must be i16. If _hi_ and _lo_ component type is i16, the _Result Type_ component type must be i32. If _hi_ and _lo_ component type is i32, the _Result Type_ component type must be i64. _Result Type_ must have the same component count as _hi_ and _lo_ operands.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 164
+ | _<id>_ +
+_hi_ | _<id>_ +
+_lo_
+
+|=====
+<<<
+[cols="2*1,6*3",width="100%"]
+|=====
+8+|[[s_upsample]]*s_upsample* +
+ +
+If _hi_ and _lo_ component type is i8:
+
+Result = ((upcast...to i16)_hi_ << 8) \| _lo_
+
+If _hi_ and _lo_ component type is i16:
+
+Result = ((upcast...to i32)_hi_ << 16) \| _lo_
+
+If _hi_ and _lo_ component i32:
+
+Result = ((upcast...to i64)_hi_ << 32) \| _lo_
+
+_hi_ is treated as a signed integer and _lo_ is treated as an unsigned integer.
+
+
+_hi_ and _lo_ must be _i8_, _i16_ or _i32_ or _vector(2,3,4,8,16)_ of _i8_, _i16_ or _i32_ values. 
+
+_Result Type_ must be _i16_, _i32_ or _i64_ or _vector(2,3,4,8,16)_ of _i16_, _i32_ or _i64_ values. 
+
+_hi_ and _lo_ operands must be of the same type. If _hi_ and _lo_ component type is i8, the _Result Type_ component type must be i16. If _hi_ and _lo_ component type is i16, the _Result Type_ component type must be i32. If _hi_ and _lo_ component type is i32, the _Result Type_ component type must be i64. _Result Type_ must have the same component count as _hi_ and _lo_ operands.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 165
+ | _<id>_ +
+_hi_ | _<id>_ +
+_lo_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[popcount]]*popcount* +
+ +
+Returns the number of non-zero bits in _x_.
+
+
+_Result Type_ and _x_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 166
+ | _<id>_ +
+_x_
+
+|=====
+<<<
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[s_mad24]]*s_mad24* +
+ +
+Multiply two 24-bit integer values _x_ and _y_ and add the 32-bit integer result to the 32-bit integer _z_. Refer to definition of s_mul24 to see how the 24-bit integer multiplication is performed.
+
+
+_Result Type_, _x_, _y_ and _z_ must be _i32_ or _vector(2,3,4,8,16)_ of _i32_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 167
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_ | _<id>_ +
+_z_
+
+|=====
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[u_mad24]]*u_mad24* +
+ +
+Multiply two 24-bit integer values _x_ and _y_ and add the 32-bit integer result to the 32-bit integer _z_. Refer to definition of u_mul24 to see how the 24-bit integer multiplication is performed.
+
+
+_Result Type_, _x_, _y_ and _z_ must be _i32_ or _vector(2,3,4,8,16)_ of _i32_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 168
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_ | _<id>_ +
+_z_
+
+|=====
+[cols="2*1,6*3",width="100%"]
+|=====
+8+|[[s_mul24]]*s_mul24* +
+ +
+Multiply two 24-bit integer values _x_ and _y_, where _x_ and _y_ are treated as signed integers. _x_ and _y_ are 32-bit integers but only the low-order 24 bits are used to perform the multiplication. s_mul24 should only be used if values in _x_ and _y_ are in the range [-2^23^, 2^23^-1]. If _x_ and _y_ are not in this range, the multiplication result is implementation-defined.
+
+
+_Result Type_, _x_ and _y_ must be _i32_ or _vector(2,3,4,8,16)_ of _i32_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 169
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+<<<
+[cols="2*1,6*3",width="100%"]
+|=====
+8+|[[u_mul24]]*u_mul24* +
+ +
+Multiply two 24-bit integer values _x_ and _y_, where _x_ and _y_ are treated as unsigned integers. _x_ and _y_ are 32-bit integers but only the low-order 24 bits are used to perform the multiplication. u_mul24 should only be used if values in _x_ and _y_ are in the range [0, 2^24^-1]. If _x_ and _y_ are not in this range, the multiplication result is implementation-defined.
+
+
+_Result Type_, _x_ and _y_ must be _i32_ or _vector(2,3,4,8,16)_ of _i32_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 170
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[u_abs]]*u_abs* +
+ +
+Returns \|_x_\|, where _x_ is treated as unsigned integer.
+
+
+_Result Type_ and _x_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 201
+ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[u_abs_diff]]*u_abs_diff* +
+ +
+Returns \| _x_ - _y_ \| without modulo overflow, where _x_ and _y_ are treated as unsigned integers.
+
+
+_Result Type_, _x_ and _y_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 202
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[u_mul_hi]]*u_mul_hi* +
+ +
+Computes _x_ * _y_ and returns the high half of the product of _x_ and _y_, where _x_ and _y_ are treated as unsigned integers.
+
+
+_Result Type_, _x_ and _y_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 203
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[u_mad_hi]]*u_mad_hi* +
+ +
+Returns _mul_hi_(_a_, _b_) + _c_, where _a_,_b_ and _c_ are treated as unsigned integers.
+
+
+_Result Type_, _a_, _b_ and _c_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 204
+ | _<id>_ +
+_a_ | _<id>_ +
+_b_ | _<id>_ +
+_c_
+
+|=====
+<<<
+
+[[Common]]
+=== Common instructions
+This section describes the list of common instructions that take scalar or vector arguments. The vector versions of the integer instructions operate component-wise.  The description is per-component. The common instructions are implemented using the round to nearest even rounding mode.
+
+For environments that allow use of *FPFastMathMode* decorations on *OpExtInst* instructions, *FPFastMathMode* decorations may be applied to the common instructions.
+
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[fclamp]]*fclamp* +
+ +
+Returns _fmin_(_fmax_(_x_, _minval_), _maxval_). The resulting values are _poison_ if _minval_ > _maxval_.
+
+
+_Result Type_, _x_, _minval_ and _maxval_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 95
+ | _<id>_ +
+_x_ | _<id>_ +
+_minval_ | _<id>_ +
+_maxval_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[degrees]]*degrees* +
+ +
+Converts _radians_ to degrees, i.e. (180 / {pi}) * _radians_.
+
+
+_Result Type_ and _radians_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 96
+ | _<id>_ +
+_radians_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[fmax_common]]*fmax_common* +
+ +
+Returns _y_ if _x_ < _y_, otherwise it returns _x_. If x or y are infinite or NaN, the resulting values are _poison_.
+
+
+_Result Type_, _x_ and _y_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 97
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+<<<
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[fmin_common]]*fmin_common* +
+ +
+Returns _y_ if _y_ < _x_, otherwise it returns _x_. If x or y are infinite or NaN, the resulting values are _poison_.
+
+
+_Result Type_, _x_ and _y_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 98
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_
+
+|=====
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[mix]]*mix* +
+ +
+Returns the linear blend of _x_ & _y_ implemented as:
+
+_x_ + (_y_ - _x_) * _a_
+
+
+_Result Type_, _x_, _y_ and _a_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+*Note:* This instruction can be implemented using contractions such as *mad* or *fma*.
+
+| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 99
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_ | _<id>_ +
+_a_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[radians]]*radians* +
+ +
+Converts _degrees_ to radians, i.e. ({pi} / 180) * _degrees_.
+
+
+_Result Type_ and _degrees_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 100
+ | _<id>_ +
+_degrees_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[step]]*step* +
+ +
+Returns 0.0 if _x_ < _edge_, otherwise it returns 1.0.
+
+
+_Result Type_, _edge_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 101
+ | _<id>_ +
+_edge_ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[smoothstep]]*smoothstep* +
+ +
+Returns 0.0 if _x_ {le} _edge~0~_ and 1.0 if _x_ {ge} _edge~1~_ and performs smooth Hermite interpolation between 0 and 1, if _edge~0~_ < x < _edge~1~_.
+
+ This is equivalent to :
+
+ t = _fclamp_((_x_ - _edge~0~_) / (_edge~1~_ - _edge~0~_), 0, 1);
+
+ return t * t * (3 - 2 * t);
+
+The resulting values are _poison_ if _edge~0~_ {ge} _edge~1~_ or if _x_, _edge~0~_ or _edge~1~_ is a NaN.
+
+
+_Result Type_, _edge~0~_, _edge~1~_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+*Note:* This instruction can be implemented using contractions such as *mad* or *fma*.
+
+| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 102
+ | _<id>_ +
+_edge~0~_ | _<id>_ +
+_edge~1~_ | _<id>_ +
+_x_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[sign]]*sign* +
+ +
+Returns 1.0 if _x_ > 0, -0.0 if _x_ = -0.0, +0.0 if _x_ = +0.0, or -1.0 if _x_ < 0. Returns 0.0 if _x_ is a NaN.
+
+
+_Result Type_ and _x_ must be _floating-point_ or _vector(2,3,4,8,16)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 103
+ | _<id>_ +
+_x_
+
+|=====
+<<<
+
+[[Geometric]]
+=== Geometric instructions
+This section describes the list of geometric instructions. In this section _x_,_y_,_z_ and _w_ denote the first, second, third and fourth component respectively, of vectors with 3 and four components. The geometric instructions are implemented using the round to nearest even rounding mode.
+
+*Note:* The geometric instructions can be implemented using contractions such as mad or fma
+
+For environments that allow use of *FPFastMathMode* decorations on *OpExtInst* instructions, *FPFastMathMode* decorations may be applied to the geometric instructions.
+
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[cross]]*cross* +
+ +
+Returns the cross product of _p~0~_.xyz and _p~1~_.xyz. 
+
+If the vector component count is 4, the w component returned is 0.0.
+
+
+_Result Type_, _p~0~_ and _p~1~_ must be  _vector(3,4)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 104
+ | _<id>_ +
+_p~0~_ | _<id>_ +
+_p~1~_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[distance]]*distance* +
+ +
+Returns the distance between _p~0~_ and _p~1~_.  This is calculated as _length_(_p~0~_ - _p~1~_). 
+
+
+_Result Type_ must be _floating-point_. 
+
+_p~0~_ and _p~1~_ must be _floating-point_ or _vector(2,3,4)_ of _floating-point_ values. 
+
+_p~0~_ and _p~1~_ operands must have the same type. _Result Type_, _p~0~_ and _p~1~_ operands must have the same component type| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 105
+ | _<id>_ +
+_p~0~_ | _<id>_ +
+_p~1~_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[length]]*length* +
+ +
+Return the length of vector _p_, i.e. _sqrt_( _p_.x^2^ + _p_.y^2^ + ... )
+
+
+_Result Type_ must be _floating-point_. 
+
+_p_ must be _floating-point_ or _vector(2,3,4)_ of _floating-point_ values. 
+
+_Result Type_ and _p_ operands must have the same component type| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 106
+ | _<id>_ +
+_p_
+
+|=====
+<<<
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[normalize]]*normalize* +
+ +
+Returns a vector in the same direction as _p_ but with a length of 1.
+
+
+_Result Type_ and _p_ must be _floating-point_ or _vector(2,3,4)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 107
+ | _<id>_ +
+_p_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[fast_distance]]*fast_distance* +
+ +
+Returns _fast_length_(_p~0~_ - _p~1~_). 
+
+
+_Result Type_ must be _floating-point_. 
+
+_p~0~_ and _p~1~_ must be _floating-point_ or _vector(2,3,4)_ of _floating-point_ values. 
+
+_p~0~_ and _p~1~_ operands must have the same type. _Result Type_, _p~0~_ and _p~1~_ operands must have the same component type| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 108
+ | _<id>_ +
+_p~0~_ | _<id>_ +
+_p~1~_
+
+|=====
+[cols="2*1,5*3",width="84%"]
+|=====
+7+|[[fast_length]]*fast_length* +
+ +
+Return the length of vector _p_ computed as: _half_sqrt_( _p_.x^2^ + _p_.y^2^ + ... )
+
+
+_Result Type_ must be _floating-point_. 
+
+_p_ must be  _vector(2,3,4)_ of _floating-point_ values. 
+
+_Result Type_ and _p_ operands must have the same component type| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 109
+ | _<id>_ +
+_p_
+
+|=====
+<<<
+[cols="2*1,5*3",width="100%"]
+|=====
+7+|[[fast_normalize]]*fast_normalize* +
+ +
+Returns a vector in the same direction as _p_ but with a length of 1 computed as:
+
+_p_ * _half_rsqrt_( _p_.x^2^ + _p_.y^2^ ... ) 
+
+The result shall be within 8192 ulps error from the infinitely precise result of:
+
+if (_all_( _p_ == 0.0f )) { result = _p_; }
+
+else {  result = _p_ / _sqrt_(_p_.x^2^ + _p_.y^2^ + ...); }
+
+with the following exceptions :
+
+1) If the sum of squares is greater than FLT_MAX then the value of the floating-point values in the result vector are _poison_.
+
+2) If the sum of squares is less than FLT_MIN then the implementation may return back _p_.
+
+3) If the device is in "denorms are flushed to zero" mode, individual operand elements with magnitude less than _sqrt_(FLT_MIN) may be flushed to zero before proceeding with the calculation.
+
+
+_Result Type_ and _p_ must be _floating-point_ or _vector(2,3,4)_ of _floating-point_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 6 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 110
+ | _<id>_ +
+_p_
+
+|=====
+<<<
+
+[[Relational]]
+=== Relational instructions
+This section describes the list of relational instructions that take scalar or vector arguments. The vector versions of the integer instructions operate component-wise.  The description is per-component. 
+
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[bitselect]]*bitselect* +
+ +
+Each bit of the result is the corresponding bit of _a_ if the corresponding bit of _c_ is 0.  Otherwise it is the corresponding bit of _b_.
+
+
+_Result Type_, _a_, _b_ and _c_ must be _floating-point_ or _integer_ or _vector(2,3,4,8,16)_ of _floating-point_ or _integer_ values. 
+
+All of the operands, including the _Result Type_ operand, must be of the same type.
+
+| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 186
+ | _<id>_ +
+_a_ | _<id>_ +
+_b_ | _<id>_ +
+_c_
+
+|=====
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[select]]*select* +
+ +
+For each component of a vector type, the result is _a_ if the most significant bit of _c_ is zero, otherwise it is _b_.
+
+For a scalar type, the result is _a_ if _c_ is zero, otherwise it is _b_.
+
+
+_c_ must be _integer_ or _vector(2,3,4,8,16)_ of _integer_ values. 
+
+_Result Type_, _a_ and _b_ must be _floating-point_ or _integer_ or _vector(2,3,4,8,16)_ of _floating-point_ or _integer_ values. 
+
+_Result Type_, _a_ and _b_ must have the same type. _c_ operand must have the same component count and component bit width as the rest of the operands.| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 187
+ | _<id>_ +
+_a_ | _<id>_ +
+_b_ | _<id>_ +
+_c_
+
+|=====
+<<<
+
+[[Vector]]
+=== Vector Data Load and Store instructions
+This section describes the list of instructions that allow reading and writing of vector types from a pointer to memory. 
+
+For environments that allow use of *FPFastMathMode* decorations on *OpExtInst* instructions, *FPFastMathMode* decorations may be applied to vector data load and store instructions that convert to or from _half_ values.
+
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[vloadn]]*vloadn* +
+ +
+Reads _n_ components from the address computed as (_p_ + (_offset_ * _n_)) and creates a vector result value from the _n_ components. 
+
+Behavior is undefined if the computed address is not 8-bit aligned when _p_ points to an i8 value; 16-bit aligned when _p_ points to an i16 or half value; 32-bit aligned when _p_ points to an i32 or float value; 64-bit aligned when _p_ points to an i64 or double value.
+
+
+_offset_ must be _size_t_. 
+
+_p_ must be a _pointer_(_global_, _local_, _private_, _constant_, _generic_) to _floating-point_, _integer_. 
+
+_Result Type_ must be  _vector(2,3,4,8,16)_ of _floating-point_ or _integer_ values. 
+
+_Result Type_ component count must be equal to _n_ and its component type must be equal to the type pointed by _p_.
+
+_n_ must be 2, 3, 4, 8 or 16.| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 171
+ | _<id>_ +
+_offset_ | _<id>_ +
+_p_ | _Literal_ +
+_n_
+
+|=====
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[vstoren]]*vstoren* +
+ +
+Writes _n_ components from the _data_ vector value to the address computed as (_p_ + (_offset_ * _n_)), where _n_ is equal to the component count of the vector _data_.
+
+Behavior is undefined if the computed address is not 8-bit aligned when _p_ points to an i8 value; 16-bit aligned when _p_ points to an i16 or half value; 32-bit aligned when _p_ points to an i32 or float value; 64-bit aligned when _p_ points to an i64 or double value.
+
+
+_offset_ must be _size_t_. 
+
+_Result Type_ must be _void_. 
+
+_p_ must be a _pointer_(_global_, _local_, _private_, _generic_) to _floating-point_, _integer_. 
+
+_data_ must be  _vector(2,3,4,8,16)_ of _floating-point_ or _integer_ values. 
+
+_data_ component type must be equal to the type pointed by _p_.| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 172
+ | _<id>_ +
+_data_ | _<id>_ +
+_offset_ | _<id>_ +
+_p_
+
+|=====
+<<<
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[vload_half]]*vload_half* +
+ +
+Reads a half value from the address computed as (_p_ + (_offset_)) and converts it to a float result value. 
+
+Behavior is undefined if the computed address is not 16-bit aligned.
+
+
+_Result Type_ must be _float_. 
+
+_offset_ must be _size_t_. 
+
+_p_ must be a _pointer_(_global_, _local_, _private_, _constant_, _generic_) to _half_. 
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 173
+ | _<id>_ +
+_offset_ | _<id>_ +
+_p_
+
+|=====
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[vload_halfn]]*vload_halfn* +
+ +
+Reads _n_ half components from the address (_p_ + (_offset_ * _n_)), converts to _n_ float components, and creates a float vector result value from the _n_ float components.
+
+Behavior is undefined if the computed address is not 16-bit aligned.
+
+
+_offset_ must be _size_t_. 
+
+_p_ must be a _pointer_(_global_, _local_, _private_, _constant_, _generic_) to _half_. 
+
+_Result Type_ must be  _vector(2,3,4,8,16)_ of _float_ values. 
+
+_Result Type_ component count must be equal to _n_.
+
+_n_ must be 2, 3, 4, 8 or 16.| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 174
+ | _<id>_ +
+_offset_ | _<id>_ +
+_p_ | _Literal_ +
+_n_
+
+|=====
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[vstore_half]]*vstore_half* +
+ +
+Converts the _data_ float or double value to a half value using the default rounding mode and writes the half value to the address computed as (_p_ + _offset_). 
+
+Behavior is undefined if the computed address is not 16-bit aligned.
+
+
+_data_ must be _float_ or _double_. 
+
+_offset_ must be _size_t_. 
+
+_Result Type_ must be _void_. 
+
+_p_ must be a _pointer_(_global_, _local_, _private_, _generic_) to _half_. 
+
+| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 175
+ | _<id>_ +
+_data_ | _<id>_ +
+_offset_ | _<id>_ +
+_p_
+
+|=====
+[cols="2*1,8*3",width="100%"]
+|=====
+10+|[[vstore_half_r]]*vstore_half_r* +
+ +
+Converts the _data_ float or double value to a half value using the specified rounding mode _mode_ and writes the half value to the address computed as (_p_ + _offset_). 
+
+Behavior is undefined if the computed address is not 16-bit aligned.
+
+
+_data_ must be _float_ or _double_. 
+
+_offset_ must be _size_t_. 
+
+_Result Type_ must be _void_. 
+
+_p_ must be a _pointer_(_global_, _local_, _private_, _generic_) to _half_. 
+
+| 9 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 176
+ | _<id>_ +
+_data_ | _<id>_ +
+_offset_ | _<id>_ +
+_p_ | _FP Rounding Mode_ +
+_mode_
+
+|=====
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[vstore_halfn]]*vstore_halfn* +
+ +
+Converts the _data_ vector of float or vector of double values to a vector of half values using the default rounding mode and writes the half values to memory.
+
+Let _n_ be the component count of the vector _data_.
+
+The _n_ components from the converted vector of half values are written to the address computed as (_p_ + (_offset_ * _n_)).
+
+Behavior is undefined if the computed address is not 16-bit aligned.
+
+
+_offset_ must be _size_t_. 
+
+_Result Type_ must be _void_. 
+
+_p_ must be a _pointer_(_global_, _local_, _private_, _generic_) to _half_. 
+
+_data_ must be  _vector(2,3,4,8,16)_ of _float_ or _double_ values. 
+
+| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 177
+ | _<id>_ +
+_data_ | _<id>_ +
+_offset_ | _<id>_ +
+_p_
+
+|=====
+<<<
+[cols="2*1,8*3",width="100%"]
+|=====
+10+|[[vstore_halfn_r]]*vstore_halfn_r* +
+ +
+Converts the _data_ vector of float or vector of double values to a vector of half values using the specified rounding mode _mode_ and writes the half values to memory.
+
+Let _n_ be the component count of the vector _data_.
+
+The _n_ components from the converted vector of half values are written to the address computed as (_p_ + (_offset_ * _n_)).
+
+Behavior is undefined if the computed address is not 16-bit aligned.
+
+
+_offset_ must be _size_t_. 
+
+_Result Type_ must be _void_. 
+
+_p_ must be a _pointer_(_global_, _local_, _private_, _generic_) to _half_. 
+
+_data_ must be  _vector(2,3,4,8,16)_ of _float_ or _double_ values. 
+
+| 9 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 178
+ | _<id>_ +
+_data_ | _<id>_ +
+_offset_ | _<id>_ +
+_p_ | _FP Rounding Mode_ +
+_mode_
+
+|=====
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[vloada_halfn]]*vloada_halfn* +
+ +
+Reads a vector of _n_ half values from aligned memory and converts it to a float vector result value.
+
+For _n_ equal to 2, 4, 8, and 16, the vector of _n_ half values is read from the address computed as (_p_ + (_offset_ * _n_)). Behavior is undefined if the computed address is not aligned to (_sizeof(half)_ * _n_) bytes.
+
+For _n_ equal to 3, the vector of _n_ half values are read from the address computed as (_p_ + (_offset_ * 4)). Behavior is undefined if the computed address is not aligned to (_sizeof(half)_ * 4) bytes.
+
+
+_offset_ must be _size_t_. 
+
+_p_ must be a _pointer_(_global_, _local_, _private_, _constant_, _generic_) to _half_. 
+
+_Result Type_ must be  _vector(2,3,4,8,16)_ of _float_ values. 
+
+_Result Type_ component count must be equal to _n_.
+
+_n_ must be 2, 3, 4, 8 or 16.| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 179
+ | _<id>_ +
+_offset_ | _<id>_ +
+_p_ | _Literal_ +
+_n_
+
+|=====
+<<<
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[vstorea_halfn]]*vstorea_halfn* +
+ +
+Converts the _data_ vector of float or vector of double values to a vector of half values using the default rounding mode, and then writes the converted vector of half values to aligned memory.
+
+Let _n_ be the component count of the vector _data_.
+
+For _n_ equal to 2, 4, 8, and 16, the converted vector of half values is written to the address computed as (_p_ + (_offset_ * _n_)). Behavior is undefined if the computed address is not aligned to (_sizeof(half)_ * _n_) bytes.
+
+For _n_ equal to 3, the converted vector of half values is written to the address computed as (_p_ + (_offset_ * 4)). Behavior is undefined if the computed address is not aligned to (_sizeof(half)_ * 4) bytes.
+
+
+_offset_ must be _size_t_. 
+
+_Result Type_ must be _void_. 
+
+_p_ must be a _pointer_(_global_, _local_, _private_, _generic_) to _half_. 
+
+_data_ must be  _vector(2,3,4,8,16)_ of _float_ or _double_ values. 
+
+| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 180
+ | _<id>_ +
+_data_ | _<id>_ +
+_offset_ | _<id>_ +
+_p_
+
+|=====
+[cols="2*1,8*3",width="100%"]
+|=====
+10+|[[vstorea_halfn_r]]*vstorea_halfn_r* +
+ +
+Converts the _data_ vector of float or vector of double values to a vector of half values using the specified rounding mode _mode_, and then write the converted vector of half values to aligned memory.
+
+Let _n_ be the component count of the vector _data_.
+
+For _n_ equal to 2, 4, 8, and 16, the converted vector of half values is written to the address computed as (_p_ + (_offset_ * _n_)). Behavior is undefined if the computed address is not aligned to (_sizeof(half)_ * _n_) bytes.
+
+For _n_ equal to 3, the converted vector of half values is written to the address computed as (_p_ + (_offset_ * 4)). Behavior is undefined if the computed address is not aligned to (_sizeof(half)_ * 4) bytes.
+
+
+_offset_ must be _size_t_. 
+
+_Result Type_ must be _void_. 
+
+_p_ must be a _pointer_(_global_, _local_, _private_, _generic_) to _half_. 
+
+_data_ must be  _vector(2,3,4,8,16)_ of _float_ or _double_ values. 
+
+| 9 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 181
+ | _<id>_ +
+_data_ | _<id>_ +
+_offset_ | _<id>_ +
+_p_ | _FP Rounding Mode_ +
+_mode_
+
+|=====
+<<<
+
+[[MiscVec]]
+=== Miscellaneous Vector instructions
+This section describes additional vector instructions. 
+
+[cols="2*1,6*3",width="100%"]
+|=====
+8+|[[shuffle]]*shuffle* +
+ +
+Construct a permutation of components from _x_ vector value, returning a vector value with the same component type as _x_ and component count that is the same as _shuffle mask_.
+
+For this instruction, only the _ilogb_(2 _m_ -1) least significant bits of each mask element are considered, where _m_ is equal to the component count of _x_.
+
+_shuffle mask_ operand specifies, for each component in the result vector, which component of _x_ it gets.
+
+The size of each component in _shuffle mask_ must match the size of each component in _Result Type_.
+
+_Result Type_ must have the same component type as _x_ and component count as _shuffle mask_.
+
+
+_shuffle mask_ must be  _vector(2,4,8,16)_ of _integer_ values. 
+
+_Result Type_ and _x_ must be  _vector(2,4,8,16)_ of _floating-point_ or _integer_ values. 
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 182
+ | _<id>_ +
+_x_ | _<id>_ +
+_shuffle mask_
+
+|=====
+<<<
+[cols="2*1,7*3",width="100%"]
+|=====
+9+|[[shuffle2]]*shuffle2* +
+ +
+Construct a permutation of components from _x_ and _y_ vector values, returning a vector value with the same component type as _x_ and _y_ and component count that is the same as _shuffle mask_.
+
+For this instruction, only the _ilogb_(2 _m_ - 1) + 1 least significant bits of each mask component are considered, where _m_ is equal to the component count of _x_ and _y_.
+
+_shuffle mask_ operand specifies, for each component in the result vector, which component of _x_ or _y_ it gets. Where component count begins with _x_ and then proceeds to _y_.
+
+_x_ and _y_ must be of the same type.
+
+The size of each component in _shuffle mask_ must match the size of each component in _Result Type_.
+
+_Result Type_ must have the same component type as _x_ and component count as _shuffle mask_.
+
+
+_shuffle mask_ must be  _vector(2,4,8,16)_ of _integer_ values. 
+
+_Result Type_, _x_ and _y_ must be  _vector(2,4,8,16)_ of _floating-point_ or _integer_ values. 
+
+| 8 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 183
+ | _<id>_ +
+_x_ | _<id>_ +
+_y_ | _<id>_ +
+_shuffle mask_
+
+|=====
+<<<
+
+[[Misc]]
+=== Misc instructions
+This section describes additional miscellaneous instructions. 
+
+[cols="2*1,6*3",width="100%"]
+|=====
+8+|[[printf]]*printf* +
+ +
+The _printf_ extended instruction writes output to an implementation-defined stream such as stdout under control of the string pointed to by format that specifies how subsequent arguments are converted for output.  If there are insufficient arguments for the format, the behavior is undefined. If the format is exhausted while arguments remain, the excess arguments are evaluated (as always) but are otherwise ignored.  The printf instruction returns when the end of the format string is encountered
+
+_printf_ returns 0 if it was executed successfully and -1 otherwise
+
+
+_Result Type_ must be _i32_. 
+
+_format_ must be a _pointer_(_constant_) to _i8_. 
+
+| 6 + variable | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 184
+ | _<id>_ +
+_format_ | _<id>, <id>, ..._ +
+_additional arguments_
+
+|=====
+[cols="2*1,6*3",width="96%"]
+|=====
+8+|[[prefetch]]*prefetch* +
+ +
+Prefetch _num_elements_ * size in bytes of the type pointed by _p_, into the global cache. The prefetch instruction is applied to an invocation in a workgroup and does not affect the functionality of the kernel.
+
+
+_num_elements_ must be _size_t_. 
+
+_Result Type_ must be _void_. 
+
+_ptr_ must be a _pointer_(_global_) to _floating-point_, _integer_ or _vector(2,3,4,8,16)_ of _floating-point_, _integer_ values. 
+
+| 7 | 12  | _<id>_ +
+_Result Type_ | _Result <id>_| extended instructions set _<id>_| 185
+ | _<id>_ +
+_ptr_ | _<id>_ +
+_num_elements_
+
+|=====

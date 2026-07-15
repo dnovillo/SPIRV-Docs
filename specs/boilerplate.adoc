@@ -1,0 +1,15 @@
+:title-logo-image: {images}/Khronos_500px_June18.png
+:numbered:
+:toc: left
+:toc2:
+:toclevels: 3
+:table-stripes: even
+
+ifdef::backend-html5[]
+image::{images}/Khronos_500px_June18.png[width=600,align=center]
+endif::[]
+
+image::{images}/SPIR-V_RGB_500px_Jan25.png[width=200,align=center]
+
+include::{specs}/entities.adoc[]
+

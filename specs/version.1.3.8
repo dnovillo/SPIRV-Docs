@@ -1,0 +1,33 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+changes:
+
+=== Changes from Version 1.3, Revision 7
+
+- Fixed Issues:
+ * Khronos SPIR-V Issue #371: Restrict <<Intermediate, _intermediate object_>> types to variable types allowed at global scope.
+   See <<ShaderValidation, shader validation data rules>>.
+ * Khronos SPIR-V Issue #408: (Re)allow the <<Decoration, decorations>>
+   *Volatile*, *Coherent*, *NonWritable*, and *NonReadable*
+   on members of blocks.
+   (Temporarily dropping this functionality was accidental/clerical; intent is that it has always been present.)
+ * Khronos SPIR-V Issue #418: Add statements about undefinedness and how NaNs are mixed to
+   <<OpGroupNonUniformFAdd, *OpGroupNonUniformFAdd*>>,
+   <<OpGroupNonUniformFMul, *OpGroupNonUniformFMul*>>,
+   <<OpGroupNonUniformFMin, *OpGroupNonUniformFMin*>>, and
+   <<OpGroupNonUniformFMax, *OpGroupNonUniformFMax*>>.
+ * Khronos SPIR-V Issue #435: Expand the <<Validation, universal validation>> rule for variable pointers and matrices
+   to also disallow pointing within a matrix.
+ * Khronos SPIR-V Issue #447: Remove implication that <<OpPtrAccessChain, *OpPtrAccessChain*>> obeys an *ArrayStride* decoration
+   in storage classes laid out by the implementation.
+ * Khronos SPIR-V Issue #450: Allow pointers to *OpFunctionCall* to be pointers to an element of an array of samplers or images.
+   See the <<Validation, universal validation rules>> under the *Logical* addressing model without variable pointers.
+ * Khronos SPIR-V Issue #452: <<OpGroupNonUniformAllEqual, *OpGroupNonUniformAllEqual*>>
+   uses ordered compares for floating-point values.
+ * Khronos SPIR-V Issue #454: Add *OpExecutionModeId* to the list of allowed forward references in the
+   <<LogicalLayout, Logical Layout of a Module>>.

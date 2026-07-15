@@ -1,0 +1,29 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+changes:
+
+=== Changes from Version 1.4
+
+- Extensions Incorporated into SPIR-V 1.5:
+* SPV_KHR_8bit_storage
+* SPV_EXT_descriptor_indexing
+* SPV_EXT_shader_viewport_index_layer, with changes:
+  Replaced the single *ShaderViewportIndexLayerEXT* capability with the two new <<Capability, capabilities>>
+  *ShaderViewportIndex* and *ShaderLayer*.
+  Declaring both is equivalent to declaring *ShaderViewportIndexLayerEXT*.
+* SPV_EXT_physical_storage_buffer and SPV_KHR_physical_storage_buffer
+* SPV_KHR_vulkan_memory_model
+
+- Khronos Issue #402: Relax <<OpGroupNonUniformBroadcast, *OpGroupNonUniformBroadcast*>> _Id_ from constant to
+  dynamically uniform, starting with version 1.5.
+- Khronos Issue #493: Relax <<OpGroupNonUniformQuadBroadcast, *OpGroupNonUniformQuadBroadcast*>> _Id_ from constant to
+  dynamically uniform, starting with version 1.5.
+- Khronos Issue #494: Update the <<DynamicallyUniform, _Dynamically Uniform_>> definition to say that the
+  invocation group is the set of invocations, _unless otherwise stated_.
+- Khronos Issue #485: When <<RelaxedPrecisionSection, RelaxedPrecision>> is applied to a numerical instruction, the
+  operands may be truncated.

@@ -1,0 +1,33 @@
+// Copyright 2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+= LICENSE File for the KhronosGroup/SPIR-V-Docs Project
+
+Files in this repository fall under one of these licenses:
+
+  * SPDX license identifier: "`Apache-2.0 OR MIT`"
+  ** Apache License 2.0 OR MIT License
+  ** For files which need to be usable in GPL-licensed projects.
+
+  * SPDX license identifier: "`Apache-2.0`"
+  ** Apache License 2.0
+  ** For other scripts
+
+  * SPDX license identifier: "`CC-BY-4.0`"
+  ** Creative Commons Attribution 4.0 International
+  ** For specification source documents
+
+  * SPDX license identifier: "`LicenseRef-JsonCpp`"
+  ** License for components from JsonCpp project
+  ** Used in asciidoc markup generators
+
+  * SPDX license identifier: "`LicenseRef-KhronosSpecCopyright`"
+  ** Khronos propietary specification copyright
+  ** For Published specification outputs (HTML, PDF) ratified by the SPIR-V
+     Working Group.
+
+  * SPDX license identifier: "`MIT`"
+  ** MIT License
+  ** For files copied from other MIT-licensed projects
+
+Full text of these licenses is available in the LICENSES directory.

@@ -1,0 +1,6 @@
+# Copyright 2015-2026 The Khronos Group Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+[submodule "SPIRV-Headers"]
+        path = SPIRV-Headers
+        url = https://github.com/KhronosGroup/SPIRV-Headers.git

@@ -1,0 +1,109 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+= OpenCL Extended Instruction Set Specification
+Ben Ashbaugh, Intel
+1.00, Revision 9
+include::{specs}/boilerplate.adoc[]
+
+include::{specs}/copyright-spec.adoc[]
+
+// "<<<" means use a page break when going to PDF or printer
+<<<
+[float]
+=== Contributors and Acknowledgments
+
+- Yaxun Liu, AMD
+- Brian Sumner, AMD
+- Marty Johnson, AMD
+- Mandana Baregheh, AMD
+- Andrew Richards, Codeplay
+- Ben Ashbaugh, Intel
+- Alexey Bader, Intel
+- Guy Benyei, Intel
+- Raun Krisch, Intel
+- Boaz Ouriel, Intel
+- Yuan Lin, NVIDIA
+- Lee Howes, Qualcomm
+- Chihong Zang, Qualcomm
+- Ben Gaster, Qualcomm
+- Jack Liu, Qualcomm
+- Ronan Keryell, Xilinx
+
+include::{specs}/OpenCLGenerated.adoc[]
+
+== Appendix A: Changes and TBD
+
+* Fork the revision stream, changes section, TBD, etc. from the core specification, so this specification has its own, starting numbering at revision 1.
+This document now lives independently.
+
+=== Changes from Version 0.99, Revision 1
+
+- Move to use the updated image/texturing/sampling, instead of extended instructions.  Also, see changes in core specification related to this.
+* 14241 Implement OpenCL Extended Instructions for images/samplers with core OpImageSample instructions
+
+- Fixed internal bugs
+* 13455 Merged the OpenCL 1.2, 2.0, and 2.1 extended-instruction set into a single OpenCL extended-instruction set.
+
+- Fixed public bugs
+
+=== Changes from Version 0.99, Revision 2
+
+- 14679 moved precision information to the OpenCL environment spec
+- 14636 clarified trig functions to accept and return radians
+
+=== Changes from Version 0.99, Revision 3
+
+- Fixed internal bugs:
+* 14862 removed remaining image instructions as core versions are sufficient
+* 14636 Fixed type-o's in several trig functions accepting radian inputs and/or producing radian results
+
+* Flattened opcode numbers
+
+
+=== Changes from Version 1.0, Revision 1
+- Fixed internal bugs:
+* Issue 8 - order of parameters for prefetch was reversed; pointer operand should be first.
+* Issue 103 - typo: _singp_ should be _signp_
+
+- Fixed public bugs
+* 1469 - incorrect specification of *pow* and *pown*
+
+=== Changes from Version 1.0, Revision 2
+- Fixed internal bugs:
+* Issue 261 - clarified that *s_mad24* and *u_mad24* only support 32-bit integers
+* Issue 262 - added scalars to the types supported by *length*
+* Issue 266 - fixed *shuffle* and *shuffle2* description
+* Issue 267 - fixed description of *ldexp* operands
+
+=== Changes from Version 1.0, Revision 3
+- Moved image and sampler encoding to the OpenCL environment specification
+- Editorial fixes and improvements
+- Fixed internal bugs:
+* Issue 271 - storage class inconsistency between *vloadn*/*vstoren* and *vload_half*/*vstore_half*
+* Issue 312 - bad wording for *vstorea_halfn*
+
+=== Changes from Version 1.0, Revision 4
+
+Support SPV_KHR_no_integer_wrap_decoration, in the *s_abs* instruction.
+
+=== Changes from Version 1.0, Revision 5
+
+- Fixed internal bugs:
+* Issue 497 - fixed description for *s_upsample*
+
+=== Changes from Version 1.0, Revision 6
+
+- Fixed internal bugs:
+* Issue 515 - permit use of FPFastMathMode decorations with math, common, geometric, and
+  vector data load/store instructions for environments that allow it.
+
+=== Changes from Version 1.0, Revision 7
+
+- Fixed internal bugs:
+* Corrected the description of *u_upsample* and *s_upsample*.
+
+=== Changes from Version 1.0, Revision 8
+
+- Fixed internal bugs:
+* Issue 912 - clarify that the floating-point types in this specification use the IEEE 754 encoding.

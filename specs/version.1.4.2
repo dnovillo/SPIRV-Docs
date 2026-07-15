@@ -1,0 +1,38 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+changes:
+
+=== Changes from Version 1.4, Revision 1
+
+- GitHub SPIRV-Registry Issue #25: Remove validation rule for simultaneous use of *RowMajor* and *ColMajor*,
+  instead stating this in the <<Decoration, decoration>> cells themselves.
+- Khronos Issue #319: Bring in fixes to the SPV_KHR_16bit_storage extension.
+  See the *StorageBuffer16BitAccess* and the related 16-bit <<Capability, capabilities>>.
+- Khronos Issue #363: <<OpTypeBool, *OpTypeBool*>> can be used in the Input and Output storage classes,
+  but the client APIs still only allow built-in Boolean variables (e.g. FrontFacing), not user variables.
+- Khronos Issue #432: Remove the untrue expository statement
+  "*OpFunction* is the only valid use of <<OpTypeFunction, *OpTypeFunction*>>."
+- Khronos Issue #465: Distinguish between the **Groups** <<Capability, capability>>
+  and the <<Group, Group and Subgroup instructions>>.
+- Khronos Issue #484: Have <<OpTypeArray, *OpTypeArray*>> and <<OpTypeStruct, *OpTypeStruct*>> point to their
+  definitions.
+- Khronos Issue #477: Include 0.0 in the range of required values for *RelaxedPrecision* and other minor
+  clarifications in <<RelaxedPrecisionSection, the relaxed-precision section>> regarding floating-point precision.
+- Khronos Issue #226: Be more clear about explicit level-of-detail being either *Lod* or *Grad*
+  throughout the sampling instructions, and that *ConstOffset*, *Offset*, and *ConstOffsets* are mutually exclusive in
+  <<Image_Operands, the image operand's descriptions.>>
+- Khronos Issue #390: The *Volatile* <<Decoration, decoration>> does not guarantee each invocation performs the access.
+
+- Reserved New Tokens for:
+ * SPV_EXT_fragment_shader_interlock
+ * SPV_NV_shader_sm_builtins
+ * SPV_INTEL_shader_integer_functions2
+ * SPV_EXT_demote_to_helper_invocation
+ * SPV_KHR_shader_clock
+ * SPV_GOOGLE_user_type
+ * *Volatile*, for SPV_KHR_vulkan_memory_model

@@ -1,0 +1,62 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+changes:
+
+=== Changes from Version 1.6, Revision 1
+
+- Reserve enumerants for:
+ * SPV_KHR_ray_cull_mask
+ * SPV_KHR_uniform_group_instructions
+ * SPV_AMD_shader_early_and_late_fragment_tests
+ * SPV_INTEL_vector_compute
+ * SPV_INTEL_memory_access_aliasing
+ * SPV_INTEL_split_barrier
+ * SYCL <<Source_Language, source language>>
+
+- Fix Khronos issues:
+ * #680, #685, #696: Refine, clarify, and fix <<StructuredControlFlow, structured control-flow>> definitions and rules:
+    ** Add the concept of a <<StructuredControlFlowPath,structured control-flow path>>
+       to better express the rules for structured control flow, as defined by the following terms.
+    ** Terms: Define the terms <<BranchEdge,branch edge>>,
+         <<MergeEdge, merge edge>>, <<ContinueEdge,continue edge>>,
+         <<StructuredControlFlowEdge,structured control-flow edge>>,
+         <<Path,path>>, <<StructuredControlFlowPath,structured control-flow path>>,
+         <<StructurallyReachable, structurally reachable>>, <<StructurallyDominate,structurally dominate>>,
+         and <<StructurallyPostDominate,structurally post dominate>>.
+         Remove "post dominate".
+         Revise definition of <<BackEdge,back edge>> to refer to _branch edge_ instead of
+         _branch_. Pull out <<BackEdgeBlock,back-edge block>> into its own definition.
+         Rename the term "termination instruction" to <<Termination, block termination instruction>>
+         and introduce the term <<FunctionTermination, function termination instruction>>.
+    ** Rework and simplify structured control-flow rules using the terms above.
+         Clarify that a loop's continue target must be different from its merge block.
+         Remove redundant condition that a loop's continue construct must contain the
+         loop's back-edge block.
+         Precisely define the rules for exiting structured control-flow constructs.
+
+ * #672, #673, #674: Clarify branching rules for the <<OpSwitch, **OpSwitch**>> instruction, for:
+    ** the order in which target operands appear in an
+         <<OpSwitch, **OpSwitch**>> instruction,
+    ** duplicated targets, and
+    ** branching between case constructs, to make
+         it clear that branch edges do not have to start at a switch target, but can
+         come from anywhere in a switch construct.
+
+ * #695: For most cases, disallow multiple uses of the same <<Decoration, decoration>> on
+         the same _<id>_ or structure member.
+ * #696: Change <<PhysicalValidation,validation rules>> for physical storage buffers to
+         clarify they apply to pointers nested in other types (not just arrays).
+
+ * #672, #704: Clarify branching rules under <<ConstructRules, switch construct rules>> for the *OpSwitch* instruction,
+    making it clear that the rules about
+    target ordering only apply to targets that define case constructs,
+    and resolving ambiguity about what is allowed when the default case
+    construct appears in the list of targets.
+
+- Clarify the meaning of <<FP_Fast_Math_Mode, fast math flags>> when the
+  asserted properties are not true.

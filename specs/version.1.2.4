@@ -1,0 +1,25 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+changes:
+
+=== Changes from Version 1.2, Revision 3
+
+Fixed Khronos-internal issues:
+
+- #249: Improve description of <<OpTranspose, *OpTranspose*>>.
+- #251: Undefined values in <<OpUndef, *OpUndef*>> include abstract and opaque values.
+- #258: Deprecate <<OpAtomicCompareExchangeWeak, *OpAtomicCompareExchangeWeak*>> in favor of <<OpAtomicCompareExchange, *OpAtomicCompareExchange*>>.
+- #241: Use "invalid" instead of "compile-time" error for *ConstOffsets*.
+- #248: <<OpImageSparseRead, *OpImageSparseRead*>> is not for *SubpassData*.
+- #257: Allow *OpImageSparseFetch* and *OpImageSparseRead* with the *Sample* <<Image_Operands, image operands>>.
+- #229: Some sensible constraints on branch hints for <<OpBranchConditional, *OpBranchConditional*>>.
+- #236: <<OpVariable, *OpVariable*>>'s storage class must match storage class of the pointer type.
+- #216: Can <<TypesVariables, decorate pointer types>> with *Coherent* and *Volatile*.
+- #247: Don't say <<Scope_-id-, Scope _<id>_ >> is a mask; it is not.
+- #254: Remove <<Validation, validation>> rules about the types atomic instructions can operate on. These rules belong instead to the client API.
+- #265: <<OpGroupDecorate, *OpGroupDecorate*>> cannot target an *OpDecorationGroup*.

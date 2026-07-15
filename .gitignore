@@ -1,0 +1,36 @@
+# Copyright 2015-2026 The Khronos Group Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+tools/spirv/build
+tools/buildHeaders/build
+tags
+specs/GLSL.std.450.html
+specs/GLSL.std.450.pdf
+specs/GLSL.std.450.xml
+specs/OpenCL.std.html
+specs/OpenCL.std.pdf
+specs/OpenCL.std.xml
+specs/DebugInfo.html
+specs/DebugInfo.pdf
+specs/DebugInfo.xml
+specs/SPIRV.html
+specs/SPIRV.pdf
+specs/SPIRV.xml
+specs/*.mobile.*
+specs/*.auto
+specs/SPIRV-docbook.xml
+specs/MachineReadableGrammar.html
+specs/MachineReadableGrammar.pdf
+specs/MachineReadableGrammar.xml
+specs/unified-version-info
+specs/auto.*.adoc
+specs/OpenCL.DebugInfo.100.html
+specs/OpenCL.DebugInfo.100.pdf
+specs/OpenCL.DebugInfo.100.xml
+tools/spirv/.vs
+tools/spirv/CMakeSettings.json
+tools/spirv/out/
+build/*
+.vscode/*
+diff/
+rel-diff/

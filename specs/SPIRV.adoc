@@ -1,0 +1,16 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+// This is the top-level asciidoc file.  Content could appear here, it's
+// just all being included from other places currently.
+include::{specs}/intro.adoc[]
+
+// "<<<" means use a page break when going to PDF or printer
+<<<
+include::{specs}/specification.adoc[]
+
+<<<
+include::{specs}/binary.adoc[]
+
+<<<
+include::{specs}/changes.adoc[]

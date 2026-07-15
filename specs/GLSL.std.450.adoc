@@ -1,0 +1,167 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+= SPIR-V Extended Instructions for GLSL
+John Kessenich, Google
+1.00, Revision 17
+include::{specs}/boilerplate.adoc[]
+
+include::{specs}/copyright-spec.adoc[]
+
+== Introduction
+
+This specifies the GLSL.std.450 extended instruction set. It provides instructions for the GLSL built-in functions that do not directly map to native SPIR-V instructions.
+
+Import this extended instruction set using an *OpExtInstImport* "GLSL.std.450" instruction.
+
+Where requirements are written in the form f({plusmn}x) = {plusmn}y, this means that f(x) = y and f(-x) = -y.
+
+In this specification, a floating-point type is any *OpTypeFloat* using the IEEE 754 encoding.
+
+[NOTE]
+====
+These instructions may specify their behavior for special floating-point values such as -0.0, Infinities or NaN.
+Such values can only be reliably observed when *SPV_KHR_float_controls2* is used because the
+**SignedZeroInfNaNPreserve** execution mode does not apply to these instructions and by default these special
+values may be ignored. In some cases, client APIs may allow an error bound for results which may include values
+other than the reference value given.
+====
+
+== Binary Form
+
+[float]
+=== Documentation form for each extended instruction:
+
+[cols="4*1",width="70%"]
+|=====
+4+| *Extended Instruction Name*
+
+Instruction description.
+
+_Result Type_ will describe the _Result Type_ for the *OpExtInst* instruction.
+
+_Number_ is the extended instruction number to use in the *OpExtInst* instruction.
+
+_Operand 1_, _Operand 2_,... are the operands listed for the *OpExtInst* instruction.
+
+Any *Capability* restrictions. |
+
+_Number_ | _Operand 1_ | _Operand 2_ | ...
+|=====
+
+[float]
+=== Extended instructions:
+
+include::{specs}/GLSLGenerated.adoc[]
+
+== Appendix A: Changes
+
+=== Changes from Version 0.99, Revision 1
+
+- Fork the revision stream, changes section, etc. from the core specification, so this specification has its own, starting numbering at revision 1.
+This document now lives independently.
+- Added integer versions of abs, sign, min, max, and clamp.
+- Removed floatBitsToInt, floatBitsToUint, intBitsToFloat, and uintBitsToFloat; these can be handled with *OpBitcast*.
+- Removed fTransform, not needed.
+
+- Fixed internal bugs
+* 13721: Add *OpTypeStruct*-result versions of *Modf* and *Frexp*: *ModfStruct* and *FrexpStruct*.
+
+- Fixed public bugs
+* 1322: GLSL.std.450 frexp wasn't saying the _exp_ argument was a pointer to the result
+
+=== Changes from Version 0.99, Revision 2
+
+- Moved AddCarry, SubBorrow, and MulExtended type of instructions to the core specification.
+- Added integer variant of *Mix*, creating *FMix* and *IMix* (14480).
+- Modified spellings to be more regular (14614).
+
+=== Changes from Version 0.99, Revision 3
+
+- Add "*N*" version of *Min*, *Max*, and *Clamp*, creating a version that favors non-NaN operands over NaN operands.
+- Bug 15452 Remove *IMix*.
+- Bug 15300 Be more consistent that the *InterpolateAt* instructions take a pointer.
+- Bug 14548 Document the *Capability* needed for *Double2x32* and *InterpolateAt* instructions.
+
+=== Changes from Version 1.00, Revision 1
+
+- Bug 14548 Document the *Capability* needed for *UnpackDouble2x32*.
+
+=== Changes from Version 1.00, Revision 2
+
+- Change *precise* to *NoContraction*
+
+=== Changes from Version 1.00, Revision 3
+
+- Allow both 16-bit and 32-bit floating-point types in most places where before only 32-bit floating-point types were allowed.
+  This does not effect whether 16-bit floating point types are allowed, which is selected independently.  Since 16-bit types
+  were historically disallowed, this is a backward compatible change.
+- Fix Khronos internal issue #109: be more clear for NMin/NMax: If both operands are NaN, the result is a NaN.
+
+=== Changes from Version 1.00, Revision 4
+
+- Be clear about *UnpackHalf2x16* denorm rules.
+
+=== Changes from Version 1.00, Revision 5
+
+Fixed:
+
+- Khronos SPIR-V Issue #211: As with *FindSMsb* and *FindUMsb*, *FindILsb* needs 32-bit components.
+
+=== Changes from Version 1.00, Revision 6
+
+Fixed:
+
+- Khronos SPIR-V Issue #337: The component types of the operands for *Refract* must all be the same.
+- Khronos SPIR-V Issue #331: Correct the types in *ModfStruct*.
+
+=== Changes from Version 1.00, Revision 7
+
+Support SPV_KHR_no_integer_wrap_decoration, in the *SAbs* instruction.
+
+=== Changes from Version 1.00, Revision 8
+
+Fixed:
+
+- Khronos SPIR-V Issue #466: *FAbs* of _-0.0_ is _+0.0_, *FSign* of _-0.0_ can be either _{plusmn}0.0_.
+  *FMin*, *FMax*, *NMin*, and *NMax* are allowed to return either operand when both are zeros.
+- Khronos SPIR-V Issue #458: For *Frexp*, be more clear about negative values, and also about which returned value is being discussed.
+
+=== Changes from Version 1.00, Revision 9
+
+- Corrected the output range of *Atan*.
+
+=== Changes from Version 1.00, Revision 10
+
+- State what *FSign* of _{plusmn}NaN_ is.
+
+=== Changes from Version 1.00, Revision 11
+
+- Khronos SPIR-V Issue #555: Deprecate *Modf*, use *ModfStruct* instead. Deprecate *Frexp*, use *FrexpStruct* instead.
+- Khronos SPIR-V Issue #284: Say all bits are set, instead of saying -1, for some results of *FindILsb*, *FindSMsb*, and *FindUMsb*.
+- Khronos SPIR-V MR #181: Use "fragment" instead of "pixel" in *InterpolateAtCentroid*, *InterpolateAtSample*, and *InterpolateAtOffset*.
+
+=== Changes from Version 1.00, Revision 12
+
+- Khronos SPIR-V Issue #705: Clarify the computation provided for *Reflect* is used regardless of input normalization.
+
+=== Changes from Version 1.00, Revision 13
+
+- Clarify behavior for *Round*, *RoundEven*, *Trunc*, *FAbs*, *FSign*, *Floor*, *Ceil*, *Fract*, *Sin*, *Cos*, *Tan*, *Asin*, *Acos*, *Sinh*, *Cosh*, *Tanh*, *Asinh*, *Acosh*, *Exp*, *Log*, *Exp2*, *Log2*, *Sqrt*, *InverseSqrt*, *ModfStruct*, *FMin*, *FMax*, *NMin*, *NMax* for special floating-point values (only observable when SPV_KHR_float_controls2 is used).
+
+
+=== Changes from Version 1.00, Revision 14
+
+- Khronos SPIR-V Issue #800: Clarify behavior for *FMin*, *FMax*, *NMin*, *NMax* to match IEEE 754-2019 (observable when SPV_KHR_float_controls2 is used).
+- Khronos SPIR-V Issue #801: Clarify that the _exp_ operand to *Ldexp* is always interpreted as signed.
+- Khronos SPIR-V Issue #795: Clarify that *RelaxedPrecision* only applies to the conversion part of the pack and unpack operations.
+
+Changes from Version 1.00, Revision 15
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Khronos SPIR-V Issue #855: Clarify exponent limits for half-precision floats in *Ldexp*.
+
+Changes from Version 1.00, Revision 16
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Khronos SPIR-V Issue #912: Clarify that a floating-point type in this specification is an *OpTypeFloat* using the IEEE 754 encoding.

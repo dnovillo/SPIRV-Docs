@@ -1,0 +1,18 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+changes:
+
+=== Changes from Version 1.00, Revision 8
+
+ - Add SPV_KHR_subgroup_vote tokens.
+ - Typo: Change "without a sampler" to "with a sampler" for the description of the <<Capability, *SampledBuffer*>> Capability.
+ - Khronos SPIR-V issue #61: Clarification of packet size and alignment on all instructions that use the <<Capability, *Pipes*>> Capability.
+ - Khronos SPIR-V issue #99: Use "invalid" language to replace any "compile-time error" language.
+ - Khronos SPIR-V issue #55: Distinguish between <<Branch, branch instructions>> and <<Termination, termination instructions>>.
+ - Khronos SPIR-V issue #94: Add missing <<OpSubgroupReadInvocationKHR, *OpSubgroupReadInvocationKHR*>> enumerant.
+ - Khronos SPIR-V issue #114: Header blocks <<Dominate, strictly dominate>> their merge blocks.
+ - Khronos SPIR-V issue #119: <<OpSpecConstantOp, *OpSpecConstantOp*>> allows *OpUndef* where allowed by its _opcode_.

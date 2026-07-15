@@ -1,0 +1,34 @@
+// Copyright 2017-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+ifdef::env-github[]
+:note-caption: :information_source:
+endif::[]
+
+= SPIR-V^(R)^ Documentation Project
+
+This repository contains the source markup used to generate the formal SPIR-V specifications found on https://www.khronos.org/spirv/.
+
+[NOTE]
+====
+The SPIR Working Group intends to remove the spec generator (`tools/spirv`) after the SPIR-V specification source migrates to GitHub.
+It is kept for now so the existing spec build continues to work.
+====
+
+== Directory Structure
+
+```
+README.adoc           This file
+BUILD.adoc            Build instructions and software dependencies
+CONTRIBUTING.adoc     Requirements for external contributions to the repository
+CODE_OF_CONDUCT.adoc  Code of Conduct
+LICENSE.adoc          Summary of licenses used by files in the repository
+Makefile              Makefile and helper build scripts
+specs/                Specification source for SPIR-V, machine-readable grammar, and extended instruction sets
+```
+
+== Building
+
+See link:BUILD.adoc[BUILD.adoc] for instructions on building the HTML and PDF specifications, including software dependencies and the Khronos-provided Docker image.
+
+Proposed changes must successfully build the HTML and PDF targets before being considered for inclusion by the SPIR-V Working Group.

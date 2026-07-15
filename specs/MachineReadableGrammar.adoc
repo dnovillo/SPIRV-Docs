@@ -1,0 +1,398 @@
+// Copyright 2014-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+= SPIR-V Machine-readable Grammar
+:Author: Lei Zhang, Google
+:numbered:
+:toc: left
+:toc2:
+:toclevels: 3
+
+:source-highlighter: pygments
+
+Copyright 2014-2026 The Khronos Group Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and/or associated documentation files (the "Materials"),
+to deal in the Materials without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Materials, and to permit persons to whom the
+Materials are furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Materials.
+
+MODIFICATIONS TO THIS FILE MAY MEAN IT NO LONGER ACCURATELY REFLECTS KHRONOS
+STANDARDS. THE UNMODIFIED, NORMATIVE VERSIONS OF KHRONOS SPECIFICATIONS AND
+HEADER INFORMATION ARE LOCATED AT https://www.khronos.org/registry/
+
+THE MATERIALS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM,OUT OF OR IN CONNECTION WITH THE MATERIALS OR THE USE OR OTHER DEALINGS
+IN THE MATERIALS.
+
+== Introduction
+
+This document defines the schema used by the machine-readable JSON grammar file
+for SPIR-V. This document is *not* the SPIR-V specification fully defining
+SPIR-V itself.
+
+=== Goals and Conventions
+
+* The machine-readable JSON grammar primarily aims to describe the syntax of
+  various SPIR-V instructions. Semantics and validation rules remain in the
+  human-readable SPIR-V specification.
+* If a grammar struct has no particular attribute, e.g., `OpNop` has no
+  operands and requires no additional capabilities, the corresponding key for
+  that attribute in the JSON object is excluded for terseness.
+* Keys in various JSON objects are in the `snake_case` format, while values
+  are in the `CamelCase` format.
+* <<operand-kind,Operand kind>>s of a specific <<operand-category,category>>
+  tend to have the category name as the prefix.
+
+=== Alias mechanism
+
+<<instruction, Instructions>>, <<bitenum-operand-kind, BitEnum operand kinds>> and <<valueenum-operand-kind, ValueEnum operand kind>> can have aliases.
+An alias is introduced when an instruction or operand kind from an extension is reused in another extension or is integrated into the core specifications without a change in semantics.
+As the semantics do not change from the original extension,
+the new extension or core specifications will reuse the same opcode or value but change the name for consistency.
+This leads to instructions or operand kinds sharing the same value but having different names.
+
+Previous versions of the grammar dealt with this by duplicating the entry.
+This led to multiple entries sharing the same opcode or value, adding complexity for tooling.
+
+New versions of the grammar now bans the duplication of the opcode or operand kind in favor of the `aliases` field to keep track of the name evolution.
+
+== Top Level Structure
+
+The whole JSON grammar file consists of a single JSON object containing the
+following key-value pairs:
+
+ifdef::backend-html5[]
+[source,json]
+endif::backend-html5[]
+----
+{
+  "copyright" : [ ... ],
+  "magic_number" : "...",
+  "major_version" : ...,
+  "minor_version" : ...,
+  "revision" : ...,
+  "instructions" : [ ... ],
+  "operand_kinds" : [ ... ]
+}
+----
+
+`magic_number`::
+  A string. The magic number for a SPIR-V module in the hexadecimal format.
+`major_version`::
+  An integer. The major version of the SPIR-V represented in this grammar file.
+`minor_version`::
+  An integer. The minor version of the SPIR-V represented in this grammar file.
+`revision`::
+  An integer. The revision of the SPIR-V represented in this grammar file.
+`instructions`::
+  A list of objects. Each object contains information about a specific
+  instruction in the SPIR-V specification, including its name, opcode,
+  required capabilities, layout of operands. The order of these objects
+  dictates nothing. See the <<instruction,JSON Objects for Instructions>>
+  Section for more details.
+`operand_kinds`::
+  A list of objects. Each object contains information about a specific
+  operand kind, including its name, category, possible values, required
+  capabilities, used in the operand layouts of <<instruction,
+  instructions>>. See the <<operand-kind,JSON Objects for Operand Kinds>>
+  Section for more details.
+
+== Grammar Objects
+
+[[instruction]]
+=== JSON objects for instructions
+
+This kind of JSON object contains the information about a specific SPIR-V
+instruction. It has the following key-value pairs:
+
+ifdef::backend-html5[]
+[source,json]
+endif::backend-html5[]
+----
+{
+  "opname" : "...",
+  "opcode" : ...,
+  "operands" : [
+    { "kind" : "...", quantifier : "...", name : "..." },
+    { "kind" : "...", quantifier : "...", name : "..." },
+    ...
+  ],
+  "capabilities" : [ ... ]
+}
+----
+
+`opname`::
+  A string. The name of this instruction, starting with `Op`.
+  Must be unique in all `opname` in `instructions`.
+`opcode`::
+  An integer. The opcode enumerant for this instruction.
+  Must be unique in all `opcode` in `instructions`.
+`operands`::
+  A list of objects. _Optional_. Each object contains the information about
+  a logical operand for this instruction:
+  `kind`:::
+    A string. The <<operand-kind,kind>> of this operand.
+  `quantifier`:::
+    A string. _Optional_. If this key is missing, it means this operand
+    should appear exactly once. Otherwise, the value can only be `"?"` or
+    `"\*"`. If the value is `"?"`, it means this operand appears zero or
+    one time. If the value is `"*"`, it means this operand appears zero
+    or more times.
+  `name`:::
+    A string. _Optional_. A short descriptive name for this operand.
+`capabilities`::
+  A list of strings. _Optional_. If this field exists, at least one of the named
+  <<capability,capabilities>> must be declared to use this instruction.
+`aliases`::
+  A list of strings. _Optional_. If this field exists, each string is
+  an alternative name for this instruction.
+  Each name must appear exactly once and must not be equal to `opname`.
+
+[[operand-category]]
+=== Operand categories
+
+Operand kinds are grouped into categories according to their possible values.
+Right now, there are only five categories:
+
+*BitEnum*::
+  For an operand kind belonging to this category, its value is a mask, which
+  is formed by combining the bits specified as enumerants in an enum. See the
+  <<bitenum-operand-kind,BitEnum Operand Kind>> Section for more details.
+*ValueEnum*::
+  For an operand kind belonging to this category, its value is an enumerant
+  from an enum. See the <<valueenum-operand-kind,ValueEnum Operand Kind>>
+  Section for more details.
+*Id*::
+  For an operand kind belonging to this category, its value is an <id>
+  definition or reference.
+*Literal*::
+  For an operand kind belonging to this category, its value is an literal
+  number or string.
+*Composite*::
+  For an operand kind belonging to this category, its value is composed from
+  operand values from the above categories. See the <<composite-operand-kind,
+  Composite Operand Kind>> Section for more details.
+
+
+[[operand-kind]]
+=== JSON objects for operand kinds
+
+This kind of JSON object contains the information about a specific operand
+kind. It has the following key-value pairs:
+
+ifdef::backend-html5[]
+[source,json]
+endif::backend-html5[]
+----
+{
+  "category" : "...",
+  "kind" : "...",
+  "doc" : "...",
+  ...
+}
+----
+
+`category`::
+  A string. The <<operand-category,category>> of this operand kind.
+`kind`::
+  A string. The name of this operand kind.
+  Must be unique in all `kind` in `operand_kinds`.
+`doc`::
+  A string. _Optional_. The human-readable definition of this operand kind.
+
+Depending on the category of this operand kind, there may be more key-value
+pairs as explained in the following subsections.
+
+[[bitenum-operand-kind]]
+==== The BitEnum operand kind
+
+Apart from the general key-value pairs, this kind of JSON object additionally
+has:
+
+ifdef::backend-html5[]
+[source,json]
+endif::backend-html5[]
+----
+{
+  ...,
+  "enumerants": [
+    {
+      "enumerant" : "...",
+      "value" : "...",
+      "capabilities" : [ ... ],
+      "parameters" : [
+        { "kind" : "..." },
+        ...
+      ]
+    }
+}
+----
+
+`enumerants`::
+  A list of objects. Each object describes a possible bitflag for this operand
+  kind:
+  `enumerant`:::
+    A string. The name of this bitflag.
+    Must be unique in all `enumerant` in the <<operand-kind,operand kind object>>.
+  `value`:::
+    A string. The hexadecimal bit value of this bitflag.
+    Must be unique in all `value` in the <<operand-kind,operand kind object>>.
+  `capabilities`:::
+    A list of strings. _Optional_. If this field exists, at least one of the named
+    <<capability,capabilities>> must be declared to use this bitflag.
+  `parameters`:::
+    A list of objects. _Optional_. Each object describes a logical parameter
+    for this bitflag:
+    `kind`;;
+      A string. The <<operand-kind,kind>> of this operand.
+  `aliases`:::
+    A list of strings. _Optional_. If this field exists, each string is
+    an alternative name for this bitflag.
+    Each name must appear exactly once and must not be equal to `enumerant`.
+
+[[valueenum-operand-kind]]
+==== The ValueEnum operand kind
+
+Apart from the general key-value pairs, this kind of JSON object additionally
+has:
+
+ifdef::backend-html5[]
+[source,json]
+endif::backend-html5[]
+----
+{
+  ...,
+  "enumerants": [
+    {
+      "enumerant" : "...",
+      "value" : ...,
+      "capabilities" : [ ... ],
+      "parameters" : [
+        { "kind" : "..." },
+        ...
+      ]
+    }
+}
+----
+
+`enumerants`::
+  A list of objects. Each object describes an possible enumerant for this
+  operand kind:
+  `enumerant`:::
+    A string. The name of this enumerant.
+    Must be unique in all `enumerant` in the <<operand-kind,operand kind object>>.
+  `value`:::
+    An integer. The value of this enumerant.
+    Must be unique in all `value` in the <<operand-kind,operand kind object>>.
+  `capabilities`:::
+    A list of strings. _Optional_. If this field exists, at least one of the named
+    <<capability,capabilities>> must be declared to use this enumerant.
+    For enumerants in the <<capability,*Capability*>> operand kind, each string
+    names a capability that is additionally declared when this capability is declared.
+  `extensions`:::
+    A list of strings. _Optional_. The names of extensions that enable this
+    feature.  If absent, the feature is always enabled.
+  `parameters`:::
+    A list of objects. _Optional_. Each object describes a logical parameter
+    for this enumerant:
+    `kind`;;
+      A string. The <<operand-kind,kind>> of this operand.
+  `aliases`:::
+    A list of strings. _Optional_. If this field exists, each string is
+    an alternative name for this enumerant.
+    Each name must appear exactly once  and must not be equal to `enumerant`.
+
+[[capability]]
+===== The Capability operand kind
+
+For example, capabilities are represented as a *ValueEnum* operand kind:
+
+ifdef::backend-html5[]
+[source,json]
+endif::backend-html5[]
+----
+{
+  "category" : "ValueEnum",
+  "kind" : "Capability",
+  "enumerants" : [
+    {
+      "enumerant" : "Matrix",
+      "value" : 0
+    },
+    {
+      "enumerant" : "Shader",
+      "value" : 1,
+      "capabilities" : [ "Matrix" ]
+    },
+    {
+      "enumerant" : "Geometry",
+      "value" : 2,
+      "capabilities" : [ "Shader" ]
+    },
+    {
+      "enumerant" : "Tessellation",
+      "value" : 3,
+      "capabilities" : [ "Shader" ]
+    },
+    {
+      "enumerant" : "Addresses",
+      "value" : 4
+    },
+    ...
+}
+----
+
+[[id-operand-kind]]
+==== The Id operand kind
+
+This kind of JSON object has no additional key-value pairs. All the kinds in
+this category are prefixed with `Id`.
+
+[[literal-operand-kind]]
+==== The Literal operand kind
+
+This kind of JSON object has no additional key-value pairs. All the kinds in
+this category are prefixed with `Literal`.
+
+[[composite-operand-kind]]
+==== The Composite operand kind
+
+This kind of JSON object additionally contains:
+
+ifdef::backend-html5[]
+[source,json]
+endif::backend-html5[]
+----
+{
+  ...,
+  bases: [ ... ]
+}
+----
+
+`bases`::
+  A list of strings. Each string names an operand kind forming this *Composite*
+  kind.
+
+When an operand is of the *Composite* kind, all the operands listed in its
+`bases` must appear in the concrete case, in the given order.
+
+Right now there are only three kinds defined in this category:
+
+* `PairIdRefIdRef`: used by `OpPhi`.
+* `PairLiteralIntegerIdRef`: used by `OpSwitch`.
+* `PairIdRefLiteralInteger`: used by `OpGroupMemberDecorate`.
+
+== Example Usage
+
+Please see the https://github.com/KhronosGroup/SPIRV-Tools[SPIRV-Tools] project
+for an example of how this grammar can be used.

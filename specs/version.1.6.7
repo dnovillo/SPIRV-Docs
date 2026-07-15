@@ -1,0 +1,88 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+author: Victor Lomüller, Codeplay
+author: Diego Novillo, NVIDIA
+changes:
+
+=== Changes from Version 1.6, Revision 6
+
+- Reserve enumerants for:
+  * SPV_KHR_fma
+  * SPV_KHR_untyped_pointers
+  * SPV_INTEL_variable_length_array
+  * SPV_EXT_shader_64bit_indexing
+  * SPV_EXT_shader_invocation_reorder
+  * SPV_EXT_long_vector
+  * SPV_EXT_descriptor_heap
+  * SPV_EXT_shader_subgroup_partitioned
+  * SPV_NV_push_constant_bank
+  * SPV_VALVE_mixed_float_dot_product
+
+- Rename the vendor suffix from INTEL to ALTERA for tokens from the following extensions.
+  The original INTEL-suffixed names are kept as aliases for backward compatibility.
+  See the extension specifications for a full listing of tokens:
+  * SPV_ALTERA_fpga_memory_attributes
+  * SPV_ALTERA_arbitrary_precision_integers
+  * SPV_ALTERA_arbitrary_precision_floating_point
+  * SPV_ALTERA_fpga_loop_controls
+  * SPV_ALTERA_fpga_memory_accesses
+  * SPV_ALTERA_fpga_cluster_attributes
+  * SPV_ALTERA_loop_fuse
+  * SPV_ALTERA_fpga_dsp_control
+  * SPV_ALTERA_fpga_invocation_pipelining_attributes
+  * SPV_ALTERA_fpga_buffer_location
+  * SPV_ALTERA_arbitrary_precision_fixed_point
+  * SPV_ALTERA_usm_storage_classes
+  * SPV_ALTERA_runtime_aligned
+  * SPV_ALTERA_io_pipes
+  * SPV_ALTERA_blocking_pipes
+  * SPV_ALTERA_fpga_reg
+  * SPV_ALTERA_task_sequence
+  * SPV_ALTERA_fpga_latency_control
+  * SPV_ALTERA_fpga_argument_interfaces
+  * SPV_ALTERA_global_variable_fpga_decorations
+
+- Clarifications:
+  * !361: Introduce <<Poison,*Poison*>>, <<UndefinedValue,*Undefined Value*>>, and
+    <<StableValue,*Stable Value*>> as distinct concepts, and revise the definitions
+    of <<UndefinedBehavior,*Undefined Behavior*>> and <<ValidDefined,*Valid Module*>>.
+
+- Fix Khronos SPIR-V Issues:
+  * #912: Clarify that a floating-point type in the GLSL and OpenCL extended instruction
+    sets is an *OpTypeFloat* using the IEEE 754 encoding.
+  * GitHub #378: Clarify that <<Image_Operands,*MakeTexelVisible*>> is only valid with
+    <<OpImageRead,*OpImageRead*>> and <<OpImageSparseRead,*OpImageSparseRead*>>, not all
+    instructions reading images without a sampler. Similarly clarify that *MakeTexelAvailable*
+    is only valid with <<OpImageWrite,*OpImageWrite*>>.
+  * !355: Clarify <<OpDecorateId,*OpDecorateId*>> cannot be used with <<OpDecorationGroup,*OpDecorationGroup*>>
+    and that all *Extra Operands* must be defined before _Target_.
+  * #879: Fix missing *Subgroup* <<Scope,scope>> restriction on <<OpGroupNonUniformBallot,*OpGroupNonUniformBallot*>>
+    and <<OpGroupNonUniformShuffle,*OpGroupNonUniformShuffle*>>.
+  * #549 and #878: Clarify <<Validation,validation rules>> for <<LogicalPointerType,logical pointer type>> operands and result types.
+  * #873: Clarify <<Validation,universal validation rules>> for loaded images and samplers:
+    they do not need to be consumed in the same block.
+  * !364: Relax <<OpArrayLength,*OpArrayLength*>> return type to allow 64-bit values.
+  * #900: Clarify that for <<OpUDiv,*OpUDiv*>>, and similar instructions, any component of a vector being zero in undefined in the same
+    way a scalar is if zero.
+  * #904: Provide information in <<OpExecutionModeId,*OpExecutionModeId*>> to use <<OpExecutionMode,*OpExecutionMode*>> when using literal extra operands.
+  * #909: Clarify <<OpSDot,integer dot product>> instructions return a scalar.
+  * #905: Clarify that the *Coordinate* operand of <<Image,Image>> sampling, fetch, gather,
+    read, write, and query instructions must be a 32-bit <<Floating,floating-point>> or
+    32-bit <<Integer,integer>> type, as applicable per instruction.
+  * !373: Remove the _Qualifier_ operand from <<OpCreatePipeFromPipeStorage,*OpCreatePipeFromPipeStorage*>>;
+    the access qualifier is already encoded in the result type.
+
+- Fix Github SPIRV-Headers Issues:
+  * #571: Clarify that *ConstOffsets* is valid with <<OpImageSparseGather,*OpImageSparseGather*>>
+    and <<OpImageSparseDrefGather,*OpImageSparseDrefGather*>>, consistent with their non-sparse
+    counterparts <<OpImageGather,*OpImageGather*>> and <<OpImageDrefGather,*OpImageDrefGather*>>.
+
+- Fix SPIR-V Registry Issues:
+  * #383: Clarify that the `capabilities` list in the machine-readable grammar
+    is an OR condition -- at least one of the named capabilities must be declared, not all
+    of them.

@@ -1,0 +1,1512 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+= OpenCL.DebugInfo.100 Information Extended Instruction Set Specification
+Alexey Sotkin, Intel
+2.00, Revision 1
+include::{specs}/boilerplate.adoc[]
+
+include::{specs}/copyright-spec.adoc[]
+
+:result_type: pass:normal[_Result Type_ must be *OpTypeVoid*.]
+:source:      pass:normal[_Source_ is a *DebugSource* instruction representing text of the source program]
+:flags:       pass:normal[_Flags_ is a single _word_ literal formed by the bitwise-OR of values from the <<DebugFlags,*Debug Info Flags*>> table.]
+
+// "<<<" means use a page break when going to PDF or printer
+<<<
+[float]
+=== Contributors and Acknowledgments
+
+ - Yaxun Liu, AMD
+ - Brian Sumner, AMD
+ - Ben Ashbaugh, Intel
+ - Alexey Bader, Intel
+ - Raun Krisch, Intel
+ - Pratik Ashar, Intel
+ - John Kessenich, Google
+ - David Neto, Google
+ - Neil Henning, Codeplay
+ - Kerch Holt, Nvidia
+ - Jaebaek Seo, Google
+
+
+== Introduction
+
+This is the specification of the *OpenCL.DebugInfo.100* extended instruction
+set.
+
+This extended instruction set is imported into a SPIR-V module in the following
+manner:
+
+[[OpExtInstImport]]`<extinst-id> OpExtInstImport "OpenCL.DebugInfo.100"`
+
+The instructions below are capable of conveying debug information about the
+source program.
+
+The design guidelines for these instructions are:
+
+* Sufficient for a back end to generate <<DWARF,DWARF>> debug information for
+  OpenCL C/C++ kernels
+* Easy translation between SPIR-V/LLVM
+* Clear
+* Concise
+* Extensible for other languages
+* Capable of representing debug information for an optimized IR
+
+=== Terms
+
+[[LexicalScope]]_Lexical scope:_ One of
+<<DebugCompilationUnit,*DebugCompilationUnit*>>,
+<<DebugFunction,*DebugFunction*>>, <<DebugLexicalBlock,*DebugLexicalBlock*>>, or
+<<DebugTypeComposite,*DebugTypeComposite*>>.
+
+[[LocalVariable]]_Local variable:_ A variable that is invisible in some
+<<LexicalScope,_lexical scopes_>>. It depends on the definition of a local
+variable in the high-level language.
+
+[[DWARF]]_DWARF:_ The http://www.dwarfstd.org[DWARF Debugging Standard],
+which is a debugging file format used by many compilers and debuggers to
+support source level debugging.
+
+== Binary Form
+
+This section contains the semantics of the debug info extended instructions
+using the *OpExtInst* instruction. +
+
+All _Name_ operands are the _<id>_ of *OpString* instructions, which represents
+the name of the entry (type, variable, function, etc.) as it appears in the
+source program. +
+ +
+_Result Type_ of all instructions below is the _<id>_ of *OpTypeVoid*. +
+ +
+_Set_ operand in all instructions below is the result of an *OpExtInstImport*
+ instruction. +
+ +
+<<DebugScope,*DebugScope*>>, <<DebugNoScope,*DebugNoScope*>>,
+<<DebugDeclare,*DebugDeclare*>>, and <<DebugValue,*DebugValue*>>
+instructions can interleave with the instructions within a function.
+All other instructions from this extended instruction set should be located
+after the logical layout section 9 "All type declarations (OpTypeXXX instructions),
+all constant instructions, and all global variable declarations ..." and before
+section 10 "All function declaration" in section 2.4
+link:++https://www.khronos.org/registry/spir-v/specs/unified1/SPIRV.html#_a_id_logicallayout_a_logical_layout_of_a_module++[Logical Layout of a Module]
+of the core SPIR-V specification. +
+ +
+Debug info for source language opaque types is represented by
+<<DebugTypeComposite,*DebugTypeComposite*>> without _Members_ operands.
+_Size_ of the composite must be <<DebugInfoNone,*DebugInfoNone*>> and _Name_
+must start with _@_ symbol to avoid clashes with user defined names.
+
+=== Removing Instructions
+
+All instructions in this extended set have no semantic impact and can be
+safely removed. This is easily done if all debug instructions are removed
+together, at once.  However, when removing a subset, for example, inlining
+a function, there may be dangling references to _<id>_ that have been removed.
+These can be replaced with the _Result <id>_ of the
+<<DebugInfoNone,*DebugInfoNone*>> instruction.
+
+All _<id>_ referred to must be defined (dangling references are not allowed).
+
+=== Forward references
+
+Forward references (an operand _<id>_ that appears before the _Result <id>_
+defining it) are generally not allowed, except for the following exceptions:
+
+- Each of <<DebugTypeComposite,*DebugTypeComposite*>> _Members_ is a forward
+  reference to a <<DebugTypeMember,*DebugTypeMember*>>,
+  <<DebugFunction,*DebugFunction*>>, or
+  <<DebugTypeInheritance,*DebugTypeInheritance*>>.
+
+- A <<DebugFunction,*DebugFunction*>> _Function_ is a forward
+  reference to an *OpFunction*.
+
+== Enumerations
+
+=== Instruction Enumeration [[InstEnum]]
+
+[cols="^1,7",options="header", width="50%"]
+|======
+| Instruction +
+  number .^| Instruction name
+|  0 | <<DebugInfoNone,*DebugInfoNone*>>
+|  1 | <<DebugCompilationUnit,*DebugCompilationUnit*>>
+|  2 | <<DebugTypeBasic,*DebugTypeBasic*>>
+|  3 | <<DebugTypePointer,*DebugTypePointer*>>
+|  4 | <<DebugTypeQualifier,*DebugTypeQualifier*>>
+|  5 | <<DebugTypeArray,*DebugTypeArray*>>
+|  6 | <<DebugTypeVector,*DebugTypeVector*>>
+|  7 | <<DebugTypedef,*DebugTypedef*>>
+|  8 | <<DebugTypeFunction,*DebugTypeFunction*>>
+|  9 | <<DebugTypeEnum,*DebugTypeEnum*>>
+| 10 | <<DebugTypeComposite,*DebugTypeComposite*>>
+| 11 | <<DebugTypeMember,*DebugTypeMember*>>
+| 12 | <<DebugTypeInheritance,*DebugTypeInheritance*>>
+| 13 | <<DebugTypePtrToMember,*DebugTypePtrToMember*>>
+| 14 | <<DebugTypeTemplate,*DebugTypeTemplate*>>
+| 15 | <<DebugTypeTemplateParameter,*DebugTypeTemplateParameter*>>
+| 16 | <<DebugTypeTemplateTemplateParameter,*DebugTypeTemplateTemplateParameter*>>
+| 17 | <<DebugTypeTemplateParameterPack,*DebugTypeTemplateParameterPack*>>
+| 18 | <<DebugGlobalVariable,*DebugGlobalVariable*>>
+| 19 | <<DebugFunctionDeclaration,*DebugFunctionDeclaration*>>
+| 20 | <<DebugFunction,*DebugFunction*>>
+| 21 | <<DebugLexicalBlock,*DebugLexicalBlock*>>
+| 22 | <<DebugLexicalBlockDiscriminator,*DebugLexicalBlockDiscriminator*>>
+| 23 | <<DebugScope,*DebugScope*>>
+| 24 | <<DebugNoScope,*DebugNoScope*>>
+| 25 | <<DebugInlinedAt,*DebugInlinedAt*>>
+| 26 | <<DebugLocalVariable,*DebugLocalVariable*>>
+| 27 | <<DebugInlinedVariable,*DebugInlinedVariable*>>
+| 28 | <<DebugDeclare,*DebugDeclare*>>
+| 29 | <<DebugValue,*DebugValue*>>
+| 30 | <<DebugOperation,*DebugOperation*>>
+| 31 | <<DebugExpression,*DebugExpression*>>
+| 32 | <<DebugMacroDef,*DebugMacroDef*>>
+| 33 | <<DebugMacroUndef,*DebugMacroUndef*>>
+| 34 | <<DebugImportedEntity,*DebugImportedEntity*>>
+| 35 | <<DebugSource,*DebugSource*>>
+|======
+
+
+=== Debug Info Flags [[DebugFlags]]
+
+[cols="^4,8",options="header", width="50%"]
+|======
+| Value .^| Flag Name
+| 1 << 0  | *FlagIsProtected*
+| 1 << 1  | *FlagIsPrivate*
+| 1<<0 \| 1<<1 | *FlagIsPublic*
+| 1 << 2  | *FlagIsLocal*
+| 1 << 3  | *FlagIsDefinition*
+| 1 << 4  | *FlagFwdDecl*
+| 1 << 5  | *FlagArtificial*
+| 1 << 6  | *FlagExplicit*
+| 1 << 7  | *FlagPrototyped*
+| 1 << 8  | *FlagObjectPointer*
+| 1 << 9  | *FlagStaticMember*
+| 1 << 10 | *FlagIndirectVariable*
+| 1 << 11 | *FlagLValueReference*
+| 1 << 12 | *FlagRValueReference*
+| 1 << 13 | *FlagIsOptimized*
+| 1 << 14 | *FlagIsEnumClass*
+| 1 << 15 | *FlagTypePassByValue*
+| 1 << 16 | *FlagTypePassByReference*
+|======
+
+
+=== Base Type Attribute Encodings [[BaseTypeAttributeEncoding]]
+
+Used by <<DebugTypeBasic,*DebugTypeBasic*>> +
+
+[cols="^1,10",options="header",width = "50%"]
+|======
+2+^| Encoding code name
+| 0 | *Unspecified*
+| 1 | *Address*
+| 2 | *Boolean*
+| 3 | *Float*
+| 4 | *Signed*
+| 5 | *SignedChar*
+| 6 | *Unsigned*
+| 7 | *UnsignedChar*
+|======
+
+=== Composite Types [[CompositeTypes]]
+Used by <<DebugTypeComposite,*DebugTypeComposite*>> +
+
+[cols="^1,10",options="header",width = "50%"]
+|======
+2+^| Tag code name
+| 0 | *Class*
+| 1 | *Structure*
+| 2 | *Union*
+|======
+
+=== Type Qualifiers [[TypeQualifiers]]
+Used by <<DebugTypeQualifier,*DebugTypeQualifier*>> +
+
+[cols="^1,10",options="header",width = "50%"]
+|======
+2+^| Qualifier tag code name
+| 0 | *ConstType*
+| 1 | *VolatileType*
+| 2 | *RestrictType*
+| 3 | *AtomicType*
+|======
+
+=== Debug Operations [[Operation]]
+These operations are used to form a DWARF expression.
+Such expressions provide information about the current location
+(described by <<DebugDeclare,*DebugDeclare*>>) or value
+(described by <<DebugValue,*DebugValue*>>) of a variable.
+Operations in an expression are to be applied on a stack.
+Initially, the stack contains one element: the address or value of the source variable. +
+Used by <<DebugOperation,*DebugOperation*>> +
+
+[cols="^1,3,1,6",options="header",width = "50%"]
+|======
+2+^| Operation encodings | No. of Operands | Description
+| 0 | *Deref*            | 0               | Pops the top stack entry, treats it as an address, pushes the value retrieved from that address.
+| 1 | *Plus*             | 0               | Pops the top two entries from the stack, adds them together and push the result.
+| 2 | *Minus*            | 0               | Pops the top two entries from the stack, subtracts the former top entry from the former second to top entry and push the result.
+| 3 | *PlusUconst*       | 1               | Pops the top stack entry, adds the _addend_ operand to it, and pushes the result.
+                                             The operand must be a single word integer literal.
+| 4 | *BitPiece*         | 2               | Describes an object or value that may be contained in part of a register or stored in more than one location.
+                                             The first operand is _offset_ in bit from the location defined by the preceding operation.
+                                             The second operand is _size_ of the piece in bits.
+                                             The operands must be a single word integer literals.
+| 5 | *Swap*             | 0               | Swaps the top two stack values.
+| 6 | *Xderef*           | 0               | Pops the top two entries from the stack.
+                                             Treats the former top entry as an address and the former second to top entry as an address space.
+                                             The value retrieved from the address in the given address space is pushed.
+| 7 | *StackValue*       | 0               | Describes an object that doesn't exist in memory but it's value is known and is at the top of the DWARF expression stack.
+| 8 | *Constu*           | 1               | Pushes a constant _value_ onto the stack. The _value_ operand must be a single word integer literal.
+| 9 | *Fragment*         | 2               | Has the same semantics as *BitPiece*, but the _offset_ operand defines location within the source variable.
+|======
+
+=== Imported Entities [[ImportedEntities]]
+Used by <<DebugImportedEntity,*DebugImportedEntity*>> +
+
+[cols="^1,10",options="header",width = "50%"]
+|======
+2+^| Tag code name
+| 0 | *ImportedModule*
+| 1 | *ImportedDeclaration*
+|======
+
+== Instructions
+
+=== Missing Debugging Information
+
+[cols="2*1,3*2,1,0*3"]
+|======
+6+|[[DebugInfoNone]]*DebugInfoNone* +
+ +
+Other instructions can refer to this one in case the debugging information is
+unknown, not available, or not applicable. +
+ +
+{result_type} +
+
+| 5 | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_| 0
+|======
+
+
+=== Compilation Unit
+
+[cols="2*1,3*2,1,4*3"]
+|======
+10+|[[DebugCompilationUnit]]*DebugCompilationUnit* +
+ +
+ Describe a source compilation unit. A SPIR-V module can contain one or
+ multiple source compilation units. The _Result <id>_ of this instruction
+ represents a <<LexicalScope,lexical scope>>. +
+ +
+ {result_type} +
+ +
+ _Version_ is version of the SPIRV debug information format. +
+ +
+ _DWARF Version_ is version of the DWARF standard this specification is compatible
+ with. +
+ +
+ {source}. +
+ +
+ _Language_ is the source programming language of this particular compilation
+ unit. Possible values of this operand are described in the _Source Language_
+ section of the core SPIR-V specification. +
+
+| 9 | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_| 1
+| _Literal Number_ +
+  _Version_
+| _Literal Number_ +
+  _DWARF version_
+| _<id>_ _Source_
+| _Language_
+|======
+
+[cols="2*1,3*2,1,2*3"]
+|======
+8+|[[DebugSource]]*DebugSource* +
+ +
+ Describe the source program. It can be either the primary source file or a
+ file added via a `#include` directive. +
+ +
+ {result_type} +
+ +
+ _File_ is an *OpString* holding the name of the source file including its full
+ path. +
+ +
+ _Text_ is an *OpString* that contains text of the source program the SPIR-V
+  module is derived from. +
+
+| 6+ | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_| 35
+| _<id>_ _File_
+| Optional +
+  _<id>_ _Text_
+|======
+
+
+=== Type instructions
+
+[cols="2*1,3*2,1,3*3"]
+|======
+9+|[[DebugTypeBasic]]*DebugTypeBasic* +
+ +
+ Describe a basic data type. +
+ +
+ {result_type} +
+ +
+ _Name_ is an *OpString* representing the name of the type as it appears in the
+  source program. May be empty. +
+ +
+ _Size_ is an *OpConstant* with 32-bit or 64-bit integer type and its value is
+  the number of bits required to hold an instance of the type. +
+ +
+ <<BaseTypeAttributeEncoding,_Encoding_>> describes how the base type is
+ encoded. +
+
+| 8 | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_| 2
+| _<id>_ _Name_
+| _<id>_ _Size_
+| <<BaseTypeAttributeEncoding,_Encoding_>>
+|======
+
+
+[cols="2*1,3*2,1,3*3"]
+|======
+9+|[[DebugTypePointer]]*DebugTypePointer* +
+ +
+Describe a pointer or reference data type. +
+ +
+{result_type}  +
+ +
+_Base Type_ is the _<id>_ of a debugging instruction that represents the pointee
+ type. +
+ +
+_Storage Class_ is the class of the memory where the object pointed to is allocated.
+ Possible values of this operand are described in the _Storage Class_ section of
+ the core SPIR-V specification. +
+ +
+{flags} +
+
+| 8 | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_| 3
+| _<id> Base Type_
+| _Storage Class_
+| _Literal_ +
+  _Flags_
+|======
+
+
+[cols="2*1,3*2,1,2*3"]
+|======
+8+|[[DebugTypeQualifier]]*DebugTypeQualifier* +
+ +
+Describe a _const_, _volatile_, or _restrict_ qualified data type.
+A type with multiple qualifiers are represented as a sequence of
+<<DebugTypeQualifier,*DebugTypeQualifier*>> instructions. +
+ +
+{result_type} +
+ +
+_Base Type_ is debug instruction that represents the type being qualified. +
+ +
+ _Type Qualifier_ is a literal value from the
+  <<TypeQualifiers,*TypeQualifiers*>> table. +
+
+| 7 | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_| 4
+| _<id> Base Type_
+| <<TypeQualifiers,_Type Qualifier_>>
+|======
+
+
+[cols="2*1,3*2,1,2*3"]
+|======
+8+|[[DebugTypeArray]]*DebugTypeArray* +
+ +
+ Describe a array data type. +
+ +
+{result_type} +
+ +
+_Base Type_ is a debugging instruction that describes the element type of the
+ array. +
+ +
+_Component Count_ is the number of elements in the corresponding dimension of
+ the array. The number and order of _Component Count_ operands must match with
+ the number and order of array dimensions as they appear in the source program.
+ _Component Count_ must be a _Result <id>_ of an *OpConstant*,
+ <<DebugGlobalVariable,*DebugGlobalVariable*>>, or
+ <<DebugLocalVariable,*DebugLocalVariable*>>. If it is an *OpConstant*, its type
+ must be a 32-bit or 64-bit integer type. Otherwise its type must be
+ a <<DebugTypeBasic,*DebugTypeBasic*>> whose _Size_ is 32 or 64 and whose
+ _Encoding_ is *Unsigned*. +
+
+| 7+ | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_| 5
+| _<id> Base Type_
+| _<id> Component Count_, ...
+|======
+
+
+[cols="2*1,3*2,1,2*3"]
+|======
+8+|[[DebugTypeVector]]*DebugTypeVector* +
+ +
+Describe a vector data type. +
+ +
+{result_type} +
+ +
+_Base Type_ is the _<id>_ of a debugging instruction that describes the type of
+ element of the vector. +
+ +
+_Component Count_ is a single _word_ literal denoting the number of elements in the
+ vector. +
+
+| 7 | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_| 6
+| _<id> Base Type_
+| _Literal Number_ +
+  _Component Count_
+|======
+
+
+[cols="2*1,3*2,1,6*3"]
+|======
+12+|[[DebugTypedef]]*DebugTypedef* +
+ +
+Describe a C/C++ _typedef declaration_. +
+ +
+{result_type} +
+ +
+_Name_ is an *OpString* that represents a new name for the _Base Type_. +
+ +
+_Base Type_ is a debugging instruction representing the type for which a new
+ name is being declared. +
+ +
+{source} containing the typedef declaration. +
+ +
+_Line_ is a single _word_ literal denoting the source line number at which the
+ declaration appears in the _Source_. +
+ +
+_Column_ is a single _word_ literal denoting the column number at which the first
+ character of the declaration appears. +
+ +
+_Scope_ is the _<id>_ of a debug instruction that represents the
+ <<LexicalScope,lexical scope>> that contains the typedef declaration. +
+
+| 11 | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_| 7
+| _<id> Name_
+| _<id> Base Type_
+| _<id> Source_
+| _Literal Number_ +
+  _Line_
+| _Literal Number_ +
+  _Column_
+| _<id> Scope_
+|======
+
+
+[cols="2*1,3*2,1,3*3"]
+|======
+9+|[[DebugTypeFunction]]*DebugTypeFunction* +
+ +
+Describe a function type. +
+ +
+{result_type} +
+ +
+ {flags} +
+ +
+_Return Type_ is a debug instruction that represents the type of return value of
+ the function. If the function has no return value, this operand is
+ *OpTypeVoid*. +
+ +
+ _Parameter Types_ are debug instructions that describe the type of parameters of
+ the function. +
+
+| 7+ | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_| 8
+| _Literal_ +
+  _Flags_
+| _<id> Return Type_
+| Optional _<id>, <id>, ... Parameter Types_
+|======
+
+
+[cols="9*1,5*2,3"]
+|======
+15+|[[DebugTypeEnum]]*DebugTypeEnum* +
+ +
+Describe an enumeration type. +
+ +
+{result_type} +
+ +
+_Name_ is an *OpString* holding the name of the enumeration as it appears in the
+ source program. +
+ +
+_Underlying Type_ is a debugging instruction that describes the underlying type
+ of the enum in the source program. If the underlying type is not specified in
+ the source program, this operand must refer to
+ <<DebugInfoNone,*DebugInfoNone*>>. +
+  +
+{source} containing the _enum_ declaration. +
+ +
+_Line_ is a single _word_ literal denoting the source line number at which the
+ enumeration declaration appears in the _Source_. +
+ +
+_Column_ is a single _word_ literal denoting the column number at which the first
+ character of the enumeration declaration appears. +
+ +
+_Scope_ is the _<id>_ of a debug instruction that represents the
+ <<LexicalScope,lexical scope>> that contains the enumeration type. +
+ +
+_Size_ is an *OpConstant* with 32-bit or 64-bit integer type and its value is
+ the number of bits required to hold an instance of the enumeration type. +
+ +
+{flags} +
+ +
+Enumerators are encoded as trailing pairs of _Value_ and corresponding _Name_.
+_Values_ must be the _<id>_ of *OpConstant* instructions, with a 32-bit integer result
+type. _Name_ must be the _<id>_ of an *OpString* instruction. +
+
+| 13+ | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_| 9
+| _<id> Name_
+| _<id> Underlying Type_
+| _<id> Source_
+| _Literal Number_ +
+  _Line_
+| _Literal Number_ +
+  _Column_
+| _<id> Scope_
+| _<id>_ _Size_
+| _Literal_ _Flags_
+| _<id>_ _Value_, +
+  _<id>_ _Name_, +
+  _<id>_ _Value_, +
+  _<id>_ _Name_, ...
+|======
+
+
+[cols="2*1,3*2,1,10*3"]
+|======
+16+|[[DebugTypeComposite]]*DebugTypeComposite* +
+ +
+Describe a _structure_, _class_, or _union_ data type. The _Result <id>_ of this
+ instruction represents a <<LexicalScope,lexical scope>>. +
+ +
+{result_type} +
+ +
+_Tag_ is a literal value from the  <<CompositeTypes,Composite Types>> table
+ that specifies the kind of the composite type. +
+ +
+_Name_ is an *OpString* holding the name of the type as it appears in the source
+ program. +
+ +
+{source} containing the type declaration. +
+ +
+_Line_ is a single _word_ literal denoting the source line number at which the
+ type declaration appears in the _Source_. +
+ +
+_Column_ is a single _word_ literal denoting the column number at which the first
+ character of the declaration appears. +
+ +
+_Scope_ is the _<id>_ of a debug instruction that represents the
+ <<LexicalScope,lexical scope>> that contains the composite type. It must be
+ one of the following: <<DebugCompilationUnit,*DebugCompilationUnit*>>,
+ <<DebugFunction,*DebugFunction*>>,
+ <<DebugLexicalBlock,*DebugLexicalBlock*>>, or
+ <<DebugTypeComposite,*DebugTypeComposite*>>. +
+ +
+_Linkage Name_ is an *OpString*, holding the linkage name or mangled name of the
+ composite. +
+ +
+_Size_ is an *OpConstant* with 32-bit or 64-bit integer type and its value is
+ the number of bits required to hold an instance of the composite type. +
+ +
+{flags} +
+ +
+_Members_ must be the _<id>s_ of <<DebugTypeMember,*DebugTypeMember*>>,
+ <<DebugFunction,*DebugFunction*>>,
+ or <<DebugTypeInheritance,*DebugTypeInheritance*>>. This could be a forward
+ reference. +
+
+*Note:* To represent a source language opaque type, this instruction must have no
+_Members_ operands, _Size_ operand must be <<DebugInfoNone,*DebugInfoNone*>>,
+ and _Name_ must start with _@_ to avoid clashes with user defined names.
+
+| 14+ | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 10
+| _<id> Name_
+| <<CompositeTypes,_Tag_>>
+| _<id> Source_
+| _Literal Number_ +
+  _Line_
+| _Literal Number_ +
+  _Column_
+| _<id> Scope_
+| _<id> Linkage Name_
+| _<id> Size_
+| _Literal_ +
+  _Flags_
+| _<id>, <id>, ... Members_
+|======
+
+
+[cols="2*1,3*2,1,10*3"]
+|======
+16+|[[DebugTypeMember]]*DebugTypeMember* +
+ +
+Describe a data member of a _structure_, _class_, or _union_. +
+ +
+{result_type} +
+ +
+_Name_ is an *OpString* holding the name of the member as it appears in the
+ source program. +
+ +
+_Type_ is a debug type instruction that represents the type of the member. +
+ +
+{source} containing the member declaration. +
+ +
+_Line_ is a single _word_ literal denoting the source line number at which the
+ member declaration appears in the _Source_. +
+ +
+_Column_ is a single _word_ literal denoting the column number at which the first
+ character of the member declaration appears. +
+ +
+_Scope_ is the _<id>_ of a debug instruction that represents a composite type
+ containing this member. +
+ +
+_Offset_ is an *OpConstant* with integral type, and its value is the memory
+ offset in bits from the beginning of the _Scope_ type. +
+ +
+_Size_ is an *OpConstant* with 32-bit or 64-bit integer type and its value is
+ the number of bits the member occupies within the _Scope_ type. +
+ +
+{flags} +
+ +
+_Value_ is an *OpConstant* representing initialization value in case of
+ _const static_ qualified member in C++. +
+
+| 14+ | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 11
+| _<id> Name_
+| _<id> Type_
+| _<id> Source_
+| _Literal Number_ +
+  _Line_
+| _Literal Number_ +
+  _Column_
+| _<id> Scope_
+| _<id>_ _Offset_
+| _<id>_ _Size_
+| <<DebugFlags,_Flags_>>
+| Optional _<id> Value_
+|======
+
+
+[cols="2*1,3*2,1,2*2,2*3,1"]
+|======
+11+|[[DebugTypeInheritance]]*DebugTypeInheritance* +
+ +
+Describe the inheritance relationship with a parent _class_ or _structure_.
+The Result of this instruction can be used as a member of a composite type. +
+ +
+{result_type} +
+ +
+_Child_ is a debug instruction representing a derived _class_ or _struct_ in
+ C++. +
+ +
+_Parent_ is a debug instruction representing a class or structure the
+ _Child Type_ is derived from. +
+ +
+_Offset_ is an *OpConstant* with integral type and its value is the offset of the
+ _Parent Type_ in bits in layout of the _Child Type_. +
+ +
+_Size_ is an *OpConstant* with 32-bit or 64-bit integer type and its value is
+ the number of bits the _Parent type_ occupies within the _Child Type_. +
+ +
+{flags} +
+
+| 10 | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 12
+| _<id> Child_
+| _<id> Parent_
+| _<id>_ _Offset_
+| _<id>_ _Size_
+| <<DebugFlags,_Flags_>>
+|======
+
+
+[cols="2*1,3*2,1,2*3"]
+|======
+8+|[[DebugTypePtrToMember]]*DebugTypePtrToMember* +
+ +
+Describe the type of an object that is a pointer to a structure or class member. +
+ +
+{result_type} +
+ +
+_Member Type_ is a debug instruction representing the type of the member. +
+ +
+_Parent_ is a debug instruction, representing a structure or class type. +
+
+| 7 | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 13
+| _<id> Member Type_
+| _<id> Parent_
+|======
+
+
+=== Templates
+
+[cols="2*1,3*2,1,2*3"]
+|======
+8+|[[DebugTypeTemplate]]*DebugTypeTemplate* +
+ +
+Describe an instantiated template of _class_, _struct_, or _function_ in C++. +
+ +
+{result_type} +
+ +
+_Target_ is a debug instruction representing the class, struct, or function that has
+ template parameter(s). +
+ +
+_Parameters_ are debug instructions representing the template parameters for
+ this particular instantiation. +
+ +
+
+| 7 | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 14
+| _<id>_ _Target_
+| _<id>..._ _Parameters_
+|======
+
+
+[cols="2*1,3*2,1,6*3"]
+|======
+12+|[[DebugTypeTemplateParameter]]*DebugTypeTemplateParameter* +
+ +
+Describe a formal parameter of a C++ template instantiation. +
+ +
+{result_type} +
+ +
+_Name_ is an *OpString* holding the name of the template parameter. +
+ +
+_Actual Type_ is a debug instruction representing the actual type of the formal
+ parameter for this particular instantiation. +
+ +
+ If this instruction describes a template value parameter, the _Value_ is
+ represented by an *OpConstant* with an integer result type. For a template type
+ parameter, the _Value_ operand must be the _Result <id>_ of
+ <<DebugInfoNone,*DebugInfoNone*>>. +
+ +
+{source} containing the template instantiation. +
+ +
+_Line_ is a single _word_ literal denoting the source line number at which the
+ template parameter declaration appears in the _Source_. +
+ +
+_Column_ is a single _word_ literal denoting the column number at which the first
+ character of the template parameter declaration appears. +
+
+| 11 | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 15
+| _<id>_ _Name_
+| _<id>_ _Actual Type_
+| _<id>_ _Value_
+| _<id> Source_
+| _Literal Number_ +
+  _Line_
+| _Literal Number_ +
+  _Column_
+|======
+
+
+[cols="2*1,3*2,1,5*3"]
+|======
+11+|[[DebugTypeTemplateTemplateParameter]]*DebugTypeTemplateTemplateParameter* +
++
+Describe a template template parameter of a C++ template instantiation. +
+ +
+{result_type} +
+ +
+_Name_ is an *OpString* holding the name of the template template parameter +
+ +
+_Template Name_ is an *OpString* holding the name of the template used as
+ template parameter in this particular instantiation. +
+ +
+{source} containing the template instantiation. +
+ +
+_Line_ is a single _word_ literal denoting the source line number at which the
+ template template parameter declaration appears in the _Source_ +
+ +
+_Column_ is a single _word_ literal denoting column number at which the first
+ character of the template template parameter declaration appears on the _Line_ +
+
+| 10 | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 16
+| _<id>_ _Name_
+| _<id>_ _Template Name_
+| _<id> Source_
+| _Literal Number_ +
+  _Line_
+| _Literal Number_ +
+  _Column_
+|======
+
+
+[cols="2*1,3*2,1,5*3"]
+|======
+11+|[[DebugTypeTemplateParameterPack]]*DebugTypeTemplateParameterPack* +
+ +
+Describe the expanded template parameter pack in a variadic template instantiation
+ in C++. +
+ +
+{result_type} +
+ +
+_Name_ is an *OpString* holding the name of the template parameter pack. +
+ +
+{source} containing the template instantiation. +
+ +
+_Line_ is a single _word_ literal denoting the source line number at which the
+ template parameter pack declaration appears in the _Source_. +
+ +
+_Column_ is a single _word_ literal denoting the column number at which the first
+ character of the template parameter pack declaration appears. +
+ +
+_Template parameters_ are
+ <<DebugTypeTemplateParameter,*DebugTypeTemplateParameter*>>s describing the
+ expanded parameter pack in the variadic template instantiation. +
+ +
+| 10+ | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 17
+| _<id>_ _Name_
+| _<id> Source_
+| _Literal Number_ +
+  _Line_
+| _Literal Number_ +
+  _Column_
+| _<id>..._ _Template parameters_
+|======
+
+
+=== Global Variables
+
+[cols="2*1,3*2,1,10*3"]
+|======
+16+|[[DebugGlobalVariable]]*DebugGlobalVariable* +
+ +
+ Describe a source global variable. +
+ +
+{result_type} +
+ +
+_Name_ is an *OpString*, holding the name of the variable as it appears in the
+ source program. +
+ +
+_Type_ is a debug instruction that represents the type of the variable. +
+ +
+{source} containing the source global variable declaration. +
+ +
+_Line_ is a single _word_ literal denoting the source line number at which the
+ source global variable declaration appears in the _Source_. +
+ +
+_Column_ is a single _word_ literal denoting the column number at which the first
+ character of the source global variable declaration appears. +
+ +
+_Scope_ is the _<id>_ of a debug instruction that represents the
+ <<LexicalScope,lexical scope>> that contains the source global variable
+ declaration. It must be one of the following:
+ <<DebugCompilationUnit,*DebugCompilationUnit*>>,
+ <<DebugFunction,*DebugFunction*>>,
+ <<DebugLexicalBlock,*DebugLexicalBlock*>>, or
+ <<DebugTypeComposite,*DebugTypeComposite*>>. +
+ +
+_Linkage Name_ is an *OpString*, holding the linkage name of the variable. +
+ +
+_Variable_ is the _<id>_ of the source global variable or constant that
+ is described by this instruction. If the variable is optimized out, this
+ operand must be <<DebugInfoNone,*DebugInfoNone*>>. +
+ +
+{flags} +
+ +
+If the source global variable represents a defining declaration
+ for a C++ static data member of a structure, class, or union, the optional
+ _Static Member Declaration_ operand refers to the debugging type of the
+ previously declared variable, i.e.  <<DebugTypeMember,*DebugTypeMember*>>. +
+
+| 14+ | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 18
+| _<id> Name_
+| _<id> Type_
+| _<id> Source_
+| _Literal Number_ +
+  _Line_
+| _Literal Number_ +
+  _Column_
+| _<id> Scope_
+| _<id> Linkage Name_
+| _<id> Variable_
+| <<DebugFlags,_Flags_>> +
+| Optional _<id> Static Member Declaration_
+|======
+
+=== Functions
+
+[cols="2*1,3*2,1,8*3"]
+|======
+14+|[[DebugFunctionDeclaration]]*DebugFunctionDeclaration* +
+ +
+Describe a function or method declaration. +
+ +
+{result_type} +
+ +
+_Name_ is an *OpString*, holding the name of the function as it appears in the
+ source program. +
+ +
+_Type_ is an <<DebugTypeFunction,*DebugTypeFunction*>> instruction that
+ represents the type of the function. +
+ +
+{source} containing the function declaration. +
+ +
+_Line_ is a single _word_ literal denoting the source line number at which the
+ function declaration appears in the _Source_. +
+ +
+_Column_ is a single _word_ literal denoting the column number at which the first
+ character of the function declaration appears. +
+ +
+_Scope_ is the _<id>_ of a debug instruction that represents the
+ <<LexicalScope,lexical scope>> that contains the function declaration. +
+ +
+_Linkage Name_ is an *OpString*, holding the linkage name of the function. +
+ +
+ {flags} +
+  +
+
+| 13 | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 19
+| _<id> Name_
+| _<id> Type_
+| _<id> Source_
+| _Literal Number_ +
+  _Line_
+| _Literal Number_ +
+  _Column_
+| _<id> Scope_
+| _<id> Linkage Name_
+| <<DebugFlags,_Flags_>> +
+|======
+
+
+[cols="2*1,3*2,1,11*3"]
+|======
+17+|[[DebugFunction]]*DebugFunction* +
+ +
+Describe a function or method definition. The _Result <id>_ of this instruction
+ represents a <<LexicalScope,lexical scope>>. +
+ +
+{result_type} +
+ +
+_Name_ is an *OpString*, holding the name of the function as it appears in the
+ source program. +
+ +
+_Type_ is an <<DebugTypeFunction,*DebugTypeFunction*>> instruction that
+ represents the type of the function. +
+ +
+{source} containing the function definition. +
+ +
+_Line_ is a single _word_ literal denoting the source line number at which the
+ function declaration appears in the _Source_. +
+ +
+_Column_ is a single _word_ literal denoting the column number at which the first
+ character of the function declaration appears. +
+ +
+_Scope_ is the _<id>_ of a debug instruction that represents the
+ <<LexicalScope,lexical scope>> that contains the function definition. +
+ +
+_Linkage Name_ is an *OpString*, holding the linkage name of the function. +
+ +
+ {flags} +
+  +
+_Scope Line_ a single _word_ literal denoting line number in the source program
+ at which the function lexical scope begins. +
+ +
+_Function_ is a forward reference to the _Result <id>_ of an *OpFunction*, which
+ is described by this instruction. If that function is optimized out, this
+ operand must be the _Result <id>_ of the <<DebugInfoNone,*DebugInfoNone*>>. +
+ +
+_Declaration_ is <<DebugFunctionDeclaration,*DebugFunctionDeclaration*>>
+ that represents non-defining declaration of the function. +
+
+| 15+ | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 20
+| _<id> Name_
+| _<id> Type_
+| _<id> Source_
+| _Literal Number_ +
+  _Line_
+| _Literal Number_ +
+  _Column_
+| _<id> Scope_
+| _<id> Linkage Name_
+| <<DebugFlags,_Flags_>> +
+| _Literal Number_ +
+  _Scope Line_
+| _<id> Function_
+| Optional _<id> Declaration_
+|======
+
+
+=== Location Information
+
+[cols="2*1,3*2,1,5*3"]
+|======
+11+|[[DebugLexicalBlock]]*DebugLexicalBlock* +
+ +
+Describe a lexical block in the source program. The _Result <id>_ of this
+ instruction represents a <<LexicalScope,lexical scope>>. +
+ +
+{result_type} +
+ +
+{source} containing the lexical block. +
+ +
+_Line_ is a single _word_ literal denoting the source line number at which the
+ lexical block begins in the _Source_. +
+ +
+_Column_ is a single _word_ literal denoting the column number at which the lexical
+ block begins. +
+ +
+_Scope_ is the _<id>_ of a debug instruction that represents the
+ <<LexicalScope,lexical scope>> containing the lexical block. Entities
+ in the global lexical scope should have _Scope_ referring to a
+ <<DebugCompilationUnit,*DebugCompilationUnit*>>. +
+ +
+ The presence of the _Name_ operand indicates that this instruction represents a
+ C\++ namespace. This operand refers to an *OpString* holding the name of the
+ namespace. For anonymous C++ namespaces, the name must be an empty string. +
+
+| 9+ | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 21
+| _<id>_ _Source_
+| _Literal Number_ +
+  _Line_
+| _Literal Number_ +
+  _Column_
+| _<id>_ _Scope_
+| Optional _<id>_ _Name_
+|======
+
+
+[cols="2*1,3*2,1,3*3"]
+|======
+9+|[[DebugLexicalBlockDiscriminator]]*DebugLexicalBlockDiscriminator* +
+ +
+Distinguish lexical blocks on a single line in the source program. +
+ +
+{result_type} +
+ +
+{source} containing the lexical block. +
+ +
+_Scope_ is the _<id>_ of a debug instruction that represents the
+ <<LexicalScope,lexical scope>> containing the lexical block. +
+ +
+_Discriminator_ is a single _word_ literal denoting a DWARF discriminator value
+ for instructions in the lexical block. +
+
+| 8 | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 22
+| _<id>_ _Source_
+| _Literal Number_ +
+  _Discriminator_
+| _<id>_ _Scope_
+|======
+
+
+[cols="2*1,3*2,1,2*3"]
+|======
+8+|[[DebugScope]]*DebugScope* +
+ +
+Provide information about a previously declared
+ <<LexicalScope,lexical scope>>. This instruction delimits the start of a
+ contiguous group of instructions, to be ended by any of the following: the next
+ end of block, the next *DebugScope* instruction, or the next *DebugNoScope*
+ instruction. +
+ +
+{result_type} +
+ +
+ _Scope_ is a previously declared <<LexicalScope,lexical scope>>. +
+ +
+ _Inlined_ is a <<DebugInlinedAt,*DebugInlinedAt*>> instruction that represents
+ the <<LexicalScope,lexical scope>> and location to where _Scope_ instructions
+ were inlined. +
+
+| 6+ | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 23
+| _<id> Scope_
+| Optional +
+  _<id> Inlined_
+|======
+
+
+[cols="2*1,3*2,1,0*3"]
+|======
+6+|[[DebugNoScope]]*DebugNoScope* +
+ +
+Delimit the end of a contiguous group of instructions started by the
+ previous *DebugScope*. +
+ +
+ {result_type} +
+
+| 5 | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 24
+|======
+
+
+[cols="2*1,3*2,1,3*3"]
+|======
+9+|[[DebugInlinedAt]]*DebugInlinedAt* +
+ +
+Declare to where instructions grouped together by a <<DebugScope,*DebugScope*>>
+ instruction are inlined. When a function is inlined, a
+ <<DebugScope,*DebugScope*>> for the function or a part of the function can have
+ an _Inlined_ operand i.e., <<DebugInlinedAt,*DebugInlinedAt*>>, which means the
+ set of instructions grouped by the <<DebugScope,*DebugScope*>> was inlined to
+ the _Line_ operand of the <<DebugInlinedAt,*DebugInlinedAt*>> of the _Scope_
+ operand of the <<DebugInlinedAt,*DebugInlinedAt*>>. +
+ +
+{result_type} +
+ +
+_Line_ is a single _word_ literal denoting the line number in the source file
+ to where the range of instructions were inlined. +
+ +
+_Scope_ is a <<LexicalScope,lexical scope>> that contains _Line_. +
+ +
+_Inlined_ is a debug instruction representing the next level of inlining in case
+ of recursive inlining. +
+
+| 7+ | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 25
+| _Literal Number_ +
+  _Line_
+| _<id> Scope_
+| Optional _<id> Inlined_
+|======
+
+
+=== Local Variables
+
+[cols="2*1,3*2,1,8*3"]
+|======
+14+|[[DebugLocalVariable]]*DebugLocalVariable* +
+ +
+ Describe a <<LocalVariable,local variable>>. +
+ +
+{result_type} +
+ +
+_Name_ is an *OpString*, holding the name of the variable as it appears in the
+ source program. +
+ +
+_Type_ is a debugging instruction that represents the type of the
+ <<LocalVariable,local variable>>. +
+ +
+{source} containing the <<LocalVariable,local variable>> declaration. +
+ +
+_Line_ is a single _word_ literal denoting the source line number at which the
+ <<LocalVariable,local variable>> declaration appears in the _Source_. +
+ +
+_Column_ is a single _word_ literal denoting the column number at which the first
+ character of the <<LocalVariable,local variable>> declaration appears. +
+ +
+_Scope_ is the _<id>_ of a debug instruction that represents the
+ <<LexicalScope,lexical scope>> that contains the
+ <<LocalVariable,local variable>> declaration. +
+ +
+ {flags} +
+ +
+If _ArgNumber_ operand is present, this instruction represents a function formal
+ parameter. +
+
+| 12+ | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 26
+| _<id> Name_
+| _<id> Type_
+| _<id> Source_
+| _Literal Number_ +
+  _Line_
+| _Literal Number_ +
+  _Column_
+| _<id> Scope_
+| _Literal_ +
+  _Flags_
+| Optional +
+  _Literal Number_ +
+  _ArgNumber_
+|======
+
+
+[cols="2*1,3*2,1,2*3"]
+|======
+8+|[[DebugInlinedVariable]]*DebugInlinedVariable* +
+ +
+ Describe an inlined <<LocalVariable,local variable>>. +
+ +
+{result_type} +
+ +
+_Variable_ is a debug instruction representing a
+ <<LocalVariable,local variable>> that is inlined. +
+ +
+_Inlined_ is an <<DebugInlinedAt,*DebugInlinedAt*>> instruction representing
+ the inline location. +
+
+| 7+ | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 27
+| _<id> Variable_
+| _<id> Inlined_
+|======
+
+
+[cols="2*1,3*2,1,3*3"]
+|======
+9+|[[DebugDeclare]]*DebugDeclare* +
+ +
+Define point of declaration of a <<LocalVariable,local variable>>. +
+ +
+{result_type} +
+ +
+_Local Variable_ must be an _<id>_ of <<DebugLocalVariable,*DebugLocalVariable*>>. +
+ +
+_Variable_ must be the _<id>_ of an *OpVariable* instruction that defines the local
+ variable. +
+ +
+_Expression_ must be an _<id>_ of a <<DebugExpression,*DebugExpression*>>
+ instruction. +
+
+| 8 | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 28
+| _<id> Local Variable_
+| _<id> Variable_
+| _<id> Expression_
+|======
+
+
+[cols="2*1,3*2,1,4*3"]
+|======
+10+|[[DebugValue]]*DebugValue* +
+ +
+Represent a changing of value of a <<LocalVariable,local variable>>. +
+ +
+{result_type} +
+ +
+_Local Variable_ must be an _<id>_ of a
+ <<DebugLocalVariable,*DebugLocalVariable*>>. +
+ +
+_Value_ is a _Result <id>_ of a non-debug instruction. The new value of
+ _Local Variable_ is the result of the evaluation of _Expression_ to _Value_. +
+ +
+_Expression_ is the _<id>_ of a <<DebugExpression,*DebugExpression*>>
+ instruction. +
+ +
+_Indexes_ have the same semantics as the corresponding operand(s) of
+ *OpAccessChain*. +
+
+| 8+ | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 29
+| _<id> Local Variable_
+| _<id> Value_
+| _<id> Expression_
+| _<id>, <id>, ... Indexes_
+|======
+
+
+[cols="2*1,3*2,1,2*3"]
+|======
+8+|[[DebugOperation]]*DebugOperation* +
+ +
+Represent a DWARF operation that operates on a stack of values. +
+ +
+{result_type} +
+ +
+_Operation_ is a DWARF operation from the  <<Operation,Debug Operations>>
+ table. +
+ +
+_Operands_ are zero or more single _word_ literals that the _Operation_ operates on.
+
+| 6+ | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 30
+| <<Operation,_Operation_>>
+| Optional _Literal_ +
+  _Operands ..._
+|======
+
+
+[cols="2*1,3*2,1,1*3"]
+|======
+7+|[[DebugExpression]]*DebugExpression* +
+ +
+ Represent a DWARF expression, which describe how to compute a value or name
+ location during debugging of a program. This is expressed in terms of DWARF
+ operations that operate on a stack of values. +
+ +
+{result_type} +
+ +
+_Operation_ is zero or more ids of <<DebugOperation,*DebugOperation*>>. +
+
+| 5+ | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 31
+| Optional _<id>..._ _Operation_
+|======
+
+=== Macros
+
+[cols="2*1,3*2,1,4*3"]
+|======
+10+|[[DebugMacroDef]]*DebugMacroDef* +
+ +
+ Represents a macro definition. +
+ +
+{result_type} +
+ +
+ _Source_ is the _<id>_ of an *OpString*, which contains the name of the file that
+ contains definition of the macro. +
+ +
+ _Line_ is the line number in the source file at which the macro is defined. If
+ _Line_ is zero, the macro definition is provided by compiler's command line
+ argument. +
+ +
+ _Name_ is the _<id>_ of an *OpString*, which contains the name of the macro as it appears
+ in the source program. In the case of a function-like macro definition, no
+ whitespace characters appear between the name of the defined macro and the
+ following left parenthesis. Formal parameters are separated by a comma without
+ any whitespace. A right parenthesis terminates the formal parameter list. +
+ +
+_Value_ is the _<id>_ of an *OpString*, which contains text with definition of the macro. +
+
+| 7+ | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 32
+| _<id> Source_
+| _Literal Number_ +
+  _Line_
+| _<id> Name_
+| Optional _Value_
+|======
+
+
+[cols="2*1,3*2,1,3*3"]
+|======
+9+|[[DebugMacroUndef]]*DebugMacroUndef* +
+ +
+ Discontinue previous macro definition. +
+ +
+{result_type} +
+ +
+_Source_ is the _<id>_ of an *OpString*, which contains the name of the file in which the
+ macro is undefined. +
+ +
+_Line_ is line number in the source program at which the macro is rendered as
+ undefined. +
+ +
+_Macro_ is the _<id>_ of <<DebugMacroDef,*DebugMacroDef*>> which represent the macro
+ to be undefined. +
+
+| 8 | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 33
+| _<id> Source_
+| _Literal Number_ +
+  _Line_
+| _<id> Macro_
+|======
+
+=== Imported Entities
+
+[cols="2*1,3*2,1,7*3"]
+|======
+13+|[[DebugImportedEntity]]*DebugImportedEntity* +
+ +
+ Represents a C++ namespace _using-directive_, namespace alias, or
+ _using-declaration_. +
+ +
+ _Name_ is an *OpString*, holding the name or alias for the imported entity. +
+ +
+ _Tag_ is a literal value from the  <<ImportedEntities,*Imported Entities*>> table
+ which specifies the kind of the imported entity. +
+ +
+ {Source} the _Entity_ is being imported from. +
+ +
+ _Entity_ is a debug instruction representing a namespace or declaration that is
+  being imported. +
+ +
+ _Line_ is a single _word_ literal denoting the source line number at which the
+ _using_ declaration appears in the _Source_. +
+ +
+ _Column_ is a single _word_ literal denoting the column number at which the first
+ character of the _using_ declaration appears. +
+ +
+ _Scope_ is the _<id>_ of a debug instruction that represents the
+ <<LexicalScope,lexical scope>> that contains the namespace or declaration. +
+
+| 12 | 12 | _<id>_ +
+_Result Type_ | _Result <id>_ | _<id> Set_ | 34
+| _<id> Name_
+| _Literal_ +
+  _Tag_
+| _<id> Source_
+| _<id> Entity_
+| _Literal Number_ +
+  _Line_
+| _Literal Number_ +
+  _Column_
+| _<id> Scope_
+|======
+
+
+== Validation Rules
+None.
+
+
+== Issues
+. Does the ABI used for the OpenCL C 2.0 blocks feature have to be declared
+  somewhere else in the module?
++
+--
+*RESOLVED*:
+  No. Block ABI is out of scope for this specification.
+--
+
+
+== Revision History
+[cols="14%,12%,10%,64%"]
+[grid="rows"]
+[options="header"]
+|========================================================
+|Rev         |Date      |Author             |Changes
+|0.99 Rev 1  |2016-11-25|Alexey Sotkin      |*Initial revision*
+|0.99 Rev 2  |2016-12-08|Alexey Sotkin      |Added details for the type instructions
+|0.99 Rev 3  |2016-12-14|Alexey Sotkin      |Added details for the rest of instructions
+|0.99 Rev 4  |2016-12-21|Alexey Sotkin      |Applied comments after review
+|0.99 Rev 5  |2017-03-22|Alexey Sotkin      |Format the specification as extended instruction set
+|0.99 Rev 6  |2017-04-21|Alexey Sotkin      |Adding File and Line operands
+|0.99 Rev 7  |2017-06-05|Alexey Sotkin      |Moving Flags to operands. Adding several new instructions.
+|0.99 Rev 8  |2017-08-31|Alexey Sotkin      |Replacing File operand by Source operand. Fixing typos. Formatting
+|0.99 Rev 9  |2017-09-05|Alexey Sotkin      |Clarifying representation of opaque types
+|0.99 Rev 10 |2017-09-13|Alexey Sotkin      |Support of multidimensional arrays. Adding DebugFunctionDeclaration. Updating debug operations.
+|0.99 Rev 11 |2017-12-13|Alexey Sotkin      |Removing "Op" prefix
+|0.99 Rev 12 |2017-12-13|Alexey Sotkin      |Changing style of enum tokens to CamelCase
+|1.00 Rev 1  |2017-12-14|David Neto         |Approved by SPIR WG on 2017-09-22. Change to 1.00 Rev 1
+|2.00 Rev 1  |2018-12-05|Alexey Sotkin      |Changing the name string in *OpExtInstImport* instruction. +
+                                             Adding <<DebugSource,*DebugSource*>> and <<DebugImportedEntity,*DebugImportedEntity*>> instructions. +
+                                             Adding _AtomicType_ to the <<TypeQualifiers,*Type Qualifiers*>> table. +
+                                             Adding _FlagIsEnumClass_, _FlagTypePassByValue_, _FlagTypePassByReference_ to the <<DebugFlags,*Debug Info Flags*>> table. +
+                                             Adding _Fragment_ to the <<Operation,*Debug Operations*>> table. +
+                                             Adding _Linkage Name_ operand to the <<DebugTypeComposite,*DebugTypeComposite*>> instruction. +
+                                             Adding _Flags_ operand to the <<DebugTypeFunction,*DebugTypeFunction*>> and <<DebugLocalVariable,*DebugLocalVariable*>> instructions. +
+                                             Adding _Language_ operand to the <<DebugCompilationUnit,*DebugCompilationUnit*>> +
+                                             instruction. +
+|2.00 Rev.2  |2018-12-19|Alexey Sotkin      |Added description of <<DebugOperation,*DebugOperations*>>. +
+                                             Fixed minor typos and grammatical errors.
+|2.00 Rev.2  |2020-05-06|Jaebaek Seo        |Revising the overall specification to fix errors, typos, and grammar errors. +
+                                             Revising the overall specification to address incorrect or contradictory expression of semantics. +
+                                             Adding definition of the <<LexicalScope,lexical scope>>. +
+                                             Adding definition of the <<LocalVariable,local variable>>. +
+                                             Adding the rule for forward references. +
+                                             Clarifying the valid location of instructions from this extended instruction set.
+|========================================================

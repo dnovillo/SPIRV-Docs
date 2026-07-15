@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.26">
+<meta name="author" content="Lei Zhang, Google">
+<title>SPIR-V Machine-readable Grammar</title>
+<style>
+@import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700";
+@import "https://cdn.jsdelivr.net/gh/asciidoctor/asciidoctor@2.0/data/stylesheets/asciidoctor-default.css";
+
+p {
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: normal;
+}
+em, b, strong {
+    color: darkblue;
+}
+
+</style>
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<h1>SPIR-V Machine-readable Grammar</h1>
+<div class="details">
+<span id="author" class="author">Lei Zhang, Google</span><br>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_introduction">1. Introduction</a>
+<ul class="sectlevel2">
+<li><a href="#_goals_and_conventions">1.1. Goals and Conventions</a></li>
+<li><a href="#_alias_mechanism">1.2. Alias mechanism</a></li>
+</ul>
+</li>
+<li><a href="#_top_level_structure">2. Top Level Structure</a></li>
+<li><a href="#_grammar_objects">3. Grammar Objects</a>
+<ul class="sectlevel2">
+<li><a href="#instruction">3.1. JSON objects for instructions</a></li>
+<li><a href="#operand-category">3.2. Operand categories</a></li>
+<li><a href="#operand-kind">3.3. JSON objects for operand kinds</a>
+<ul class="sectlevel3">
+<li><a href="#bitenum-operand-kind">3.3.1. The BitEnum operand kind</a></li>
+<li><a href="#valueenum-operand-kind">3.3.2. The ValueEnum operand kind</a></li>
+<li><a href="#id-operand-kind">3.3.3. The Id operand kind</a></li>
+<li><a href="#literal-operand-kind">3.3.4. The Literal operand kind</a></li>
+<li><a href="#composite-operand-kind">3.3.5. The Composite operand kind</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_example_usage">4. Example Usage</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Copyright 2014-2026 The Khronos Group Inc.</p>
+</div>
+<div class="paragraph">
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and/or associated documentation files (the "Materials"),
+to deal in the Materials without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Materials, and to permit persons to whom the
+Materials are furnished to do so, subject to the following conditions:</p>
+</div>
+<div class="paragraph">
+<p>The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Materials.</p>
+</div>
+<div class="paragraph">
+<p>MODIFICATIONS TO THIS FILE MAY MEAN IT NO LONGER ACCURATELY REFLECTS KHRONOS
+STANDARDS. THE UNMODIFIED, NORMATIVE VERSIONS OF KHRONOS SPECIFICATIONS AND
+HEADER INFORMATION ARE LOCATED AT <a href="https://www.khronos.org/registry/" class="bare">https://www.khronos.org/registry/</a></p>
+</div>
+<div class="paragraph">
+<p>THE MATERIALS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM,OUT OF OR IN CONNECTION WITH THE MATERIALS OR THE USE OR OTHER DEALINGS
+IN THE MATERIALS.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_introduction">1. Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This document defines the schema used by the machine-readable JSON grammar file
+for SPIR-V. This document is <strong>not</strong> the SPIR-V specification fully defining
+SPIR-V itself.</p>
+</div>
+<div class="sect2">
+<h3 id="_goals_and_conventions">1.1. Goals and Conventions</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>The machine-readable JSON grammar primarily aims to describe the syntax of
+various SPIR-V instructions. Semantics and validation rules remain in the
+human-readable SPIR-V specification.</p>
+</li>
+<li>
+<p>If a grammar struct has no particular attribute, e.g., <code>OpNop</code> has no
+operands and requires no additional capabilities, the corresponding key for
+that attribute in the JSON object is excluded for terseness.</p>
+</li>
+<li>
+<p>Keys in various JSON objects are in the <code>snake_case</code> format, while values
+are in the <code>CamelCase</code> format.</p>
+</li>
+<li>
+<p><a href="#operand-kind">Operand kind</a>s of a specific <a href="#operand-category">category</a>
+tend to have the category name as the prefix.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_alias_mechanism">1.2. Alias mechanism</h3>
+<div class="paragraph">
+<p><a href="#instruction">Instructions</a>, <a href="#bitenum-operand-kind">BitEnum operand kinds</a> and <a href="#valueenum-operand-kind">ValueEnum operand kind</a> can have aliases.
+An alias is introduced when an instruction or operand kind from an extension is reused in another extension or is integrated into the core specifications without a change in semantics.
+As the semantics do not change from the original extension,
+the new extension or core specifications will reuse the same opcode or value but change the name for consistency.
+This leads to instructions or operand kinds sharing the same value but having different names.</p>
+</div>
+<div class="paragraph">
+<p>Previous versions of the grammar dealt with this by duplicating the entry.
+This led to multiple entries sharing the same opcode or value, adding complexity for tooling.</p>
+</div>
+<div class="paragraph">
+<p>New versions of the grammar now bans the duplication of the opcode or operand kind in favor of the <code>aliases</code> field to keep track of the name evolution.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_top_level_structure">2. Top Level Structure</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The whole JSON grammar file consists of a single JSON object containing the
+following key-value pairs:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">{
+  "copyright" : [ ... ],
+  "magic_number" : "...",
+  "major_version" : ...,
+  "minor_version" : ...,
+  "revision" : ...,
+  "instructions" : [ ... ],
+  "operand_kinds" : [ ... ]
+}</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>magic_number</code></dt>
+<dd>
+<p>A string. The magic number for a SPIR-V module in the hexadecimal format.</p>
+</dd>
+<dt class="hdlist1"><code>major_version</code></dt>
+<dd>
+<p>An integer. The major version of the SPIR-V represented in this grammar file.</p>
+</dd>
+<dt class="hdlist1"><code>minor_version</code></dt>
+<dd>
+<p>An integer. The minor version of the SPIR-V represented in this grammar file.</p>
+</dd>
+<dt class="hdlist1"><code>revision</code></dt>
+<dd>
+<p>An integer. The revision of the SPIR-V represented in this grammar file.</p>
+</dd>
+<dt class="hdlist1"><code>instructions</code></dt>
+<dd>
+<p>A list of objects. Each object contains information about a specific
+instruction in the SPIR-V specification, including its name, opcode,
+required capabilities, layout of operands. The order of these objects
+dictates nothing. See the <a href="#instruction">JSON Objects for Instructions</a>
+Section for more details.</p>
+</dd>
+<dt class="hdlist1"><code>operand_kinds</code></dt>
+<dd>
+<p>A list of objects. Each object contains information about a specific
+operand kind, including its name, category, possible values, required
+capabilities, used in the operand layouts of <a href="#instruction">instructions</a>. See the <a href="#operand-kind">JSON Objects for Operand Kinds</a>
+Section for more details.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_grammar_objects">3. Grammar Objects</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="instruction">3.1. JSON objects for instructions</h3>
+<div class="paragraph">
+<p>This kind of JSON object contains the information about a specific SPIR-V
+instruction. It has the following key-value pairs:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">{
+  "opname" : "...",
+  "opcode" : ...,
+  "operands" : [
+    { "kind" : "...", quantifier : "...", name : "..." },
+    { "kind" : "...", quantifier : "...", name : "..." },
+    ...
+  ],
+  "capabilities" : [ ... ]
+}</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>opname</code></dt>
+<dd>
+<p>A string. The name of this instruction, starting with <code>Op</code>.
+Must be unique in all <code>opname</code> in <code>instructions</code>.</p>
+</dd>
+<dt class="hdlist1"><code>opcode</code></dt>
+<dd>
+<p>An integer. The opcode enumerant for this instruction.
+Must be unique in all <code>opcode</code> in <code>instructions</code>.</p>
+</dd>
+<dt class="hdlist1"><code>operands</code></dt>
+<dd>
+<p>A list of objects. <em>Optional</em>. Each object contains the information about
+a logical operand for this instruction:</p>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>kind</code></dt>
+<dd>
+<p>A string. The <a href="#operand-kind">kind</a> of this operand.</p>
+</dd>
+<dt class="hdlist1"><code>quantifier</code></dt>
+<dd>
+<p>A string. <em>Optional</em>. If this key is missing, it means this operand
+should appear exactly once. Otherwise, the value can only be <code>"?"</code> or
+<code>"*"</code>. If the value is <code>"?"</code>, it means this operand appears zero or
+one time. If the value is <code>"*"</code>, it means this operand appears zero
+or more times.</p>
+</dd>
+<dt class="hdlist1"><code>name</code></dt>
+<dd>
+<p>A string. <em>Optional</em>. A short descriptive name for this operand.</p>
+</dd>
+</dl>
+</div>
+</dd>
+<dt class="hdlist1"><code>capabilities</code></dt>
+<dd>
+<p>A list of strings. <em>Optional</em>. If this field exists, at least one of the named
+<a href="#capability">capabilities</a> must be declared to use this instruction.</p>
+</dd>
+<dt class="hdlist1"><code>aliases</code></dt>
+<dd>
+<p>A list of strings. <em>Optional</em>. If this field exists, each string is
+an alternative name for this instruction.
+Each name must appear exactly once and must not be equal to <code>opname</code>.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="operand-category">3.2. Operand categories</h3>
+<div class="paragraph">
+<p>Operand kinds are grouped into categories according to their possible values.
+Right now, there are only five categories:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>BitEnum</strong></dt>
+<dd>
+<p>For an operand kind belonging to this category, its value is a mask, which
+is formed by combining the bits specified as enumerants in an enum. See the
+<a href="#bitenum-operand-kind">BitEnum Operand Kind</a> Section for more details.</p>
+</dd>
+<dt class="hdlist1"><strong>ValueEnum</strong></dt>
+<dd>
+<p>For an operand kind belonging to this category, its value is an enumerant
+from an enum. See the <a href="#valueenum-operand-kind">ValueEnum Operand Kind</a>
+Section for more details.</p>
+</dd>
+<dt class="hdlist1"><strong>Id</strong></dt>
+<dd>
+<p>For an operand kind belonging to this category, its value is an &lt;id&gt;
+definition or reference.</p>
+</dd>
+<dt class="hdlist1"><strong>Literal</strong></dt>
+<dd>
+<p>For an operand kind belonging to this category, its value is an literal
+number or string.</p>
+</dd>
+<dt class="hdlist1"><strong>Composite</strong></dt>
+<dd>
+<p>For an operand kind belonging to this category, its value is composed from
+operand values from the above categories. See the <a href="#composite-operand-kind">Composite Operand Kind</a> Section for more details.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="operand-kind">3.3. JSON objects for operand kinds</h3>
+<div class="paragraph">
+<p>This kind of JSON object contains the information about a specific operand
+kind. It has the following key-value pairs:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">{
+  "category" : "...",
+  "kind" : "...",
+  "doc" : "...",
+  ...
+}</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>category</code></dt>
+<dd>
+<p>A string. The <a href="#operand-category">category</a> of this operand kind.</p>
+</dd>
+<dt class="hdlist1"><code>kind</code></dt>
+<dd>
+<p>A string. The name of this operand kind.
+Must be unique in all <code>kind</code> in <code>operand_kinds</code>.</p>
+</dd>
+<dt class="hdlist1"><code>doc</code></dt>
+<dd>
+<p>A string. <em>Optional</em>. The human-readable definition of this operand kind.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>Depending on the category of this operand kind, there may be more key-value
+pairs as explained in the following subsections.</p>
+</div>
+<div class="sect3">
+<h4 id="bitenum-operand-kind">3.3.1. The BitEnum operand kind</h4>
+<div class="paragraph">
+<p>Apart from the general key-value pairs, this kind of JSON object additionally
+has:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">{
+  ...,
+  "enumerants": [
+    {
+      "enumerant" : "...",
+      "value" : "...",
+      "capabilities" : [ ... ],
+      "parameters" : [
+        { "kind" : "..." },
+        ...
+      ]
+    }
+}</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>enumerants</code></dt>
+<dd>
+<p>A list of objects. Each object describes a possible bitflag for this operand
+kind:</p>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>enumerant</code></dt>
+<dd>
+<p>A string. The name of this bitflag.
+Must be unique in all <code>enumerant</code> in the <a href="#operand-kind">operand kind object</a>.</p>
+</dd>
+<dt class="hdlist1"><code>value</code></dt>
+<dd>
+<p>A string. The hexadecimal bit value of this bitflag.
+Must be unique in all <code>value</code> in the <a href="#operand-kind">operand kind object</a>.</p>
+</dd>
+<dt class="hdlist1"><code>capabilities</code></dt>
+<dd>
+<p>A list of strings. <em>Optional</em>. If this field exists, at least one of the named
+<a href="#capability">capabilities</a> must be declared to use this bitflag.</p>
+</dd>
+<dt class="hdlist1"><code>parameters</code></dt>
+<dd>
+<p>A list of objects. <em>Optional</em>. Each object describes a logical parameter
+for this bitflag:</p>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>kind</code></dt>
+<dd>
+<p>A string. The <a href="#operand-kind">kind</a> of this operand.</p>
+</dd>
+</dl>
+</div>
+</dd>
+<dt class="hdlist1"><code>aliases</code></dt>
+<dd>
+<p>A list of strings. <em>Optional</em>. If this field exists, each string is
+an alternative name for this bitflag.
+Each name must appear exactly once and must not be equal to <code>enumerant</code>.</p>
+</dd>
+</dl>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="valueenum-operand-kind">3.3.2. The ValueEnum operand kind</h4>
+<div class="paragraph">
+<p>Apart from the general key-value pairs, this kind of JSON object additionally
+has:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">{
+  ...,
+  "enumerants": [
+    {
+      "enumerant" : "...",
+      "value" : ...,
+      "capabilities" : [ ... ],
+      "parameters" : [
+        { "kind" : "..." },
+        ...
+      ]
+    }
+}</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>enumerants</code></dt>
+<dd>
+<p>A list of objects. Each object describes an possible enumerant for this
+operand kind:</p>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>enumerant</code></dt>
+<dd>
+<p>A string. The name of this enumerant.
+Must be unique in all <code>enumerant</code> in the <a href="#operand-kind">operand kind object</a>.</p>
+</dd>
+<dt class="hdlist1"><code>value</code></dt>
+<dd>
+<p>An integer. The value of this enumerant.
+Must be unique in all <code>value</code> in the <a href="#operand-kind">operand kind object</a>.</p>
+</dd>
+<dt class="hdlist1"><code>capabilities</code></dt>
+<dd>
+<p>A list of strings. <em>Optional</em>. If this field exists, at least one of the named
+<a href="#capability">capabilities</a> must be declared to use this enumerant.
+For enumerants in the <a href="#capability"><strong>Capability</strong></a> operand kind, each string
+names a capability that is additionally declared when this capability is declared.</p>
+</dd>
+<dt class="hdlist1"><code>extensions</code></dt>
+<dd>
+<p>A list of strings. <em>Optional</em>. The names of extensions that enable this
+feature.  If absent, the feature is always enabled.</p>
+</dd>
+<dt class="hdlist1"><code>parameters</code></dt>
+<dd>
+<p>A list of objects. <em>Optional</em>. Each object describes a logical parameter
+for this enumerant:</p>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>kind</code></dt>
+<dd>
+<p>A string. The <a href="#operand-kind">kind</a> of this operand.</p>
+</dd>
+</dl>
+</div>
+</dd>
+<dt class="hdlist1"><code>aliases</code></dt>
+<dd>
+<p>A list of strings. <em>Optional</em>. If this field exists, each string is
+an alternative name for this enumerant.
+Each name must appear exactly once  and must not be equal to <code>enumerant</code>.</p>
+</dd>
+</dl>
+</div>
+</dd>
+</dl>
+</div>
+<div class="sect4">
+<h5 id="capability">The Capability operand kind</h5>
+<div class="paragraph">
+<p>For example, capabilities are represented as a <strong>ValueEnum</strong> operand kind:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">{
+  "category" : "ValueEnum",
+  "kind" : "Capability",
+  "enumerants" : [
+    {
+      "enumerant" : "Matrix",
+      "value" : 0
+    },
+    {
+      "enumerant" : "Shader",
+      "value" : 1,
+      "capabilities" : [ "Matrix" ]
+    },
+    {
+      "enumerant" : "Geometry",
+      "value" : 2,
+      "capabilities" : [ "Shader" ]
+    },
+    {
+      "enumerant" : "Tessellation",
+      "value" : 3,
+      "capabilities" : [ "Shader" ]
+    },
+    {
+      "enumerant" : "Addresses",
+      "value" : 4
+    },
+    ...
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="id-operand-kind">3.3.3. The Id operand kind</h4>
+<div class="paragraph">
+<p>This kind of JSON object has no additional key-value pairs. All the kinds in
+this category are prefixed with <code>Id</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="literal-operand-kind">3.3.4. The Literal operand kind</h4>
+<div class="paragraph">
+<p>This kind of JSON object has no additional key-value pairs. All the kinds in
+this category are prefixed with <code>Literal</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="composite-operand-kind">3.3.5. The Composite operand kind</h4>
+<div class="paragraph">
+<p>This kind of JSON object additionally contains:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">{
+  ...,
+  bases: [ ... ]
+}</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>bases</code></dt>
+<dd>
+<p>A list of strings. Each string names an operand kind forming this <strong>Composite</strong>
+kind.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>When an operand is of the <strong>Composite</strong> kind, all the operands listed in its
+<code>bases</code> must appear in the concrete case, in the given order.</p>
+</div>
+<div class="paragraph">
+<p>Right now there are only three kinds defined in this category:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>PairIdRefIdRef</code>: used by <code>OpPhi</code>.</p>
+</li>
+<li>
+<p><code>PairLiteralIntegerIdRef</code>: used by <code>OpSwitch</code>.</p>
+</li>
+<li>
+<p><code>PairIdRefLiteralInteger</code>: used by <code>OpGroupMemberDecorate</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_example_usage">4. Example Usage</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Please see the <a href="https://github.com/KhronosGroup/SPIRV-Tools">SPIRV-Tools</a> project
+for an example of how this grammar can be used.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2026-03-02 19:41:31 UTC
+</div>
+</div>
+</body>
+</html>

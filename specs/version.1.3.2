@@ -1,0 +1,37 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+changes:
+
+=== Changes from Version 1.3, Revision 1
+
+- Fixed Issues:
+  * Public SPIRV-Headers PR #73: Add missing fields for some NVIDIA-specific tokens.
+  * Khronos SPIR-V Issue #202: <<ShaderValidation, Shader Validation>>: Be clear that arrays of blocks set by the client API cannot have an *ArrayStride*.
+  * Khronos SPIR-V Issue #210: Clarify the _Result Type_ of <<OpSampledImage, *OpSampledImage*>>.
+  * Khronos SPIR-V Issue #211: State that <<OpDPdx, Derivative>> instructions only work on 32-bit width components.
+  * Khronos SPIR-V Issue #239: Clarify <<OpImageFetch, *OpImageFetch*>> is for an image whose _Sampled_ operand is 1.
+  * Khronos SPIR-V Issue #256: <<OpAtomicCompareExchange, *OpAtomicCompareExchange*>> does not store if comparison fails.
+  * Khronos SPIR-V Issue #269: Be more clear which bits are mutually exclusive for <<Memory_Semantics_-id-, memory semantics>>.
+  * Khronos SPIR-V Issue #278: Delete <<OpTypeRuntimeArray, *OpTypeRuntimeArray*>> restriction on storage classes,
+    as this is already covered by the client API.
+  * Khronos SPIR-V Issue #279:
+    ** Add section expository section 2.8.1 "Unsigned Versus Signed Integers".
+    ** As expected, <<OpUConvert, *OpUConvert*>> can have vector _Result Type_.
+  * Khronos SPIR-V Issue #280: <<OpImageQuerySizeLod, *OpImageQuerySizeLod*>> and <<OpImageQueryLevels, *OpImageQueryLevels*>>
+    can be limited by the client API.
+  * Khronos SPIR-V Issue #285: Remove *Kernel* as a <<Capability, capability>> implicitly declared by *Int8*.
+  * Khronos SPIR-V Issue #290: Clarify implicit declaration of <<Capability, capabilities>>,
+    in part by changing the column heading to *Implicitly Declares".
+  * Khronos SPIR-V Issues #295: Explicitly say blocks cannot be nested in blocks, in the <<Validation, validation>> section.
+    (This was already indirectly required.)
+  * Khronos SPIR-V Issue #299: Add the *ImageGatherExtended* capability to *ConstOffsets* in <<Image_Operands, the image operands section>>.
+  * Khronos SPIR-V Issues #303 and #304: <<OpGroupNonUniformBallotBitExtract, *OpGroupNonUniformBallotBitExtract*>> documentation:
+    add *Result Type* and fix *Index* parameter.
+  * Khronos SPIR-V Issue #310: Remove instruction word count from the <<Limits, Limits>> table, as it is already intrinsically limited.
+  * Khronos SPIR-V Issue #313: Move the *FPRoundingMode*-decoration validation rule to the <<ShaderValidation, shader validation>> section (not a universal rule).
+    Also, include the *StorageBuffer* storage class in this rule.

@@ -1,0 +1,21 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+changes:
+
+=== Changes from Version 1.00, Revision 5
+
+ - Khronos SPIR-V issue #27: Removed *Shader* dependency from *SampledBuffer* and *Sampled1D* <<Capability,Capabilities>>.
+ - Khronos SPIR-V issue #56: Clarify that the meaning of "read-only" in the <<Storage_Class, Storage Classes>> includes not allowing initializers.
+ - Khronos SPIR-V issue #57: Clarify "modulo" means "remainder" in <<OpFMod, **OpFMod**>>'s description.
+ - Khronos SPIR-V issue #60: <<OpControlBarrier, *OpControlBarrier*>> synchronizes *Output* variables when used in tessellation-control shader.
+ - Public SPIRV-Headers issue #1: Remove the *Shader* capability requirement from the *Input* <<Storage_Class, Storage Class>>.
+ - Public SPIRV-Headers issue #10: Don't say the _(u [, v] [, w], q)_ has four components, as it can be closed up when the optional ones are missing.
+   Seen in the <<OpImageSampleProjImplicitLod, projective image>> instructions.
+ - Public SPIRV-Headers issues #12 and #13 and Khronos SPIR-V issue #65:
+   Allow <<OpVariable, *OpVariable*>> as an initializer for another *OpVariable* instruction
+   or the _Base_ of an <<OpSpecConstantOp, *OpSpecConstantOp*>> with an *AccessChain* opcode.
+ - Public SPIRV-Headers issues #14: add *Max* enumerants of 0x7FFFFFFF to each of the non-mask enums in the C-based header files.

@@ -1,0 +1,39 @@
+#!/usr/bin/bash
+# Copyright 2015-2026 The Khronos Group Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+HEADER_SRC=../SPIRV-Headers/include/spirv/unified1
+PROJECT_SRC=../SPIRV-Headers/tools/buildHeaders
+HEADER_DEST=~/GitHub/SPIRV-Headers/include/spirv/unified1
+PROJECT_DEST=~/GitHub/SPIRV-Headers/tools/buildHeaders
+
+if [ "$1" = 'push' ]
+then
+
+    # Grammars and Headers: should cross-check the new GitHub project builds consistent headers
+    cp $HEADER_SRC/* $HEADER_DEST
+
+    # Project
+    cd $PROJECT_SRC
+    cp *.cpp *.h *.txt $PROJECT_DEST
+
+elif [ "$1" = 'pull' ]
+then
+
+    # Grammars
+    cp $HEADER_DEST/*.json  $HEADER_SRC
+
+    # Project
+    cd $PROJECT_SRC
+    cp $PROJECT_DEST/*.cpp .
+    cp $PROJECT_DEST/*.h .
+    cp $PROJECT_DEST/*.txt .
+
+else
+
+    echo usage:
+    echo $0 push \# move from GitLab to GitHub
+    echo $0 pull \# move from GitHub to GitLab
+    echo run this tool from the specs directory
+
+fi

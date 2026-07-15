@@ -1,0 +1,31 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+changes:
+
+=== Changes from Version 1.00, Revision 11
+
+- Public issue #2: Disallow the *Cube* dimension from use with the *Offset*, *ConstOffset*, and *ConstOffset*
+  <<Image_Operands, image operands>>.
+- Public issue #48: <<OpConvertPtrToU, *OpConvertPtrToU*>> only returns a scalar, not a vector.
+- Khronos SPIR-V issue #130: Be more clear which masks are literal and which are not.
+- Khronos SPIR-V issue #154: Clarify only one of the listed <<Capabilities, *Capabilities*>> needs to be declared to use a feature that lists multiple capabilities.
+  The non-declared capabilities need not be supported by the underlying implementation.
+- Khronos SPIR-V issue #174: <<OpImageDrefGather, *OpImageDrefGather*>> and <<OpImageSparseDrefGather, *OpImageSparseDrefGather*>>
+  return vectors, not scalars.
+- Khronos SPIR-V issue #182: The *SampleMask* <<BuiltIn, built in>> does not depend on *SampleRateShading*, only *Shader*.
+- Khronos SPIR-V issue #183: <<OpQuantizeToF16, *OpQuantizeToF16*>> with too-small magnitude can result in either +0 or -0.
+- Khronos SPIR-V issue #203: <<OpImageTexelPointer, *OpImageTexelPointer*>> has 3 components for cube arrays, not 4.
+- Khronos SPIR-V issue #217: Clearer language for <<OpArrayLength, *OpArrayLength*>>.
+- Khronos SPIR-V issue #213: <<Image_Operands, Image Operand>> *LoD* is not used by query operations.
+- Khronos SPIR-V issue #223: <<OpPhi, *OpPhi*>> has exactly one parent operand per parent block.
+- Khronos SPIR-V issue #212: In the <<Validation, Validation Rules>>, make clear a pointer can be an operand in an extended instruction set.
+- Add extension enumerants for
+  * SPV_AMD_shader_ballot
+  * SPV_KHR_post_depth_coverage
+  * SPV_AMD_shader_explicit_vertex_parameter
+  * SPV_EXT_shader_stencil_export
+  * SPV_INTEL_subgroups

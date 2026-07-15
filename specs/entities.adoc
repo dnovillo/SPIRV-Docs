@@ -1,0 +1,26 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+ifdef::backend-html5[]
+:pi: &#120587;
+:ne: &#8800;
+:le: &#8804;
+:ge: &#8805;
+:rightarrow: ->
+endif::backend-html5[]
+
+ifndef::backend-html5[]
+:pi: pi
+:ne: !=
+:le: \<=
+:ge: >=
+:rightarrow: \->
+endif::backend-html5[]
+
+:plusmn: &#177;
+:times: &#215;
+:TM: &#8482;
+:registered: &#174;
+
+// URL prefix for the SPIR-V extensions registry
+:spirv: https://github.khronos.org/SPIRV-Registry/extensions

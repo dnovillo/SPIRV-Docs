@@ -1,0 +1,77 @@
+// Copyright 2017-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+ifdef::env-github[]
+:note-caption: :information_source:
+endif::[]
+
+= Building the SPIR-V Specifications
+
+This document describes how to build the SPIR-V specification HTML and PDF targets.
+
+== Cloning the Repository
+
+Clone the repository from GitHub:
+
+    $ git clone https://github.com/KhronosGroup/SPIRV-Docs.git
+    $ cd SPIRV-Docs
+    $ git submodule update --init
+
+== Build Targets
+
+Install all necessary build tools (see <<depends,Software Dependencies>> below).
+If you are using the <<depends-docker,Khronos-Provided Docker Image>>, which we strongly recommend, prefix all make commands with `docker-`.
+The Docker image mounts the cloned repository and runs as your user and group ID, so generated files are owned by you.
+
+To build all documents as HTML5:
+
+    $ make html
+
+or
+
+    $ make docker-html
+
+To build all documents as PDF:
+
+    $ make pdf
+
+or
+
+    $ make docker-pdf
+
+To build all documents in both formats:
+
+    $ make all
+
+or
+
+    $ make docker-all
+
+Additional useful targets (prefix with `docker-` to run inside the Docker image):
+
+* `check` -- checks the generated HTML for dead links and references. Also runs in CI.
+* `diff-dev` -- generates an HTML diff between `specs/` and `latest/` and stores the results in a `diff/` folder.
+
+[[depends]]
+== Software Dependencies
+
+[[depends-docker]]
+=== Khronos-Provided Docker Image
+
+Khronos provides a public Docker image on https://hub.docker.com/r/khronosgroup/docker-images[Docker Hub] with all required tools pre-installed:
+
+    khronosgroup/docker-images:asciidoctor-spec
+
+This is the recommended way to build the specifications.
+
+=== Native Installation
+
+1. Install Ruby 2.7 or later.
+2. Install the required gems:
++
+[source,bash]
+----
+gem install asciidoctor
+gem install asciidoctor-pdf
+gem install hexapdf
+----

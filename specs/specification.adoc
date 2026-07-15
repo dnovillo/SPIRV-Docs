@@ -1,0 +1,1670 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+[[Specification]]
+== Specification
+
+[[Capabilities]]
+=== Language Capabilities
+
+A SPIR-V module is consumed by a client API that needs to support the features used by that SPIR-V module.
+Features are classified through <<Capability, capabilities>>.
+Capabilities used by a particular SPIR-V module are declared early in that module with the <<OpCapability,*OpCapability*>> instruction. Then:
+
+- A validator can validate that the module uses only its declared capabilities.
+- A client API is allowed to reject modules declaring capabilities it does not support.
+
+All available capabilities and their dependencies form a capability hierarchy, fully listed in the capability section.
+Only top-level capabilities need to be explicitly declared; their dependencies are implicitly declared.
+
+If an instruction, enumerant, or other feature specifies multiple enabling capabilities, only one such capability
+needs to be declared to use the feature. This declaration does not itself imply anything about the presence of the
+other enabling capabilities: The execution environment needs to support only the declared capability.
+
+The SPIR-V specification provides universal capability-specific validation rules, in the <<Validation, validation section>>.
+Additionally, each client API includes the following:
+
+- Which capabilities in the <<Capability, capability>> section it supports or requires, and hence allows in a SPIR-V module.
+- Any additional validation rules it has beyond those specified by the SPIR-V specification.
+- Required limits, if they are beyond the <<Limits, Universal Limits>>.
+
+=== Terms
+
+==== Instructions
+
+[[Word]]_Word_: 32 bits.
+
+[[Id]]_<id>_: A numerical name; the name used to refer to an object, a type, a function, a label, etc.
+An _<id>_ always consumes one <<Word,_word_>>.   The _<id>s_ defined by a module obey <<SSA,SSA>>.
+
+[[ResultId]]_Result <id>_:  Most instructions define a result, named by an <<Id,_<id>_>> explicitly provided in the instruction.
+The _Result <id>_ is used as an operand in other instructions to refer to the instruction that defined it.
+
+[[Literal]]_Literal_: An immediate value, not an <<Id,_<id>_>>.
+Literals larger than one <<Word,_word_>> consume multiple operands, one per word.
+An instruction states what type the literal will be interpreted as.
+A string is interpreted as a nul-terminated stream of characters.
+All string comparisons are case sensitive.
+The character set is Unicode in the UTF-8 encoding scheme.
+The UTF-8 octets (8-bit bytes) are packed four per <<Word,_word_>>,
+following the little-endian convention (i.e., the first octet is in the lowest-order 8 bits of the word).
+The final word contains the string's nul-termination character (0),
+and all contents past the end of the string in the final word are padded with 0.
+For a numeric literal, the lower-order words appear first.
+If a numeric type's bit width is less than 32-bits, the value appears in the low-order bits of the word,
+and the high-order bits must be 0 for a <<Floating, floating-point type>> or <<Integer, integer type>> with _Signedness_ of 0,
+or sign extended for an integer type with a _Signedness_ of 1
+(similarly for the remaining bits of widths larger than 32 bits but not a multiple of 32 bits).
+
+[[Operand]]_Operand_:  A one-<<Word,_word_>> argument to an instruction.
+E.g., it could be an <<Id,_<id>_>>, or (or part of) a <<Literal, literal>>.
+Which form it holds is always explicitly known from the opcode.
+
+[[WordCount]]_WordCount_:  The complete number of <<Word, _words_>> taken by an instruction, including the word holding the word count and opcode, and any optional operands.
+An instruction's word count is the total space taken by the instruction.
+
+_Instruction_:  After a header, a module is simply a linear list of instructions.  An instruction contains a <<WordCount, _word count_>>, an opcode,
+an optional <<ResultId,_Result <id>_>>, an optional <<Id,_<id>_>> of the instruction's type, and a variable list of operands.
+All instruction opcodes and semantics are listed in <<Instructions,*Instructions*>>.
+
+_Decoration_:  Auxiliary information such as built-in variable, stream numbers, invariance, interpolation type, relaxed precision, etc.,
+added to <<Id,_<id>s_>> or structure-type members through <<Decoration, Decorations>>.
+Decorations are enumerated in Decoration in the <<Binary, Binary Form>> section.
+
+[[Object]]_Object_: An instantiation of a non-void type, either as the <<ResultId,_Result <id>_>> of an operation, or created through <<OpVariable,*OpVariable*>>.
+
+_Memory Object_: An object created through <<OpVariable,*OpVariable*>>.
+Such an object exists only for the duration of a function if it is a function variable,
+and otherwise exists for the duration of an invocation.
+
+[[MemoryObjectDeclaration]]_Memory Object Declaration_: An <<OpVariable, *OpVariable*>>,
+or an <<OpFunctionParameter,*OpFunctionParameter*>> of pointer type, or the contents of an *OpVariable*
+that holds either a pointer to the *PhysicalStorageBuffer* <<Storage_Class, storage class>> or an array of such pointers.
+
+[[Intermediate]]_Intermediate Object_ or _Intermediate Value_ or _Intermediate Result_:
+An object created by an operation (not memory allocated by <<OpVariable,*OpVariable*>>) and dying on its last consumption.
+
+[[ConstantInstruction]]_Constant Instruction_: Either a specialization-constant instruction
+or a non-specialization constant instruction: Instructions that start "OpConstant" or "OpSpec".
+
+[[Inclusive]]_[a, b]_: This square-bracket notation means the range from _a_ to _b_, inclusive of _a_ and _b_.
+Parentheses exclude their end point, so, for example, _(a, b]_ means _a_ to _b_ excluding _a_ but including _b_.
+
+[[NonSemanticInstruction]]_Non-Semantic Instruction_: An instruction that has no semantic impact,
+and that can be safely removed from the module.
+
+[[InstructionHints]]_Hint_: Either an indication to the compiler a property is likely to be observed or
+a request to the compiler to perform a specific transformation. They do not affect the semantics of the program.
+Unless stated otherwise, the compiler must not assume the property will be observed
+or the transformation is always safe to be performed.
+
+==== Types
+
+[[Boolean]]_Boolean type_: The type declared by <<OpTypeBool,*OpTypeBool*>>.
+
+[[Integer]]_Integer type_: Any width signed or unsigned type from <<OpTypeInt,*OpTypeInt*>>.
+By convention, the lowest-order bit is referred to as bit-number 0, and the highest-order bit as bit-number _Width_ - 1.
+
+[[Floating]]_Floating-point type_: Any width and encoding type from <<OpTypeFloat,*OpTypeFloat*>>.
+
+[[Numerical]]_Numerical type_: An <<Integer, integer>> type or a <<Floating, floating-point>> type.
+
+[[Scalar]]_Scalar_: A single instance of a <<Numerical,_numerical type_>> or <<Boolean,_Boolean type_>>.
+Scalars are also called _components_ when being discussed either by themselves or in the context of the contents of a <<Vector,_vector_>>.
+
+[[Vector]]_Vector_: An ordered homogeneous collection of two or more <<Scalar,_scalars_>>.
+Vector sizes are quite restrictive and dependent on the execution model.
+
+[[Matrix]]_Matrix_: An ordered homogeneous collection of vectors.
+The vectors forming a matrix are also called its _columns_.
+Matrix sizes are quite restrictive and dependent on the execution model.
+
+[[Array]]_Array_: An ordered homogeneous aggregate of any non-void-type objects.
+The objects forming an array are also called its _elements_.
+Array sizes are generally not restricted.
+
+[[Structure]]_Structure_: An ordered heterogeneous aggregate of any non-void types.
+The objects forming a structure are also called its _members_.
+
+[[Aggregate]]_Aggregate_: A <<Structure,_structure_>> or an <<Array,_array_>>.
+
+[[CompositeType]]_Composite_: An <<Aggregate,_aggregate_>>, a <<Matrix,_matrix_>>, or a <<Vector,_vector_>>.
+
+[[TexelTerm]]_Texel_: A single scalar or vector element of the data collection described
+by an <<ImageTerm,image>>. Each texel is stored in a particular <<Image_Format,format>>.
+If the _Sampled Type_ operand of the <<OpTypeImage,image type>> is not <<OpTypeVoid, *OpTypeVoid*>>,
+the value is converted according to the _Sampled Type_ operand when the texel is read or written.
+
+[[ImageTerm]]_Image_: An opaque descriptor of an ordered, homogeneous,
+multi-dimensional collection of formatted data elements called texels.
+Image objects themselves are opaque and cannot be accessed or modified;
+an image's texels are accessed through dedicated <<Image, Image instructions>>.
+An image type is declared with <<OpTypeImage,*OpTypeImage*>>.
+An image does not include any information about how to access, filter, or sample it.
+
+[[Sampler]]_Sampler_: Settings that describe how to access, filter, or sample an <<ImageTerm,image>>.
+Comes either from literal declarations of settings or from an opaque reference to externally bound settings.
+A sampler does not include an <<ImageTerm,_image_>>.
+
+[[SampledImage]]_Sampled Image_: An <<ImageTerm,_image_>> combined with a <<Sampler,_sampler_>>, enabling filtered accesses of the image's contents.
+
+[[PhysicalPointerType]]_Physical Pointer Type_: An <<OpTypePointer, *OpTypePointer*>> whose _Storage Class_ uses
+physical addressing according to the <<Addressing_Model, addressing model>>.
+
+[[LogicalPointerType]]_Logical Pointer Type_: A pointer type that is not a <<PhysicalPointerType, physical pointer type>>.
+
+[[Concrete]]_Concrete Type_: A <<Numerical, numerical>> scalar, vector, or matrix type,
+or <<PhysicalPointerType, physical pointer type>>, or any aggregate containing only these types.
+
+[[Abstract]]_Abstract Type_: An <<OpTypeVoid,*OpTypeVoid*>> or <<OpTypeBool,*OpTypeBool*>>,
+or <<LogicalPointerType, logical pointer type>>, or any aggregate type containing any of these.
+
+[[Opaque]]_Opaque Type_: A type that is, or contains, or points to, or contains pointers to, any of the following types:
+
+ - <<OpTypeImage, *OpTypeImage*>>
+ - <<OpTypeSampler, *OpTypeSampler*>>
+ - <<OpTypeSampledImage, *OpTypeSampledImage*>>
+ - <<OpTypeOpaque, *OpTypeOpaque*>>
+ - <<OpTypeEvent, *OpTypeEvent*>>
+ - <<OpTypeDeviceEvent, *OpTypeDeviceEvent*>>
+ - <<OpTypeReserveId, *OpTypeReserveId*>>
+ - <<OpTypeQueue, *OpTypeQueue*>>
+ - <<OpTypePipe, *OpTypePipe*>>
+ - <<OpTypeForwardPointer, *OpTypeForwardPointer*>>
+ - <<OpTypePipeStorage, *OpTypePipeStorage*>>
+ - <<OpTypeNamedBarrier, *OpTypeNamedBarrier*>>
+
+[[VariablePointer]]_Variable pointer_: A pointer of logical pointer type that results from
+one of the following instructions:
+
+ - <<OpSelect, *OpSelect*>>
+ - <<OpPhi, *OpPhi*>>
+ - <<OpFunctionCall, *OpFunctionCall*>>
+ - <<OpPtrAccessChain, *OpPtrAccessChain*>>
+ - <<OpLoad, *OpLoad*>>
+ - <<OpConstantNull, *OpConstantNull*>>
+
+Additionally, any <<OpAccessChain, *OpAccessChain*>>, <<OpInBoundsAccessChain, *OpInBoundsAccessChain*>>,
+or <<OpCopyObject, *OpCopyObject*>> that takes a variable pointer as an operand also produces a variable pointer.
+An <<OpFunctionParameter, *OpFunctionParameter*>> of pointer type is a variable pointer if any
+<<OpFunctionCall, *OpFunctionCall*>> to the function statically passes a variable pointer as the value of the parameter.
+
+[[ExplicitLayout]]_Explicit Layout_: Types with an explicit layout have
+decorations defining the relative locations of all of their constituents.
+A type has an explicit layout if the following statements are true,
+recursively applied to any nested types:
+
+ - Each structure-type member must have an *Offset* decoration.
+ - Each array type must have an *ArrayStride* decoration, unless it is an
+   array that contains a structure decorated with *Block* or *BufferBlock*,
+   in which case it must not have an *ArrayStride* decoration.
+ - Each structure-type member that is a matrix or array-of-matrices must be
+   decorated with a *MatrixStride* decoration, and one of the *RowMajor* or
+   *ColMajor* decorations.
+ - *ArrayStride*, *MatrixStride*, and *Offset* decorations must not cause overlap between elements or with other members.
+ - Each *ArrayStride* and *MatrixStride* must be greater than zero.
+ - A pointer to a structure decorated with *Block* or *BufferBlock* must not have an *ArrayStride* decoration
+ - All members of a given structure must have distinct *Offset* decorations.
+
+==== Computation
+
+[[Remainder]]_Remainder_: When dividing _a_ by _b_, a _remainder_ _r_ is defined to be a value that satisfies
+_r_ + _q_ {times} _b_ = _a_ where _q_ is an integer and |_r_| < |_b_|.
+
+==== Module
+
+[[Module]]_Module_: A single unit of SPIR-V. It can contain multiple <<EntryPoint,_entry points_>>, but only one set of <<Capability, capabilities>>.
+
+[[EntryPoint]]_Entry Point_:  A function in a <<Module,_module_>> where execution begins.
+A single _entry point_ is limited to a single <<ExecutionModel,_execution model_>>.
+An entry point is declared using <<OpEntryPoint,*OpEntryPoint*>>.
+
+[[ExecutionModel]]_Execution Model_:  A graphical-pipeline stage or OpenCL kernel.
+These are enumerated in <<Execution_Model,Execution Model>>.
+
+_Execution Mode_:  Modes of operation relating to the interface or execution environment of the module.
+These are enumerated in <<Execution_Mode, Execution Mode>>.  Generally, modes do not change the semantics
+of instructions within a SPIR-V module.
+
+[[VertexProcessor]]_Vertex Processor_: Any stage or execution model that processes vertices: Vertex, tessellation control, tessellation evaluation, and geometry.
+Explicitly excludes fragment and compute execution models.
+
+==== Control Flow
+
+[[Block]]_Block_: A contiguous sequence of instructions starting with an <<OpLabel, *OpLabel*>>, ending with a <<Termination, block termination instruction>>.
+A _block_ has no additional label or block termination instructions.
+
+[[FunctionTermination]]_Function Termination Instruction_: One of the following, used to terminate execution of a function:
+
+* <<OpReturn,*OpReturn*>>
+* <<OpReturnValue,*OpReturnValue*>>
+* <<OpKill,*OpKill*>>
+* <<OpUnreachable,*OpUnreachable*>>
+* <<OpTerminateInvocation,*OpTerminateInvocation*>>
+
+[[ConditionalBranch]]_Conditional Branch Instruction_: One of the following, used as a <<Termination, block termination instruction>>:
+
+* <<OpBranchConditional,*OpBranchConditional*>>
+* <<OpSwitch,*OpSwitch*>>
+
+[[Branch]]_Branch Instruction_: an <<OpBranch,*OpBranch*>> or a <<ConditionalBranch, conditional branch instruction>>, used as a <<Termination, block termination instruction>>
+
+[[Termination]]_Block Termination Instruction_: One of the following, used to terminate blocks:
+
+* any <<Branch, branch instruction>>
+* any <<FunctionTermination, function termination instruction>>
+
+_Control-Flow Graph_: The graph formed by a function's blocks and branches.  The blocks are the graph's nodes, and the branches the graph's edges.
+
+_CFG_: Control-flow graph.
+
+[[Merge]]_Merge Instruction_: One of the following, used before a branch instruction to declare structured control flow:
+
+* <<OpSelectionMerge,*OpSelectionMerge*>>
+* <<OpLoopMerge,*OpLoopMerge*>>
+
+[[HeaderBlock]]_Header Block_: A block containing a <<Merge, merge instruction>>.
+
+[[LoopHeader]]_Loop Header_: A <<HeaderBlock, header block>> whose merge instruction is an <<OpLoopMerge,*OpLoopMerge*>>.
+
+[[SelectionHeader]]_Selection Header_: A <<HeaderBlock, header block>> whose merge instruction is an <<OpSelectionMerge,*OpSelectionMerge*>> and whose termination instruction is an <<OpBranchConditional,*OpBranchConditional*>>.
+
+[[SwitchHeader]]_Switch Header_: A <<HeaderBlock, header block>> whose merge instruction is an <<OpSelectionMerge,*OpSelectionMerge*>> and whose termination instruction is an <<OpSwitch,*OpSwitch*>>.
+
+[[MergeBlock]]_Merge Block_: A block declared by the _Merge Block_ operand of a <<Merge, merge instruction>>.
+
+[[BranchEdge]]_Branch Edge_: There is a _branch edge_ from block _A_ to block _B_ if the terminator of _A_ is a <<Branch, branch instruction>> and _B_ is one of the target blocks for the branch instruction.
+
+[[MergeEdge]]_Merge Edge_: There is a _merge edge_ from block _A_ to block _B_ if _A_ contains a <<Merge, merge instruction>> and _B_ is the <<MergeBlock, merge block>> of this merge instruction.
+
+[[ContinueEdge]]_Continue Edge_: There is a _continue edge_ from block _A_ to block _B_ if _A_ is a <<LoopHeader, loop header>> and _B_ is the _Continue Target_ of the loop header's <<OpLoopMerge,*OpLoopMerge*>> instruction.
+
+[[StructuredControlFlowEdge]]_Structured Control-Flow Edge_: There is a _structured control-flow edge_ from block _A_ to block _B_ if there is a <<BranchEdge,branch edge>>, <<MergeEdge,merge edge>>, or <<ContinueEdge,continue edge>> from _A_ to _B_.
+
+[[BackEdge]]_Back Edge_: A <<BranchEdge,branch edge>> that
+branches to one of its ancestors in a depth-first search over
+<<StructuredControlFlowEdge, structured control-flow edges>> starting
+at the function's entry block. +
+Note: When all loops are structured, each _back edge_ corresponds to exactly
+one loop header, and vice versa, making this set of back edges invariant with
+respect to which depth-first search found them.
+This implies that the CFG defined by the function's structured control-flow edges is reducible.
+
+[[BackEdgeBlock]]_Back-Edge Block_: If there is a <<BackEdge,back edge>> from block _A_ to block _B_ then _A_ is a _back-edge block_.
+
+[[Path]]_Path_: A sequence of blocks _B~0~_, _B~1~_, …, _B~n~_ where for each 0 \<= _i_ < _n_ there is a <<BranchEdge,branch edge>> from _B~i~_ to _B~i+1~_.
+This forms a _path_ from _B~0~_ to _B~n~_.
+
+[[StructuredControlFlowPath]]_Structured Control-Flow Path_: A sequence of blocks _B~0~_, _B~1~_, …, _B~n~_ where for each 0 \<= _i_ < _n_ there is a <<StructuredControlFlowEdge,structured control-flow edge>> from _B~i~_ to _B~i+1~_.
+This forms a _structured control-flow path_ from _B~0~_ to _B~n~_
+
+[[StructurallyReachable]]_Structurally Reachable_: A block _B_ is _structurally reachable_ if there exists a <<StructuredControlFlowPath,structured control-flow path>> from the entry block of the function containing _B_ to _B_.
+
+[[Dominate]]_Dominate_: A block _A_ _dominates_ a block _B_, where _A_ and _B_ are in the same function, if every <<Path,path>> from the function's
+entry block to block _B_ includes block _A_. _A_ _strictly dominates_ _B_ if _A_ _dominates_ _B_ and _A_ and _B_ are different blocks.
+
+[[StructurallyDominate]]_Structurally Dominate_: A block _A_ _structurally dominates_ a block _B_, where _A_ and _B_ are in the same function, if every <<StructuredControlFlowPath,structured control-flow path>> from the function's
+entry block to block _B_ includes block _A_. _A_ _strictly structurally dominates_ _B_ if _A_ _structurally dominates_ _B_ and _A_ and _B_ are different blocks.
+
+[[StructurallyPostDominate]]_Structurally Post Dominate_: A block _B_ structurally post dominates a block _A_, where _A_ and _B_ are in the same function,
+if every <<StructuredControlFlowPath,structured control-flow path>> from _A_ to a <<FunctionTermination,function termination instruction>> includes block _B_.
+
+[[Invocation]]_Invocation_: A single execution of an entry point in a SPIR-V module,
+operating only on the amount of data explicitly exposed by the semantics of the instructions.
+(Any implicit operation on additional instances of data would comprise additional invocations.)
+For example, in compute execution models, a single invocation operates only on a single work item, or,
+in a vertex execution model, a single invocation operates only on a single vertex.
+
+[[Quad]]_Quad_: The execution environment can partition invocations into _quads_, where invocations within a quad can
+synchronize and share data with each other efficiently.
+See the client API specification for more details. It has a size of exactly 4 invocations.
+
+[[QuadIndex]]_Quad index_: The index of an invocation in a <<Quad, quad>>.
+
+[[Subgroup]]_Subgroup_: Invocations are partitioned into subgroups, where invocations within a subgroup can synchronize
+and share data with each other efficiently.
+In compute models, the current workgroup is a superset of the subgroup.
+A subgroup's size is defined by the maximum of the current values of the *SubgroupSize* and *SubgroupMaxSize* <<BuiltIn,built-in variables>>.
+
+[[Cluster]]_Cluster_: A partition of invocations in a subgroup.
+Invocations are partitioned into clusters based on their subgroup local invocation ID and the per-instruction cluster size _ClusterSize_, with _ClusterSize_ invocations per cluster.
+The first _ClusterSize_ invocations with the smallest subgroup local invocation IDs are assigned to the first cluster, then the next _ClusterSize_ remaining invocations with the smallest local invocation IDs are assigned to the next cluster, and so on.
+If the current value of the *SubgroupSize* <<BuiltIn,built-in variable>> is not evenly divisible by the cluster size then the additional invocations in the last cluster are considered not part of the <<Tangle, tangle>>.
+
+[[Workgroup]]_Workgroup_: The set of invocations partitioned in some execution models (e.g. GLCompute, Kernel) as a workgroup.
+Its size is defined statically by either the *WorkgroupSize* <<BuiltIn,built-in>> or the *LocalSize* or *LocalSizeId*
+<<Execution_Mode, Execution Modes>>, or can be queried via the *WorkgroupSize* <<BuiltIn,built-in>>.
+These values can be defined in multiple dimensions, and its total size is the product of the size in each specified dimension.
+
+[[InvocationGroup]]_Invocation Group_: The complete set of invocations collectively processing a particular compute workgroup
+or graphical operation, where the scope of a "graphical operation" is implementation dependent,
+but at least as large as a single point, line, triangle, or patch, and at most as large
+as a single rendering command, as defined by the client API.
+
+[[DerivativeGroup]]_Derivative Group_: Defined only for the *Fragment* <<Execution_Model, Execution Model>>:
+The set of invocations collectively processing derivatives, which is at most as large as a single point, line, or triangle,
+including any helper invocations, as defined by the client API.
+
+[[Scope]]_Scope_: A specific set of invocations that are related to each other as defined by <<Scope_-id-, _Scope <id>_>>.
+Each invocation belongs to one or more _scopes_, but belongs to no more than one _scope_ for each <<Scope_-id-, _Scope <id>_>>.
+
+[[Tangle]]_Tangle_: The set of invocations that execute the same <<DynamicInstance, dynamic instance>> of an instruction.
+
+[[TangledInvocations]]_Tangled invocations_: Invocations in the same tangle.
+
+[[ScopeRestrictedTangle]]_Scope Restricted Tangle_: A set of invocations in the same <<Tangle, tangle>> and within the same <<Scope, scope>>.
+
+[[TangledInstruction]]_Tangled Instruction_: One of:
+
+- <<Group, Group and subgroup instructions>>
+- <<Non-Uniform, Non-uniform instructions>>
+- <<OpControlBarrier, *OpControlBarrier*>>
+- <<OpGroupReserveReadPipePackets, *OpGroupReserveReadPipePackets*>>,
+  <<OpGroupReserveWritePipePackets, *OpGroupReserveWritePipePackets*>>,
+  <<OpGroupCommitReadPipe, *OpGroupCommitReadPipe*>> and
+  <<OpGroupCommitWritePipe, *OpGroupCommitWritePipe*>>
+- <<Derivative, Derivative instructions>>
+- <<Image, Image instructions>> that consume an implicit derivative
+
+Tangled instructions communicate between invocations.
+
+[[DynamicInstance]]_Dynamic Instance_:
+Within a single invocation, a single static instruction can be executed multiple times, giving multiple dynamic instances of that instruction.
+This can happen if the instruction is executed in a loop, or in a function called from multiple call sites, or combinations of multiple of these.
+Different loop iterations and different dynamic function-call-site chains yield different dynamic instances of such an instruction.
+
+Additionally, a single dynamic instance may be executed by multiple invocations.
+At the <<EntryPoint, entry point>>, all invocations (in the <<InvocationGroup,invocation group>>, unless otherwise stated) execute the same dynamic instance of the first instruction in the entry point function.
+Invocations will continue to execute the same dynamic instances as long as they follow the same control-flow path.
+When invocations execute a <<ConditionalBranch, conditional branch>> and begin following different control flow paths, they execute different dynamic instances according to the path taken.
+Invocations that have taken different control flow paths may resume executing the same dynamic instances if their execution reaches the same static instruction.
+Invocations may only resume executing the same dynamic instances when all invocations reach the same static instruction.
+Unless otherwise indicated, the only reconvergence conditions are those described in the definition of <<UniformControlFlow, uniform control flow>>.
+
+[[ProgramOrder]]_Program Order_: Program order is an ordering on <<DynamicInstance, dynamic instances>> of instructions executed by a single shader invocation. A <<DynamicInstance, dynamic instance>> _A'_ of an instruction _A_ is program-ordered before a <<DynamicInstance, dynamic instance>> _B'_ of an instruction _B_ (and _B'_ is program-ordered after _A'_) if and only if:
+
+  * _A_ and _B_ are in the same basic block, _A_ is listed in the module before _B_, and _A'_ is the n’th dynamic instance of _A_ and _B'_ is the n’th dynamic instance of B.
+  * _A_ is a <<Branch, branch instruction>>, _B_ is <<OpLabel, *OpLabel*>>, and _A'_ branches to _B'_.
+  * _A_ is <<OpFunctionCall, *OpFunctionCall*>>, _B_ is <<OpFunction, *OpFunction*>>, and _A'_ calls _B'_.
+  * _A_ is <<OpReturn, *OpReturn*>> or <<OpReturnValue, *OpReturnValue*>>, and _B'_ is program-ordered after the <<OpFunctionCall, *OpFunctionCall*>> which called the function which executed _A'_.
+  * _A'_ is program-ordered before a <<DynamicInstance, dynamic instance>> _X'_, and _X'_ is program-ordered before _B'_.
+
+
+[[DynamicallyUniform]]_Dynamically Uniform_: An <<Id,_<id>_>> is dynamically uniform for a
+<<DynamicInstance, dynamic instance>> consuming it if its value is the same for all invocations
+(in the <<InvocationGroup,invocation group>>, unless otherwise stated) that execute that dynamic instance.
+
+[[UniformControlFlow]]_Uniform Control Flow_: Uniform control flow (or converged control flow) is
+the state when all invocations (in the <<InvocationGroup,invocation group>>, unless otherwise stated)
+execute the same dynamic instance of an instruction.
+Uniform control flow is the initial state at the entry point, and lasts until
+a <<ConditionalBranch, conditional branch>> takes different control paths for different invocations (non-uniform or divergent control flow).
+Such divergence can reconverge, with all the invocations once again executing the same control-flow path,
+and this re-establishes the existence of uniform control flow.
+If control flow is uniform upon entry into a structured loop or selection,
+and all invocations leave that loop or selection via the header block's declared merge block,
+then control flow reconverges to be uniform at that merge block.
+
+
+==== Validity and Defined Behavior
+
+[[UndefinedBehavior]]_Undefined Behavior_: No specific behavior is required by this specification.
+If performing an operation would result in undefined behavior, behavior for the entire module is undefined.
+Typically results from execution of an instruction violating a requirement of the specification.
+SPIR-V consumers may assume that a <<ValidDefined,valid module>> will not execute code that results in undefined behavior.
+
+[[Poison]]_Poison_: A value that when consumed by operations, if it is not actively prevented from propagating, is either propagated or results in <<UndefinedBehavior,undefined behavior>>.
+Poison values are only initially generated by instructions that explicitly state they are generated, or as a result of propagation.
+Dereferencing a pointer that is poison is <<UndefinedBehavior,undefined behavior>>.
+<<ConditionalBranch, Conditional branch instructions>> that consume poison result in <<UndefinedBehavior,undefined behavior>>.
+Poison values are considered distinct from any valid value for an object; consuming a poison value where specific valid values are required is always <<UndefinedBehavior,undefined behavior>>.
+If poison is consumed by an instruction in any other way, it will be propagated to the result and memory locations stored to by that instruction unless explicitly otherwise stated (e.g. see <<OpPhi,*OpPhi*>> and <<OpSelect,*OpSelect*>>).
+Individual scalar elements of a <<CompositeType,_composite_>> can independently be poison or not; consuming poison from one scalar element does not automatically propagate that poison to other scalar elements which would not be modified under normal operation.
+
+[[UndefinedValue]]_Undefined Value_: A value that when consumed by operations evaluates to any value of the given type.
+Every time an _<id>_ with an undefined value is consumed, it may evaluate to a different value.
+Undefined values are only generated by instructions that explicitly state they are generated, or as the result of operations on an existing undefined value.
+Individual scalar elements of a <<CompositeType,_composite_>> can independently have undefined values or not.
+<<ConditionalBranch, Conditional branch instructions>> that consume an undefined value result in <<UndefinedBehavior,undefined behavior>>.
+If consuming an undefined value could evaluate to a value that would result in <<UndefinedBehavior,undefined behavior>>, consuming that undefined value results in <<UndefinedBehavior,undefined behavior>>.
+The evaluated values of an undefined value may be constrained; for example, multiplying an undefined value by 2 results in an undefined value which can only evaluate to even values.
+If an undefined value is constrained to a single possible value, it becomes a <<StableValue, stable value>>.
+
+[NOTE]
+====
+While _poison_ and _undefined values_ appear fairly distinct, they have very similar behavior in practice.
+The key difference is that an undefined value can be constrained to a limited set of values, whereas poison cannot - transformations all result in poison.
+For instance, in the following code using an undefined value, `%result` would always be 0.
+
+[source,spirv]
+----
+  %uint = OpTypeInt 32 0
+   %two = OpConstant %uint 2
+
+ %undef = OpUndef %uint
+  %even = OpIMul %undef %two
+%result = OpUMod %even %two
+----
+
+However, if the same code were written with poison as input, `%even` would
+not be even; `%even` and `%result` are poison:
+
+[source,spirv]
+----
+  %uint = OpTypeInt 32 0
+   %ptr = OpTypePointer Function %uint
+   %two = OpConstant %uint 2
+
+%psnptr = OpVariable %ptr Function
+%poison = OpLoad %uint %psnptr
+  %even = OpIMul %poison %two
+%result = OpUMod %even %two
+----
+
+Notably, in both examples the code is valid and has no undefined behavior.
+====
+
+[[StableValue]]_Stable Value_: Stable values are consistent at all times.
+When an _<id>_ with a stable value is consumed, it always evaluates to the same value.
+Any values that are not <<Poison,poison>> or <<UndefinedValue,undefined>> are stable values.
+
+[[ValidDefined]]_Valid Module_: Most SPIR-V rules are expressed statically.
+These _statically expressed rules_ are based on what can be seen with a
+direct static examination of the module in the specific places the rule says
+to look.
+These are expressed using terms like _must_, _must not_, _valid_,
+_not valid_, and _invalid_.
+Such rules establish whether the module is classified as valid or not valid,
+which in turn provides terms that tools may use in labeling and describing 
+modules they process.
+A module is valid only if it does not violate any of these statically 
+expressed rules.
+Such rules might not be considered violated if a specialization constant is 
+involved, as described in the <<SpecializationSection, specialization
+constant section>>.
+
+A module having <<UndefinedBehavior,undefined behavior>> is independent
+of a module being valid.
+Tools may be able to deduce from a static module that <<UndefinedBehavior,
+behavior will be undefined>> if some part were to be executed, and alert
+a user to that fact.
+However, this does not allow the tool to classify the module as invalid.
+ 
+Sometimes, SPIR-V refers to the client API to specify what is statically
+valid or dynamically defined for a specific situation, in which case those
+rules come from the client API's execution environment.
+Otherwise, a SPIR-V client API can define an execution environment that adds
+additional statically expressed rules, further constraining what SPIR-V
+itself said was valid.
+However, a client cannot remove any such statically expressed rules.
+A client will not remove any undefined behavior specified by SPIR-V.
+Client APIs are not required to handle invalid modules.
+
+<<<
+[[PhysicalLayout]]
+=== Physical Layout of a SPIR-V Module and Instruction
+
+A SPIR-V module is a single linear stream of <<Word,_words_>>. The first words are shown in the following table:
+
+.First Words of Physical Layout
+[cols="^1,6",options="header",width = "75%"]
+|========
+| Word Number ^.^|Contents
+| 0      | <<Magic,*Magic Number*>>.
+| 1      | Version number.  The bytes are, high-order to low-order: +
+
+                _0 \| Major Number \| Minor Number \| 0_ +
+
+           Hence, version 1.3 is the value 0x00010300.
+| 2      | Generator's magic number. It is associated with the tool that generated the module.  Its value does not affect any semantics, and is allowed to be 0.
+           Using a non-0 value is encouraged, and can be registered with Khronos at https://github.com/KhronosGroup/SPIRV-Headers.
+| 3      | _Bound_; where all <<Id,_<id>s_>> in this module are guaranteed to satisfy +
+
+               _0  <  id  <  Bound_ +
+
+           _Bound_ should be small, smaller is better, with all <<Id,_<id>_>> in a module being densely packed and near 0.
+| 4      | 0 (Reserved for instruction schema, if needed.)
+| 5      | First word of instruction stream, see below.
+|========
+
+All remaining words are a linear sequence of instructions.
+
+Each instruction is a stream of <<Word,_words_>>:
+
+.Instruction Physical Layout
+[cols="^1,4",options="header",width = "75%"]
+|========
+| Instruction Word Number ^.^|Contents
+| 0   |  Opcode: The 16 high-order bits are the <<WordCount,_WordCount_>> of the instruction. The 16 low-order bits are the opcode enumerant.
+| 1   |  Optional instruction type <<Id,_<id>_>> (presence determined by opcode).
+| .   |  Optional instruction <<ResultId,_Result <id>_>> (presence determined by opcode).
+| .   |  Operand 1 (if needed)
+| .   |  Operand 2 (if needed)
+| ... | ...
+| <<WordCount,_WordCount_>> - 1 |  Operand _N_ (_N_ is determined by WordCount minus the 1 to 3 words used for the opcode, instruction type _<id>_, and instruction _Result <id>_).
+|========
+
+Instructions are variable length due both to having optional instruction type _<id>_ and _Result <id>_ words as well as a variable number of operands.
+The details for each specific instruction are given in the <<Binary, Binary Form>> section.
+
+[[LogicalLayout]]
+=== Logical Layout of a Module
+
+The instructions of a SPIR-V module must be in the following order.
+For sections earlier than function definitions, it is invalid to use instructions other than those indicated.
+
+. All <<OpCapability,*OpCapability*>> instructions.
+. Optional <<OpExtension,*OpExtension*>> instructions (extensions to SPIR-V).
+. Optional <<OpExtInstImport,*OpExtInstImport*>> instructions.
+. The single required <<OpMemoryModel,*OpMemoryModel*>> instruction.
+. All entry point declarations, using <<OpEntryPoint,*OpEntryPoint*>>.
+. All <<Execution_Mode, execution-mode>> declarations, using <<OpExecutionMode, *OpExecutionMode*>> or <<OpExecutionModeId, *OpExecutionModeId*>>.
+. These <<Debug, debug>> instructions, which must be grouped in the following order:
+.. All <<OpString,*OpString*>>, <<OpSourceExtension,*OpSourceExtension*>>, <<OpSource,*OpSource*>>, and <<OpSourceContinued, *OpSourceContinued*>>, without forward references.
+.. All <<OpName,*OpName*>> and all <<OpMemberName,*OpMemberName*>>.
+.. All <<OpModuleProcessed, *OpModuleProcessed*>> instructions.
+. All <<Annotation, annotation>> instructions:
+.. All decoration instructions.
+. All type declarations (<<OpTypeVoid,*OpTypeXXX*>> instructions), all <<ConstantInstruction,_constant instructions_>>, and all global variable declarations
+  (all <<OpVariable,*OpVariable*>> instructions whose <<Storage_Class,Storage Class>> is not *Function*).
+  This is the preferred location for <<OpUndef, *OpUndef*>> instructions, though they can also appear in function bodies.
+  All operands in all these instructions must be declared before being used.  Otherwise, they can be in any order.
+  This section is the first section to allow use of:
+  .. <<OpLine,*OpLine*>> and <<OpNoLine,*OpNoLine*>> debug information.
+  .. <<NonSemanticInstruction, Non-semantic instructions>> with *OpExtInst*.
+. All function declarations ("declarations" are functions without a body; there is no forward declaration to a function with a body). A function declaration is as follows.
+.. Function declaration, using <<OpFunction,*OpFunction*>>.
+.. Function parameter declarations, using <<OpFunctionParameter,*OpFunctionParameter*>>.
+.. Function end, using <<OpFunctionEnd,*OpFunctionEnd*>>.
+. All function definitions (functions with a body).  A function definition is as follows.
+.. Function definition, using <<OpFunction,*OpFunction*>>.
+.. Function parameter declarations, using <<OpFunctionParameter,*OpFunctionParameter*>>.
+.. Block.
+.. Block.
+.. ...
+.. Function end, using <<OpFunctionEnd,*OpFunctionEnd*>>.
+
+Within a function definition:
+
+- A block always starts with an <<OpLabel,*OpLabel*>> instruction.
+  This may be immediately preceded by an <<OpLine,*OpLine*>> instruction, but the *OpLabel* is considered as the beginning of the block.
+- A block always ends with a <<Termination, block termination instruction>> (see <<Validation,validation rules>> for more detail).
+- All <<OpVariable,*OpVariable*>> instructions in a function must have a <<Storage_Class,Storage Class>> of *Function*.
+- All <<OpVariable,*OpVariable*>> instructions in a function must be in the first block in the function.
+  These instructions, together with any intermixed <<OpLine,*OpLine*>> and <<OpNoLine,*OpNoLine*>> instructions, must be the first instructions in that block.
+(Note the validation rules prevent <<OpPhi,*OpPhi*>> instructions in the first block of a function.)
+- A function definition (starts with <<OpFunction,*OpFunction*>>) can be immediately preceded by an <<OpLine,*OpLine*>> instruction.
+
+Forward references (an operand _<id>_ that appears before the <<ResultId,_Result <id>_>> defining it) are allowed for:
+
+- Operands that are an <<OpFunction,*OpFunction*>>.  This allows for recursion and early declaration of entry points.
+
+- <<Annotation, Annotation>>-instruction operands.  This is required to fully know everything about a type or variable once it is declared.
+
+- Labels.
+
+- <<OpPhi, *OpPhi*>> can contain forward references.
+
+- *OpTypeForwardPointer*:
+* An <<OpTypeForwardPointer, *OpTypeForwardPointer*>> _Pointer Type_ is a forward reference to
+  an <<OpTypePointer, *OpTypePointer*>>.
+* Subsequent consumption of an <<OpTypeForwardPointer, *OpTypeForwardPointer*>> _Pointer Type_
+  can be a forward reference.
+
+- The list of _<id>_ provided in the <<OpEntryPoint,*OpEntryPoint*>> instruction.
+
+- <<OpExecutionModeId, *OpExecutionModeId*>>.
+
+In all cases, there is enough type information to enable a single simple pass through a module to transform it.
+For example, function calls have all the type information in the call, phi-functions don't change type, and labels don't have type.
+The pointer forward reference allows structures to contain pointers to themselves or to be mutually recursive (through pointers),
+without needing additional type information.
+
+The <<Validation, Validation Rules>> section lists additional rules.
+
+=== Instructions
+
+Most instructions create a <<ResultId,_Result <id>_>>, as provided in the _Result <id>_ field of the instruction.
+These _Result <id>s_ are then referred to by other instructions through their _<id>_ operands.
+All instruction operands are specified in the <<Binary, Binary Form>> section.
+
+Instructions are explicit about whether an operand is (or is part of) a self-contained <<Literal, literal>> or
+an _<id>_ referring to another instruction's result.
+While an _<id>_ always takes one operand, one literal takes one or more operands.
+Some common examples of <<Literal, literals>>:
+
+- A literal 32-bit (or smaller) integer is always one operand directly holding a 32-bit two's-complement value.
+- A literal 32-bit float is always one operand, directly holding a 32-bit IEEE 754 floating-point representation.
+- A literal 64-bit float is always two operands, directly holding a 64-bit IEEE 754 representation.
+  The low-order 32 bits appear in the first operand.
+
+[[SSA]]
+==== SSA Form
+
+A module is always in static single assignment (SSA) form.  That is, there is always exactly one instruction resulting in any particular <<ResultId,_Result <id>_>>.
+Storing into variables declared in memory is not subject to this; such stores do not create _Result <id>s_.  Accessing declared variables is done through:
+
+- <<OpVariable,*OpVariable*>> to allocate an object in memory and create a _Result <id>_ that is the name of a pointer to it.
+- <<OpAccessChain,*OpAccessChain*>> or <<OpInBoundsAccessChain,*OpInBoundsAccessChain*>> to create a pointer to a subpart of a <<CompositeType,_composite_>> object in memory.
+- <<OpLoad,*OpLoad*>> through a pointer, giving the loaded object a _Result <id>_ that can then be used as an operand in other instructions.
+- <<OpStore,*OpStore*>> through a pointer, to write a value. There is no _Result <id>_ for an <<OpStore,*OpStore*>>.
+
+<<OpLoad,*OpLoad*>> and <<OpStore,*OpStore*>> instructions can often be eliminated, using <<Intermediate,_intermediate_>> results instead.
+If this happens in multiple control-flow paths, these values need to be merged again at the path's merge point.
+Use <<OpPhi,*OpPhi*>> to merge such values together.
+
+=== Entry Point and Execution Model
+
+The <<OpEntryPoint,*OpEntryPoint*>> instruction identifies an <<EntryPoint, _entry point_>> with two key things:
+an execution model and a function definition.
+Execution models include *Vertex*, *GLCompute*, etc. (one for each graphical stage),
+as well as *Kernel* for OpenCL kernels.
+For the complete list, see <<Execution_Model,Execution Model>>.
+An <<OpEntryPoint,*OpEntryPoint*>> also supplies a name that can be used externally to identify the entry point,
+and a declaration of all the *Input* and *Output* variables that form its input/output interface.
+
+The static function call graphs rooted at two entry points are allowed to overlap,
+so that function definitions and global variable definitions can be shared.
+The execution model and any execution modes associated with an entry point apply to
+the entire static function call graph rooted at that entry point.
+This rule implies that a function appearing in both call graphs of two distinct entry points may behave
+differently in each case.
+Similarly, variables whose semantics depend on properties of an entry point, e.g. those using
+the *Input* <<Storage_Class,Storage Class>>,
+may behave differently if used in call graphs rooted in two different entry points.
+
+=== Execution Modes
+
+Information like the following is declared with <<OpExecutionMode,*OpExecutionMode*>> instructions.
+For example,
+
+- number of invocations (*Invocations*)
+- vertex-order CCW (*VertexOrderCcw*)
+- triangle strip generation (*OutputTriangleStrip*)
+- number of output vertices (*OutputVertices*)
+- etc.
+
+For a complete list, see <<Execution_Mode, Execution Mode>>.
+
+[[TypesVariables]]
+=== Types and Variables
+
+Types are built up hierarchically, using <<OpTypeVoid,*OpTypeXXX*>> instructions.
+The <<ResultId,_Result <id>_>> of an <<OpTypeVoid,*OpTypeXXX*>> instruction becomes
+a type _<id>_ for future use where type _<id>s_ are needed
+(therefore, <<OpTypeVoid,*OpTypeXXX*>> instructions do not have a type _<id>_, like most other instructions do).
+
+The "leaves" to start building with are types like <<OpTypeFloat,*OpTypeFloat*>>, <<OpTypeInt,*OpTypeInt*>>,
+<<OpTypeImage,*OpTypeImage*>>, <<OpTypeEvent,*OpTypeEvent*>>, etc.
+Other types are built up from the _Result <id>_ of these.
+The numerical types are parameterized to specify bit width and signed vs. unsigned.
+
+Higher-level types are then constructed using opcodes like <<OpTypeVector,*OpTypeVector*>>,
+<<OpTypeMatrix,*OpTypeMatrix*>>, <<OpTypeImage,*OpTypeImage*>>,
+<<OpTypeArray,*OpTypeArray*>>, <<OpTypeRuntimeArray,*OpTypeRuntimeArray*>>,
+<<OpTypeStruct,*OpTypeStruct*>>, and <<OpTypePointer,*OpTypePointer*>>.
+These are parameterized by number of components, array size, member lists, etc.
+The image types are parameterized by their sampling result type, dimensionality, arrayness, etc.
+To do sampling or filtering operations, a type from <<OpTypeSampledImage,*OpTypeSampledImage*>>
+is used that contains both an <<ImageTerm,image>> and a <<Sampler,sampler>>.
+Such a <<SampledImage, sampled image>> can be set directly by the client API
+or combined in a SPIR-V module from an independent image and an independent sampler.
+
+Types are built bottom up:  A parameterizing operand in a type must be defined before being used.
+
+Some additional information about the type of an _<id>_ can be provided using the decoration instructions
+(<<OpDecorate,*OpDecorate*>>, <<OpMemberDecorate,*OpMemberDecorate*>>, <<OpGroupDecorate,*OpGroupDecorate*>>,
+<<OpGroupMemberDecorate,*OpGroupMemberDecorate*>>, and <<OpDecorationGroup,*OpDecorationGroup*>>).
+These can add, for example, *Invariant* to an _<id>_ created by another instruction.
+See the full list of <<Decoration,Decorations>> in the <<Binary, Binary Form>> section.
+
+Two different type _<id>s_ form, by definition, two different types.
+It is invalid to declare multiple non-aggregate, non-pointer type _<id>s_ having the same opcode and operands.
+It is valid to declare multiple <<Aggregate, aggregate>> type _<id>s_ having the same opcode and operands.
+This is to allow multiple instances of aggregate types with the same structure to be
+<<Decoration, decorated>> differently.
+(Different decorations are not required;
+two different aggregate type _<id>s_ are allowed to have identical declarations and decorations,
+and will still be two different types.)
+Pointer types are also allowed to have multiple _<id>s_ for the same opcode and operands,
+to allow for differing decorations (e.g., *Volatile*) or different decoration values
+(e.g., different _Array Stride_ values for the *ArrayStride*).
+If new pointers are formed, their types must be decorated as needed,
+so the consumer knows how to generate an access through the pointer.
+
+Variables are declared to be of an already built type, and placed in a Storage Class.
+Storage classes include *UniformConstant*, *Input*, *Workgroup*, etc.
+and are fully specified in <<Storage_Class,Storage Class>>.
+Variables declared with the *Function* Storage Class can have their lifetime's specified within their function using
+the <<OpLifetimeStart,*OpLifetimeStart*>> and <<OpLifetimeStop,*OpLifetimeStop*>> instructions.
+
+Intermediate results are typed by the instruction's type _<id>_,
+which is constrained by each instruction's description.
+
+Built-in variables have special semantics and are declared using <<OpDecorate,*OpDecorate*>>
+or <<OpMemberDecorate,*OpMemberDecorate*>> with the *BuiltIn* <<Decoration,Decoration>>,
+followed by a <<BuiltIn,*BuiltIn*>> enumerant.
+See the <<BuiltIn, BuiltIn>> section for details on what can be decorated as a built-in variable.
+
+[[UnsignedSigned]]
+==== Unsigned Versus Signed Integers
+
+The integer type, <<OpTypeInt, *OpTypeInt*>>, is parameterized not only with a size, but also with signedness.
+There are two different ways to think about signedness in SPIR-V, both are internally consistent and acceptable:
+
+1. As if all integers are "signless", meaning they are neither signed nor unsigned:
+   All *OpTypeInt* instructions select a signedness of 0 to conceptually mean "no sign" (rather than "unsigned").
+   This is useful if translating from a language that does not distinguish between signed and unsigned types.
+   The type of operation (signed or unsigned) to perform is always selected by the choice of opcode.
+2. As if some integers are signed, and some are unsigned:
+   Some *OpTypeInt* instructions select signedness of 0 to mean "unsigned"
+   and some select signedness of 1 to mean "signed".
+   This is useful if signedness matters to external interface,
+   or if targeting a higher-level language that cares about types being signed and unsigned.
+   The type of operation (signed or unsigned) to perform is still always selected by the choice of opcode,
+   but a small amount of validation can be done where it is non-sensible to use a signed type.
+
+Note in both cases all signed and unsigned operations always work on unsigned types,
+and the semantics of operation come from the opcode.
+SPIR-V does not know which way is being used; it is set up to support both ways of thinking.
+
+Note that while SPIR-V aims to not assign semantic meaning to the signedness bit in choosing how to operate on values,
+there are a few cases known to do this, all confined to modules declaring the *Shader* capability:
+
+- validation for consistency checking for front ends for directly contradictory usage, where explicitly indicated in
+  this specification
+- interfaces that might require widening of an input value, and otherwise don't know whether to sign extend or zero
+  extend, including the following bullet
+- an image read that might require widening of an operand, in versions where the *SignExtend* and *ZeroExtend*
+  <<Image_Operands, image operands>> are not available
+  (if available, these operands are the supported way to communicate this).
+
+=== Function Calling
+
+To call a function defined in the current module or a function declared to be imported from another module,
+use <<OpFunctionCall,*OpFunctionCall*>> with an operand that is the _<id>_ of the <<OpFunction,*OpFunction*>> to call,
+and the _<id>s_ of the arguments to pass.
+All arguments are passed by value into the called function.
+This includes pointers, through which a callee object could be modified.
+
+[[ExtInst]]
+=== Extended Instruction Sets
+
+Many operations and/or built-in function calls from high-level languages are represented through _extended instruction sets_.
+Extended instruction sets include things like
+
+- trigonometric functions: sin(), cos(), ...
+- exponentiation functions: exp(), pow(), ...
+- geometry functions: reflect(), smoothstep(), ...
+- functions having rich performance/accuracy trade-offs
+- etc.
+
+Non-extended instructions, those that are core SPIR-V instructions, are listed in the <<Binary, Binary Form>> section.
+Native operations include:
+
+- Basic arithmetic: +, -, *, min(), scalar * vector, etc.
+- Texturing, to help with back-end decoding and support special code-motion rules.
+- Derivatives, due to special code-motion rules.
+
+Extended instruction sets are specified in independent specifications, not in this specification.
+The separate extended instruction set specification specifies instruction opcodes, semantics, and instruction names.
+
+To use an extended instruction set, first import it by name string using
+<<OpExtInstImport,*OpExtInstImport*>> and giving it a <<ResultId,_Result <id>_>>:
+
+  <extinst-id> OpExtInstImport "name-of-extended-instruction-set"
+
+Where "name-of-extended-instruction-set" is a <<Literal, literal>> string.
+The standard convention for this string is
+
+  "<source language name>.<package name>.<version>"
+
+For example "GLSL.std.450" could be the name of the core built-in functions for GLSL versions 450 and earlier.
+
+[NOTE]
+There is nothing precluding having two "mirror" sets of instructions with different names but the same opcode values,
+which could, for example, let modifying just the import statement to change a performance/accuracy trade off.
+
+Then, to call a specific extended instruction, use <<OpExtInst,*OpExtInst*>>:
+
+  OpExtInst <extinst-id> instruction-number operand0, operand1, ...
+
+Extended instruction-set specifications provide semantics for each "instruction-number".
+It is up to the specific specification what the overloading rules are on operand type.
+The specification will be clear on its semantics, and producers/consumers of it must follow those semantics.
+
+By convention, it is recommended that all external specifications include an *enum* {...} listing all
+the "instruction-numbers", and a mapping between these numbers and a string representing the
+instruction name.
+However, there are no requirements that instruction name strings are provided or mangled.
+
+[NOTE]
+Producing and consuming extended instructions can be done entirely through numbers (no string parsing).
+An extended instruction set specification provides opcode enumerant values for the instructions,
+and these are produced by the front end and consumed by the back end.
+
+[[StructuredControlFlow]]
+=== Structured Control Flow
+
+SPIR-V can explicitly declare structured control-flow _constructs_ using <<Merge, merge instructions>>.
+These explicitly declare a <<HeaderBlock, header block>> before the control flow diverges and a
+<<MergeBlock, merge block>> where control flow subsequently converges.
+(Control flow may partially or fully reconverge before reaching the merge block so long as it converges
+by the time the merge block is reached.)
+These blocks delimit constructs that must nest, and must be entered and exited in structured ways,
+as per the following.
+
+==== Rules for Structured Control-flow Declarations
+
+Structured control flow declarations must satisfy the following rules:
+
+- the <<MergeBlock, merge block>> declared by a <<HeaderBlock, header block>>
+  must not be a merge block declared by any other header block
+- each header block must <<StructurallyDominate, strictly structurally dominate>> its merge block
+- all <<BackEdge, back edges>> must branch to a <<LoopHeader, loop header>>,
+  with each loop header having exactly one back edge branching to it
+- for a given loop header, its <<MergeBlock, merge block>>, <<OpLoopMerge, *OpLoopMerge*>> _Continue Target_, and corresponding <<BackEdgeBlock,back-edge block>>:
+  * the _Continue Target_ and _merge block_ must be different blocks
+  * the _loop header_ must structurally dominate the _Continue Target_
+  * the _Continue Target_ must structurally dominate the _back-edge block_
+  * the _back-edge block_ must <<StructurallyPostDominate,structurally post dominate>> the _Continue Target_
+
+==== Structured Control-flow Constructs
+
+A structured control-flow _construct_ is defined as one of:
+
+- a _selection construct_: the blocks structurally dominated by a <<SelectionHeader, selection header>>,
+  excluding blocks structurally dominated by the selection header's merge block
+- a _continue construct_: the blocks that are both structurally dominated by an <<OpLoopMerge, *OpLoopMerge*>> _Continue Target_
+  and structurally post dominated by the corresponding loop's back-edge block
+- a _loop construct_: the blocks structurally dominated by a <<LoopHeader, loop header>>,
+  excluding both the loop header's _continue construct_ and the blocks structurally dominated by the loop header's merge block
+- a _switch construct_: the blocks structurally dominated by a <<SwitchHeader, switch header>>,
+  excluding blocks structurally dominated by the switch header's merge block
+- a _case construct_: the blocks structurally dominated by an <<OpSwitch, *OpSwitch*>> _Target_ or _Default_ block, excluding the blocks structurally dominated by the **OpSwitch** construct's corresponding merge block
+  (note that as a consequence of this definition, an *OpSwitch* _Target_ or _Default_ block that is equal to the *OpSwitch's* corresponding merge block does not give rise to a case construct)
+
+[[ConstructRules]]
+==== Rules for Structured Control-flow Constructs
+
+Below, we will use the following terminology:
+
+- A branch edge from block _A_ to block _B_ _exits_ a structured control-flow construct _S_ if and only if _A_ is contained in _S_ and _B_ is not contained in _S_
+- A _single-block loop_ is a loop construct where the loop's header block, continue target and back-edge block are all the same.
+
+- The _header block_ of a continue construct is the continue target of the associated loop.
+
+- The _header block_ of a case construct is the *OpSwitch* _Target_ or _Default_ block that defines the case construct.
+
+If the header block of a structured control-flow construct is <<StructurallyReachable,structurally reachable>> then that structured control-flow construct must satisfy the following rules:
+
+- if a branch edge from block _A_ to block _B_ exits the structured control-flow construct _S_, then the exit must correspond to one of the following:
+  * Breaking from a selection construct: _S_ is a selection construct, _S_ is the innermost structured control-flow construct containing _A_, and _B_ is the merge block for _S_
+  * Breaking from the innermost loop: _S_ is the innermost loop construct containing _A_, and _B_ is the merge block for _S_
+  * Entering the innermost loop's continue construct: _S_ is the innermost loop construct containing _A_, and _B_ is the continue target for _S_
+  * Next loop iteration: the branch edge from _A_ to _B_ is a <<BackEdge,back edge>> (so that _S_ is the continue construct of the associated loop)
+  * Branching from back-edge block to loop merge: _A_ is the back-edge block for a loop construct (so that _S_ is the continue construct of the associated loop), and _B_ is the merge block for the loop construct
+  * Branching from one case construct to another: _S_ is a case construct associated with an <<OpSwitch, **OpSwitch**>> instruction, and _B_ is a target block or default block associated with the **OpSwitch** instruction
+  * Breaking from the innermost switch construct without breaking from a loop: _S_ is the innermost switch construct containing _A_, _B_ is the merge block for _S_, and the branch from _A_ to _B_ does not exit a loop construct
+- a branch edge that exits a continue construct must branch to the header block or merge block of the associated loop
+- for a loop construct that is not a single block loop, if there is a branch edge from a block _B_ to the loop's continue target that is not a <<BackEdge,back edge>>, then _B_ must belong to the loop construct
+
+- if a structured control-flow construct _S_ contains the header block for a selection, loop or switch construct different from _S_, then _S_ must also contain that construct's merge block
+
+- all branches into a selection, loop or switch construct from structurally-reachable blocks outside the construct must be to the construct's header block
+
+- for a switch construct _S_ with associated <<OpSwitch, **OpSwitch**>> instruction:
+  * the header block for _S_ must <<StructurallyDominate, structurally dominate>> every _case construct_ associated with _S_
+  * each _case construct_ associated with _S_ must not branch to more than one other _case construct_ associated with _S_
+  * each _case construct_ associated with _S_ must not be branched to by more than one other _case construct_ associated with _S_
+  * if _T1_ and _T2_ appear as labels of targets in the **OpSwitch**
+    instruction and the case construct defined by _T1_ branches to
+    the case construct defined by _T2_ then the last target with label _T1_ must immediately precede
+    the first target with label _T2_ in the list of *OpSwitch*
+    _Target_ operands
+  * if _T1_ and _T2_ appear as labels of targets in the **OpSwitch**
+    instruction and the case construct defined by _T1_ branches to the
+    _Default_ case construct of the **OpSwitch** which in turn
+    branches to the case construct defined by _T2_, then either:
+      ** the block that defines the _Default_ case construct must
+         appear as a target label in the **OpSwitch** instruction, or
+      ** the last target with label _T1_ must immediately precede the
+         first target with label _T2_ in the list of **OpSwitch**
+         _Target_ operands
+  * for any label _T_, all targets with label _T_ must appear consecutively in the list of *OpSwitch* _Target_ operands
+
+
+
+[[SpecializationSection]]
+=== Specialization
+
+_Specialization_ is intended for constant objects that will not have known
+constant values until after initial generation of a SPIR-V module.
+Such objects are called _specialization constants_.
+
+A SPIR-V module containing specialization constants can consume one or more externally provided _specializations_:
+A set of final constant values for some subset of the module's _specialization constants_.
+Applying these final constant values yields a new module having fewer remaining specialization constants.
+A module also contains default values for any specialization constants that never get externally specialized.
+
+[NOTE]
+No optimizing transforms are required to make a _specialized_ module functionally correct.
+The specializing transform is straightforward and explicitly defined below.
+
+[NOTE]
+Ad hoc specializing should not be done through constants
+(<<OpConstant,*OpConstant*>> or <<OpConstantComposite,*OpConstantComposite*>>) that get overwritten:
+A SPIR-V {rightarrow} SPIR-V transform might want to do something irreversible with the value of such a constant,
+unconstrained from the possibility that its value could be later changed.
+
+Within a module, a _Specialization Constant_ is declared with one of these instructions:
+
+- <<OpSpecConstantTrue,*OpSpecConstantTrue*>>
+- <<OpSpecConstantFalse,*OpSpecConstantFalse*>>
+- <<OpSpecConstant,*OpSpecConstant*>>
+- <<OpSpecConstantComposite,*OpSpecConstantComposite*>>
+- <<OpSpecConstantOp,*OpSpecConstantOp*>>
+
+The <<Literal, literal>> operands to <<OpSpecConstant,*OpSpecConstant*>>
+are the default numerical specialization constants.
+Similarly, the "*True*" and "*False*" parts of <<OpSpecConstantTrue,*OpSpecConstantTrue*>> and <<OpSpecConstantFalse,*OpSpecConstantFalse*>>
+provide the default Boolean specialization constants.  These default values make an external specialization optional.
+However, such a default constant is applied only after all external specializations are complete, and none contained a specialization for it.
+
+An external specialization is provided as a logical list of pairs.
+Each pair is a *SpecId* <<Decoration,Decoration>> of a scalar specialization instruction along with its specialization constant.
+The numeric values are exactly what the operands would be to a corresponding <<OpConstant,*OpConstant*>> instruction.
+Boolean values are true if non-zero and false if zero.
+
+Specializing a module is straightforward.
+The following specialization-constant instructions can be updated with specialization constants.
+These can be replaced in place, leaving everything else in the module exactly the same:
+
+----
+           OpSpecConstantTrue -> OpConstantTrue or OpConstantFalse
+          OpSpecConstantFalse -> OpConstantTrue or OpConstantFalse
+               OpSpecConstant -> OpConstant
+      OpSpecConstantComposite -> OpConstantComposite
+----
+
+Note that the <<OpSpecConstantOp,*OpSpecConstantOp*>> instruction is not one that can be updated with a specialization constant.
+
+The <<OpSpecConstantOp,*OpSpecConstantOp*>> instruction is specialized by executing the operation and replacing the instruction with the result.
+The result can be expressed in terms of a <<ConstantInstruction,constant instruction>> that is not a specialization-constant instruction.
+(Note, however, this resulting instruction might not have the same size as the original instruction, so is not a "replaced in place" operation.)
+
+When applying an external specialization, the following (and only the following) will be modified to be non-specialization-constant instructions:
+
+- specialization-constant instructions with values provided by the specialization
+- specialization-constant instructions that consume nothing but non-specialization constant instructions
+(including those that the partial specialization transformed from specialization-constant instructions; these are in order, so it is a single pass to do so)
+
+A full specialization can also be done, when requested or required, in which all specialization-constant instructions will be modified to non-specialization-constant instructions,
+using the default values where required.
+
+If <<ValidDefined, a statically expressed rule>> would be broken due to the value of a constant,
+and that constant is a specialization constant, then that rule is not violated.
+(Consequently, specialization-constant default values are not relevant to the validity of the module.)
+
+[[Linkage]]
+=== Linkage
+
+The ability to have partially linked modules and libraries is provided as part of the <<Capability,*Linkage*>> capability.
+
+By default, functions and global variables are private to a module and cannot be accessed by other modules.
+However, a module may be written to _export_ or _import_ functions and global (module scope) variables.
+Imported functions and global variable definitions are resolved at linkage time.
+A module is considered to be partially linked if it depends on imported values.
+
+Within a module, imported or exported values are decorated using the *Linkage Attributes* <<Decoration,*Decoration*>>.
+This decoration assigns the following linkage attributes to decorated values:
+
+- A <<Linkage_Type,_Linkage Type_>>.
+- A _name_, interpreted is a <<Literal, literal>> string, is used to uniquely identify exported values.
+
+[NOTE]
+When resolving imported functions, the <<Function_Control,_Function Control_>> and all <<Function_Parameter_Attribute,_Function Parameter Attributes_>>
+are taken from the function definition, and not from the function declaration.
+
+[[RelaxedPrecisionSection]]
+=== Relaxed Precision
+
+The *RelaxedPrecision* <<Decoration,Decoration>> allows 32-bit integer and 32-bit floating-point operations to execute
+with a relaxed precision of somewhere between 16 and 32 bits.
+
+For a floating-point operation, operating at relaxed precision means that the minimum requirements for range and
+precision are as follows:
+
+- the floating point range may be as small as (-2^14^, 2^14^)
+- the floating point magnitude range includes 0.0 and [2^-14^, 2^14^)
+- the relative floating point precision may be as small as 2^-10^
+
+The <<Inclusive, range notation>> here means the largest required magnitude is half of the relative precision less
+than the value given.
+
+Relative floating-point precision is defined as the worst case (i.e. largest) ratio of the smallest step in relation to
+the value for all non-zero values in the required range:
+
+Precision~relative~ = (abs(v~1~ - v~2~)~min~ / abs(v~1~))~max~ for v~1~ {ne} 0, v~2~ {ne} 0, v~1~ {ne} v~2~
+
+It is therefore twice the maximum rounding error when converting from a real number.
+Subnormal numbers may be supported and may have lower relative precision.
+
+For integer operations, operating at relaxed precision means that the operation is evaluated by an operation in
+which, for some _N_, 16 {le} _N_ {le} 32:
+
+- the operation is executed as though its type were _N_ bits in size, and
+- the result is zero or sign extended to 32 bits as determined by the signedness of the result type of the operation.
+
+The *RelaxedPrecision* <<Decoration,Decoration>> must only be applied to:
+
+- The <<Id,_<id>_>> of an <<OpVariable,*OpVariable*>>, where it refers to the value of the variable.
+- The <<Id,_<id>_>> of an <<OpFunctionParameter,*OpFunctionParameter*>>, where it refers to the value of the parameter.
+- The <<ResultId,_Result <id>_>> of an instruction that reads or filters from an image.  E.g. <<OpImageSampleExplicitLod, *OpImageSampleExplicitLod*>>,
+  meaning the instruction is to operate at relaxed precision.
+- The <<ResultId,_Result <id>_>> of an <<OpFunction,*OpFunction*>>, where it refers to the value returned by the function.
+- A structure-type member (through <<OpMemberDecorate,OpMemberDecorate>>).
+- The <<ResultId,_Result <id>_>> of an <<OpFunctionCall,*OpFunctionCall*>>, where it refers to the result of the function call.
+- The <<ResultId,_Result <id>_>> of other instructions that operate on numerical types, meaning the instruction is to operate at relaxed precision.
+  The instruction's operands may also be truncated to the relaxed precision.
+
+In all cases, the types of the values that the *RelaxedPrecision* <<Decoration,Decoration>> refers to must be:
+
+- a scalar, vector, or matrix, or array of scalars, vectors, or matrices, and all the components in the
+types must be a 32-bit <<Numerical,numerical>> type,
+- a pointer to such a type, where it refers to the value pointed to.
+
+The values that the *RelaxedPrecision* <<Decoration,Decoration>> refers to can be truncated to relaxed precision.
+
+When applied to a variable, function parameter, or structure member, all loads and stores from the decorated object may be treated as though they were
+<<Decoration, decorated>> with *RelaxedPrecision*.
+Loads may also be decorated with *RelaxedPrecision*, in which case they are treated as operating at relaxed precision.
+
+All loads and stores involving relaxed precision still read and write 32 bits of data, respectively.
+Floating-point data read or written in such a manner is written in full 32-bit floating-point format.
+However, a load or store might reduce the precision (as allowed by *RelaxedPrecision*) of the destination value.
+
+For debugging portability of floating-point operations,
+<<OpQuantizeToF16,*OpQuantizeToF16*>> may be used to explicitly reduce the precision of a relaxed-precision result to 16-bit precision.
+(Integer-result precision can be reduced, for example, using left- and right-shift opcodes.)
+
+For image-sampling operations, decorations can appear on both the sampling instruction and the image variable being sampled.
+If either is decorated, they both should be decorated, and if both are decorated their decorations must match.
+If only one is decorated, the sampling instruction can behave either as if both were decorated or neither were decorated.
+
+=== Debug Information
+
+Debug information is supplied with:
+
+- Source-code text through <<OpString,*OpString*>>, <<OpSource,*OpSource*>>, and <<OpSourceContinued, *OpSourceContinued*>>.
+- Object names through <<OpName,*OpName*>> and <<OpMemberName,*OpMemberName*>>.
+- Line numbers through <<OpLine,*OpLine*>> and <<OpNoLine,*OpNoLine*>>.
+
+A module does not lose any semantics when all such instructions are removed.
+
+==== Function-Name Mangling
+
+There is no functional dependency on how functions are named.
+Signature-typing information is explicitly provided, without any need for name "unmangling".
+
+By convention, for debugging purposes, modules with <<OpSource,*OpSource*>> _Source Language_ of OpenCL use the Itanium name-mangling standard.
+
+[[Validation]]
+=== Validation Rules
+
+==== Universal Validation Rules
+
+- When using <<OpBitcast, *OpBitcast*>> to convert pointers to/from vectors of integers, only
+  vectors of 32-bit integers are allowed.
+
+- If neither the *VariablePointers* nor *VariablePointersStorageBuffer* <<Capability, capabilities>> are declared,
+  the following rules apply to <<LogicalPointerType, logical pointer types>>:
+
+  * <<OpVariable, *OpVariable*>> must not allocate an object whose type is or contains a logical pointer type.
+
+  * It is invalid for a pointer to be an operand to any instruction other than:
+    ** <<OpLoad,*OpLoad*>>
+    ** <<OpStore,*OpStore*>>
+    ** <<OpAccessChain,*OpAccessChain*>>
+    ** <<OpInBoundsAccessChain,*OpInBoundsAccessChain*>>
+    ** <<OpFunctionCall,*OpFunctionCall*>>
+    ** <<OpImageTexelPointer,*OpImageTexelPointer*>>
+    ** <<OpCopyMemory,*OpCopyMemory*>>
+    ** <<OpCopyObject,*OpCopyObject*>>
+    ** <<OpArrayLength,*OpArrayLength*>>
+    ** <<OpDecorate,*OpDecorate*>>
+    ** <<OpDecorateId,*OpDecorateId*>>
+    ** <<OpGroupDecorate,*OpGroupDecorate*>>
+    ** <<OpDecorateString,*OpDecorateString*>>
+    ** <<OpEntryPoint,*OpEntryPoint*>>
+    ** <<OpName,*OpName*>>
+    ** all <<Atomic,**OpAtomic**>> instructions
+    ** extended instruction-set instructions that are explicitly identified as taking pointer operands
+
+  * It is invalid for a pointer to be the <<ResultId,_Result <id>_>> of any instruction other than:
+    ** <<OpVariable,*OpVariable*>>
+    ** <<OpAccessChain,*OpAccessChain*>>
+    ** <<OpInBoundsAccessChain,*OpInBoundsAccessChain*>>
+    ** <<OpFunctionParameter,*OpFunctionParameter*>>
+    ** <<OpImageTexelPointer,*OpImageTexelPointer*>>
+    ** <<OpCopyObject,*OpCopyObject*>>
+    ** <<OpUndef,*OpUndef*>>
+
+  * All indexes in <<OpAccessChain,*OpAccessChain*>> and <<OpInBoundsAccessChain,*OpInBoundsAccessChain*>> that are <<OpConstant,*OpConstant*>>
+    with type of <<OpTypeInt,*OpTypeInt*>> with a _signedness_ of 1 must not have their sign bit set.
+
+  * Any pointer operand to an <<OpFunctionCall, **OpFunctionCall**>> must point into one of the following <<Storage_Class, storage classes>>:
+    ** *UniformConstant*
+    ** *Function*
+    ** *Private*
+    ** *Workgroup*
+    ** *AtomicCounter*
+
+  * Any pointer operand to an <<OpFunctionCall, **OpFunctionCall**>> must be
+    ** a <<MemoryObjectDeclaration, memory object declaration>>, or
+    ** a pointer to an element in an array that is a memory object declaration,
+       where the element type is <<OpTypeSampler, *OpTypeSampler*>> or <<OpTypeImage, *OpTypeImage*>>.
+
+  * The instructions <<OpPtrEqual, *OpPtrEqual*>> and <<OpPtrNotEqual, *OpPtrNotEqual*>> must not be used.
+
+- If the *VariablePointers* or *VariablePointersStorageBuffer* <<Capability, capability>>
+  is declared, the following are additionally allowed for <<LogicalPointerType, logical pointer types>>,
+  while other prohibitions remain:
+
+  * If <<OpVariable, *OpVariable*>> allocates an object whose type is or contains a
+    <<LogicalPointerType, logical pointer type>>,
+    the _Storage Class_ operand of the *OpVariable* must be one of the following:
+    ** *Function*
+    ** *Private*
+
+  * If a pointer is the _Object_ operand of *OpStore* or result of *OpLoad*,
+    the storage class the pointer is stored to or loaded from must be one of the following:
+    ** *Function*
+    ** *Private*
+
+  * A pointer type can be the:
+    ** _Result Type_ of *OpFunction*
+    ** _Result Type_ of *OpFunctionCall*
+    ** _Return Type_ of *OpTypeFunction*
+
+  * A pointer can be a <<VariablePointer, _variable pointer_>>
+
+  * A pointer can be an operand to one of:
+    ** <<OpReturnValue, *OpReturnValue*>>
+    ** <<OpPtrAccessChain, *OpPtrAccessChain*>>
+    ** <<OpPtrEqual, *OpPtrEqual*>>
+    ** <<OpPtrNotEqual, *OpPtrNotEqual*>>
+    ** <<OpPtrDiff, *OpPtrDiff*>>
+    ** <<OpPhi, *OpPhi*>>
+    ** <<OpSelect, *OpSelect*>>
+    ** <<OpVariable, *OpVariable*>>
+
+  * A <<VariablePointer, _variable pointer_>> must point to one of the following <<Storage_Class, storage classes>>:
+    ** *StorageBuffer*
+    ** *Workgroup*  (if the *VariablePointers* <<Capability, capability>> is declared)
+
+  * If the *VariablePointers* <<Capability, capability>> is not declared, a variable pointer must be selected from
+    pointers pointing into the same structure or be *OpConstantNull*.
+
+  * A pointer operand to <<OpFunctionCall, **OpFunctionCall**>> can point into the <<Storage_Class, storage class>>:
+    ** *StorageBuffer*
+
+  * For pointer operands to <<OpFunctionCall, **OpFunctionCall**>>,
+    the <<MemoryObjectDeclaration, memory object declaration>>-restriction is removed for the following
+    <<Storage_Class, storage classes>>:
+    ** *StorageBuffer*
+    ** *Workgroup*
+
+  * The instructions <<OpPtrEqual, *OpPtrEqual*>> and <<OpPtrNotEqual, *OpPtrNotEqual*>> can be used only if
+    the <<Storage_Class, _Storage Class_>> of the operands' <<OpTypePointer, *OpTypePointer*>> declaration is
+    ** *StorageBuffer* if the *VariablePointersStorageBuffer* <<Capability, capability>> is explicitly or implicitly declared, whether or not operands point into the same buffer, or
+    ** *Workgroup*, which can be used only if the *VariablePointers* <<Capability, capability>> was declared.
+
+- A <<VariablePointer, _variable pointer_>> must not:
+  * be an operand to an *OpArrayLength* instruction
+  * point to an array of structures with a structure type decorated with *Block* or *BufferBlock*.
+  * point to an object that is or contains an *OpTypeMatrix*
+  * point to a column, or a component in a column, within an *OpTypeMatrix*
+
+- Memory model
+  * Memory accesses that use *NonPrivatePointer* must use pointers in the *Uniform*, *Workgroup*, *CrossWorkgroup*,
+    *Generic*, *Image*, or *StorageBuffer* <<Storage_Class, storage classes>>.
+  * If the *Vulkan* <<Memory_Model, memory model>> is declared and any instruction uses *Device* <<Scope_-id-, scope>>,
+    the *VulkanMemoryModelDeviceScope* <<Capability, capability>> must be declared.
+
+[[PhysicalValidation]]
+- Physical storage buffer
+  * If the <<Addressing_Model, addressing model>> is not *PhysicalStorageBuffer64*,
+    then the *PhysicalStorageBuffer* <<Storage_Class, storage class>> must not be used.
+  * <<OpVariable, *OpVariable*>> must not use the *PhysicalStorageBuffer* <<Storage_Class, storage class>>.
+  * Any pointer value whose <<Storage_Class, storage class>> is *PhysicalStorageBuffer* and that points to a matrix,
+    an array of matrices, or a row or element of a matrix must be the result of
+    an <<OpAccessChain, *OpAccessChain*>> or <<OpPtrAccessChain, *OpPtrAccessChain*>> instruction
+    whose _Base_ operand is a structure type (or recursively must be the result of a sequence of only access chains from
+    a structure to the final value). Such a pointer must only be used as the _Pointer_ operand to
+    <<OpLoad, *OpLoad*>> or <<OpStore, *OpStore*>>.
+  * The result type of <<OpConstantNull, *OpConstantNull*>> must not be a pointer type with <<Storage_Class, storage class>>
+    *PhysicalStorageBuffer*.
+  * Operands to <<OpPtrEqual, *OpPtrEqual*>>, <<OpPtrNotEqual, *OpPtrNotEqual*>>, and <<OpPtrDiff, *OpPtrDiff*>>
+    must not be pointers into the *PhysicalStorageBuffer* <<Storage_Class, storage class>>.
+
+- SSA
+* Each <<Id,_<id>_>> must appear exactly once as the <<ResultId,_Result <id>_>> of an instruction.
+* The definition of an SSA _<id>_ should dominate all uses of it, with the following exceptions:
+** Function calls may call functions not yet defined.
+   However, note that the function's operand and return types are already known at the call site.
+** An <<OpPhi, *OpPhi*>> can consume definitions that do not dominate it.
+
+- Entry Point
+* There is at least one <<OpEntryPoint,*OpEntryPoint*>> instruction, unless the <<Capability, *Linkage*>> capability is declared.
+* It is invalid for any function to be targeted by both an <<OpEntryPoint,*OpEntryPoint*>> instruction
+  and an <<OpFunctionCall,*OpFunctionCall*>> instruction.
+* Each <<OpEntryPoint,*OpEntryPoint*>> must not set more than one of the *DenormFlushToZero* or *DenormPreserve*
+  <<Execution_Mode, execution modes>> for any given _Target Width_.
+* Each <<OpEntryPoint,*OpEntryPoint*>> must not set more than one of the *RoundingModeRTE* or *RoundingModeRTZ*
+  <<Execution_Mode, execution modes>> for any given _Target Width_.
+* Each <<OpEntryPoint,*OpEntryPoint*>> must contain at most one of *LocalSize*, *LocalSizeId*,
+  *LocalSizeHint*, or *LocalSizeHintId* <<Execution_Mode,*Execution Modes*>>.
+- Functions
+* A function declaration (an <<OpFunction,*OpFunction*>> with no basic blocks), must have a *Linkage Attributes* <<Decoration, *Decoration*>> with the *Import* <<Linkage_Type,*Linkage Type*>>.
+* A function definition (an <<OpFunction,*OpFunction*>> with basic blocks) must not be <<Decoration, decorated>>
+  with the *Import* <<Linkage_Type, *Linkage Type*>>.
+* A function must not have both a declaration and a definition (no forward declarations).
+
+- Global (Module Scope) Variables
+* A module-scope <<OpVariable,*OpVariable*>> with an _Initializer_ operand
+  must not be decorated with the *Import* <<Linkage_Type, *Linkage Type*>>.
+
+- Control-Flow Graph (CFG)
+* Blocks exist only within a function.
+* The first block in a function definition is the entry point of that function and must not be the target of any branch.
+  (Note this means it has no <<OpPhi,*OpPhi*>> instructions.)
+* The order of blocks in a function must satisfy the rule that blocks appear before all blocks they dominate.
+* Each block starts with a label.
+** A label is made by <<OpLabel,*OpLabel*>>.
+** This includes the first block of a function (*OpFunction* is not a label).
+** Labels are used only to form blocks.
+* The last instruction of each block is a <<Termination, block termination instruction>>.
+* Each <<Termination, block termination instruction>> must be the last instruction in a block.
+* Each <<OpLabel,*OpLabel*>> instruction must be within a function.
+* All <<Branch, branches>> within a function must be to labels in that function.
+
+- All <<OpFunctionCall,*OpFunctionCall*>> _Function_ operands are an <<Id,_<id>_>> of an <<OpFunction,*OpFunction*>> in the same module.
+
+- Data rules
+* Scalar floating-point types must be parameterized only as 32 bit, plus any additional sizes enabled by <<Capability, capabilities>>.
+* Scalar integer types must be parameterized only as 32 bit, plus any additional sizes enabled by <<Capability, capabilities>>.
+* Vector types must be parameterized only with numerical types or the <<OpTypeBool,OpTypeBool>> type.
+* Vector types must be parameterized only with 2, 3, or 4 components, plus any additional sizes enabled by <<Capability, capabilities>>.
+* Matrix types must be parameterized only with floating-point types.
+* Matrix types must be parameterized only with 2, 3, or 4 columns.
+* Specialization constants (see <<SpecializationSection,Specialization>>) are limited to integers, Booleans, floating-point numbers, and vectors of these.
+* Image, sampler, and sampled image objects must not appear as operands to
+  <<OpPhi,*OpPhi*>> instructions, or <<OpSelect,*OpSelect*>> instructions, or
+  any instructions other than the image or sampler instructions specified to
+  operate on them.
+* All <<OpSampledImage,*OpSampledImage*>> instructions must be in the same block in which their _Result <id>_ are consumed.
+
+* The <<Capability, capabilities>> *StorageBuffer16BitAccess*, *UniformAndStorageBuffer16BitAccess*,
+  *StoragePushConstant16*, and *StorageInputOutput16* do not generally add 16-bit operations.
+  Rather, they add only the following specific abilities:
+** An <<OpTypePointer, *OpTypePointer*>> pointing to a 16-bit scalar, a 16-bit vector,
+   or a composite containing a 16-bit member can be used as the result type of <<OpVariable, *OpVariable*>>,
+   or <<OpAccessChain, *OpAccessChain*>>, or <<OpInBoundsAccessChain, *OpInBoundsAccessChain*>>.
+** <<OpLoad, *OpLoad*>> can load 16-bit scalars, 16-bit vectors, and 16-bit matrices.
+** <<OpStore, *OpStore*>> can store 16-bit scalars, 16-bit vectors, and 16-bit matrices.
+** <<OpCopyObject, *OpCopyObject*>> can be used for 16-bit scalars or composites containing 16-bit members.
+** 16-bit scalars or 16-bit vectors can be used as operands to a width-only conversion
+   instruction to another allowed type (<<OpFConvert, *OpFConvert*>>, <<OpSConvert, *OpSConvert*>>,
+   or <<OpUConvert, *OpUConvert*>>), and can be produced as results of a width-only conversion instruction
+   from another allowed type.
+** A structure containing a 16-bit member can be an operand to <<OpArrayLength, *OpArrayLength*>>.
+
+* The <<Capability, capabilities>> *StorageBuffer8BitAccess*, *UniformAndStorageBuffer8BitAccess*,
+  and *StoragePushConstant8*, do not generally add 8-bit operations.
+  Rather, they add only the following specific abilities:
+** An <<OpTypePointer, *OpTypePointer*>> pointing to an 8-bit scalar, an 8-bit vector,
+   or a composite containing an 8-bit member can be used as the result type of <<OpVariable, *OpVariable*>>,
+   or <<OpAccessChain, *OpAccessChain*>>, or <<OpInBoundsAccessChain, *OpInBoundsAccessChain*>>.
+** <<OpLoad, *OpLoad*>> can load 8-bit scalars and vectors.
+** <<OpStore, *OpStore*>> can store 8-bit scalars and 8-bit vectors.
+** <<OpCopyObject, *OpCopyObject*>> can be used for 8-bit scalars or composites containing 8-bit members.
+** 8-bit scalars and vectors can be used as operands to a width-only conversion
+   instruction to another allowed type (<<OpSConvert, *OpSConvert*>>,
+   or <<OpUConvert, *OpUConvert*>>), and can be produced as results of a width-only conversion instruction
+   from another allowed type.
+** A structure containing an 8-bit member can be an operand to <<OpArrayLength, *OpArrayLength*>>.
+
+- Decoration rules
+* The *Linkage Attributes* <<Decoration,Decoration>> must not be applied to functions targeted by an <<OpEntryPoint,*OpEntryPoint*>> instruction.
+* A <<BuiltIn, BuiltIn>> <<Decoration,Decoration>> must be applied only as follows:
+** If applied to a structure-type member, all members of that structure type must also be <<Decoration, decorated>> with *BuiltIn*.
+   (No allowed mixing of built-in variables and non-built-in variables within a single structure.)
+** If applied to a structure-type member, that structure type must not be contained as a member of another structure type.
+** There must be no more than one object per Storage Class that contains a structure type containing members <<Decoration, decorated>> with *BuiltIn*, consumed per entry-point.
+
+- <<OpLoad,*OpLoad*>> and <<OpStore,*OpStore*>> must consume only objects whose type is a pointer.
+- A <<ResultId,_Result <id>_>> resulting from an instruction within a function must be used only in that function.
+- A function call must have the same number of arguments as the function definition (or declaration) has parameters, and their respective types must match.
+- An instruction requiring a specific number of operands must have that many operands. The <<WordCount,_word count_>> must agree.
+- Each opcode specifies its own requirements for number and type of operands, and these must be followed.
+
+- Atomic access rules
+* The pointers taken by atomic operation instructions must be a pointer into one of the following <<Storage_Class, Storage Classes>>:
+** *Uniform* when used with the *BufferBlock* <<Decoration, *Decoration*>>
+** *StorageBuffer*
+** *PhysicalStorageBuffer*
+** *Workgroup*
+** *CrossWorkgroup*
+** *Generic*
+** *AtomicCounter*
+** *Image*
+** *Function*
+
+- It is invalid to have a construct that uses the *StorageBuffer* <<Storage_Class, Storage Class>> and
+  a construct that uses the *Uniform* <<Storage_Class, Storage Class>> with the *BufferBlock* <<Decoration, Decoration>>
+  in the same SPIR-V module.
+
+- All *XfbStride* <<Decoration,*Decorations*>> must be the same for all objects decorated with the same *XfbBuffer* _XFB Buffer Number_.
+
+- All *Stream* <<Decoration,*Decorations*>> must be the same for all objects decorated with the same *XfbBuffer* _XFB Buffer Number_.
+
+- If the workgroup size is statically specified (using the LocalSize, LocalSizeId execution modes, or the WorkgroupSize BuiltIn),
+  the product of all workgroup size dimensions must not be zero.
+
+[[ShaderValidation]]
+==== Validation Rules for Shader <<Capability,Capabilities>>
+
+- CFG:
+* Loops must be structured. That is, the target basic block of a <<BackEdge,back edge>> must contain an <<OpLoopMerge,*OpLoopMerge*>> instruction.
+* Selections must be structured. That is, an <<OpSelectionMerge,*OpSelectionMerge*>> instruction is required to precede:
+** an <<OpSwitch,*OpSwitch*>> instruction
+** an <<OpBranchConditional,*OpBranchConditional*>> instruction that has different _True Label_ and _False Label_ operands where neither are
+   declared <<MergeBlock,merge blocks>> or _Continue Targets_.
+
+- Entry point and execution model
+* Each <<EntryPoint,_entry point_>> in a module, along with its corresponding static call tree within that module, forms a complete pipeline stage.
+* Each <<OpEntryPoint,*OpEntryPoint*>> with the *Fragment* <<Execution_Model, Execution Model>> must have an <<OpExecutionMode,*OpExecutionMode*>>
+  for either the *OriginLowerLeft* or the *OriginUpperLeft* <<Execution_Mode, Execution Mode>>.
+  (Exactly one of these is required.)
+* An <<OpEntryPoint,*OpEntryPoint*>> with the *Fragment* <<Execution_Model, Execution Model>>
+  must not set more than one of the
+  *DepthGreater*, *DepthLess*, or *DepthUnchanged* <<Execution_Mode,*Execution Modes*>>.
+* An <<OpEntryPoint,*OpEntryPoint*>> with one of the *Tessellation* <<Execution_Model, Execution Models>>
+  must not set more than one of the
+  *SpacingEqual*, *SpacingFractionalEven*, or *SpacingFractionalOdd* <<Execution_Mode,*Execution Modes*>>.
+* An <<OpEntryPoint,*OpEntryPoint*>> with one of the *Tessellation* <<Execution_Model, Execution Models>>
+  must not set more than one of the
+  *Triangles*, *Quads*, or *Isolines* <<Execution_Mode,*Execution Modes*>>.
+* An <<OpEntryPoint,*OpEntryPoint*>> with one of the *Tessellation* <<Execution_Model, Execution Models>>
+  must not set more than one of the
+  *VertexOrderCw* or *VertexOrderCcw* <<Execution_Mode,*Execution Modes*>>.
+* An <<OpEntryPoint,*OpEntryPoint*>> with the *Geometry* <<Execution_Model, Execution Model>> must set exactly one of the
+  *InputPoints*, *InputLines*, *InputLinesAdjacency*, *Triangles*, or *TrianglesAdjacency* <<Execution_Mode,*Execution Modes*>>.
+* An <<OpEntryPoint,*OpEntryPoint*>> with the *Geometry* <<Execution_Model, Execution Model>> must set exactly one of the
+  *OutputPoints*, *OutputLineStrip*, or *OutputTriangleStrip* <<Execution_Mode,*Execution Modes*>>.
+
+- For <<Structure, structure>> objects in the *Input* and *Output* <<Storage_Class, Storage Classes>>, the following apply:
+* If applied to structure-type members, the <<Decoration,decorations>>
+  *Noperspective*, *Flat*, *Patch*, *Centroid*, and *Sample* must be applied only to the top-level members of the structure type.
+  (Nested objects' types must not be structures whose members are decorated with these decorations.)
+
+- Type Rules
+* All declared types are restricted to those types that are, or are contained within, valid types for an
+  <<OpVariable, *OpVariable*>> _Result Type_ or an <<OpTypeFunction, *OpTypeFunction*>> _Return Type_.
+* Aggregate types for <<Intermediate, _intermediate objects_>> are restricted to those types that are
+  a valid _Type_ of an <<OpVariable, **OpVariable**>> _Result Type_ in the global storage classes.
+
+- Decorations
+* It is invalid to apply more than one of *Noperspective* or *Flat* <<Decoration,decorations>> to the same object or member.
+* It is invalid to apply more than one of *Patch*, *Centroid*, or *Sample* <<Decoration,decorations>> to the same object or member.
+* It is invalid to apply more than one of *Block* and *BufferBlock* <<Decoration,decorations>> to a structure type.
+* *Block* and *BufferBlock* <<Decoration, decorations>> must not decorate a structure type that is nested at any level inside
+   another structure type decorated with *Block* or *BufferBlock*.
+* The *FPRoundingMode* <<Decoration, decoration>> must be applied only to a width-only conversion instruction whose only
+  uses are _Object_ operands of <<OpStore, *OpStore*>> instructions storing through a pointer to a 16-bit
+  floating-point object in the *StorageBuffer*, *PhysicalStorageBuffer*, *Uniform*, or *Output*
+  <<Storage_Class, Storage Classes>>.
+
+- All _<id>_ used for <<Scope_-id-, Scope _<id>_>> and <<Memory_Semantics_-id-, Memory Semantics _<id>_>> must be of an <<OpConstant, OpConstant>>.
+
+- Atomic access rules
+* The pointers taken by atomic operation instructions are further restricted to not point into the *Function* <<Storage_Class, storage class>>.
+
+==== Validation Rules for Kernel <<Capability,Capabilities>>
+
+- The _Signedness_ in *OpTypeInt* must always be 0.
+
+
+<<<
+[[Limits]]
+=== Universal Limits
+
+These quantities are minimum limits for all implementations and validators.
+Implementations are allowed to support larger quantities.
+Client APIs may impose larger minimums.  See <<Capabilities, Language Capabilities>>.
+
+Validators inform when these limits (or explicitly parameterized limits) are crossed.
+
+.Limits
+[cols="<.^3,>.^1,>.^1",width = "85%"]
+|========
+.2+| *Limited Entity*                               2+^|     *Minimum Limit*
+                                                       | *Decimal*  | *Hexadecimal*
+| Characters in a <<Literal, literal>> string          | 65,535     | FFFF
+| Result _<id>_ bound +
+  +
+  See <<PhysicalLayout, Physical Layout>> for the shader-specific bound.
+                                                       | 4,194,303  | 3FFFFF
+| Control-flow nesting depth +
+  +
+  Measured per function, in program order, counting the
+  maximum number of <<OpBranch,*OpBranch*>>, <<OpBranchConditional,*OpBranchConditional*>>,
+  or <<OpSwitch,*OpSwitch*>> that are seen without yet seeing their
+  corresponding _Merge Block_, as declared by
+  <<OpSelectionMerge,*OpSelectionMerge*>> or <<OpLoopMerge,*OpLoopMerge*>>.
+                                                          | 1023       | 3FF
+| Global variables (<<Storage_Class,Storage Class>> other than *Function*)
+                                                          | 65,535     | FFFF
+| Local variables (*Function* <<Storage_Class,Storage Class>>)
+                                                          | 524,287    | 7FFFF
+| Decorations per target _<id>_                         2+| Number of entries in the <<Decoration,*Decoration*>> table.
+| Execution modes per entry point                         | 255        | FF
+| Indexes for <<OpAccessChain,*OpAccessChain*>>, <<OpInBoundsAccessChain,*OpInBoundsAccessChain*>>, <<OpPtrAccessChain,*OpPtrAccessChain*>>,
+   <<OpInBoundsPtrAccessChain, *OpInBoundsPtrAccessChain*>>, <<OpCompositeExtract,*OpCompositeExtract*>>, and <<OpCompositeInsert,*OpCompositeInsert*>>
+                                                          | 255        | FF
+| Number of function parameters, per function declaration | 255        | FF
+| <<OpFunctionCall,*OpFunctionCall*>> actual arguments    | 255        | FF
+| <<OpExtInst,*OpExtInst*>> actual arguments              | 255        | FF
+| <<OpSwitch,*OpSwitch*>> (literal, label) pairs          | 16,383     | 3FFF
+| <<OpTypeStruct,*OpTypeStruct*>> members                 | 16,383     | 3FFF
+| Structure nesting depth                                 | 255        | FF
+|========
+
+[[MemoryModelSection]]
+=== Memory Model
+
+A memory model is chosen using a single <<OpMemoryModel,*OpMemoryModel*>> instruction near the beginning of the module.  This selects both an addressing model and a memory model.
+
+The *Logical* <<Addressing_Model, addressing model>> means pointers are abstract, having no physical size or numeric value.
+In this mode, pointers must be created only from existing objects, and they must not be stored into an object,
+unless additional <<Capability, capabilities>>, e.g., *VariablePointers*, are declared to add such functionality.
+
+The non-*Logical* <<Addressing_Model, addressing models>> allow physical pointers to be formed.  <<OpVariable,*OpVariable*>> can be used to create objects that hold pointers.
+These are declared for a specific <<Storage_Class,Storage Class>>.
+Pointers for one Storage Class must not be used to access objects in another Storage Class.  However, they can be converted with conversion opcodes.
+Any particular addressing model describes the bit width of pointers for each of the storage classes.
+
+[[MemoryLayout]]
+==== Memory Layout
+
+*Offset*, *MatrixStride*, and *ArrayStride* <<Decoration, Decorations>> partially define how a memory buffer is laid out.
+In addition, the following also define layout of a memory buffer, applied recursively as needed:
+
+- a vector consumes contiguous memory with lower-numbered components appearing in smaller offsets than higher-numbered components,
+  and with component 0 starting at the vector's *Offset* <<Decoration,Decoration>>, if present
+- in an array, lower-numbered elements appear at smaller offsets than higher-numbered elements, with element 0 starting at the *Offset* <<Decoration,Decoration>> for the array, if present
+- in a matrix, lower-numbered columns appear at smaller offsets than higher-numbered columns,
+  and lower-numbered components within the matrix's vectors appearing at smaller offsets than high-numbered components,
+  with component 0 of column 0 starting at the *Offset* <<Decoration,Decoration>>, if present
+  (the *RowMajor* and *ColMajor* <<Decoration,Decorations>> dictate what is contiguous)
+
+[[AliasingSection]]
+==== Aliasing
+
+Two <<MemoryObjectDeclaration, memory object declarations>> are said to _alias_ if they can be accessed (in bounds)
+such that both accesses address the same memory locations during their intersecting dynamic lifetimes.
+If two memory operations access the same locations, and at least one of them performs a write,
+the memory consistency model specified by the client API defines the results
+based on the ordering of the accesses.
+
+How aliasing is managed depends on the <<Memory_Model, memory model>>:
+
+- The *Simple*, *GLSL*, and *Vulkan* memory models can assume that aliasing is generally not present between
+  the <<MemoryObjectDeclaration, memory object declarations>>.
+  Specifically, the consumer is free to assume aliasing is not present between memory object declarations,
+  unless the memory object declarations explicitly indicate they alias.
+  Aliasing is indicated by applying the *Aliased* <<Decoration, decoration>> to a memory object declaration's _<id>_,
+  for <<OpVariable, *OpVariable*>> and <<OpFunctionParameter, *OpFunctionParameter*>>.
+  Applying *Restrict* is allowed, but has no effect.
+  For variables holding *PhysicalStorageBuffer* pointers, applying the *AliasedPointer* decoration on the
+  *OpVariable* indicates that the *PhysicalStorageBuffer* pointers are potentially aliased.
+  Applying *RestrictPointer* is allowed, but has no effect.
+  Only those <<MemoryObjectDeclaration, memory object declarations>> decorated with *Aliased*
+  or *AliasedPointer* may alias each other.
+
+- The *OpenCL* memory model assumes that <<MemoryObjectDeclaration, memory object declarations>> might alias each other.
+  An implementation may assume that memory object declarations decorated with *Restrict* will not alias any other memory object declaration.
+  Applying *Aliased* is allowed, but has no effect.
+
+The *Aliased* decoration can be used to express that certain <<MemoryObjectDeclaration, memory object declarations>> may alias.
+Referencing the following table, a memory object declaration _P_ may alias another declared pointer _Q_ if within a single row:
+
+- _P_ is an instruction with opcode and storage class from the first pair of columns, and
+- _Q_ is an instruction with opcode and storage class from the second pair of columns.
+
+|========
+| First Storage Class | First Instruction(s) | Second Instructions | Second Storage Classes
+| *CrossWorkgroup* | *OpFunctionParameter*, *OpVariable* | *OpFunctionParameter*, *OpVariable* | *CrossWorkgroup*, *Generic*
+| *Function* | *OpFunctionParameter* | *OpFunctionParameter*, *OpVariable* | *Function*, *Generic*
+| *Function* | *OpVariable* | *OpFunctionParameter* | *Function*, *Generic*
+| *Generic* | *OpFunctionParameter* | *OpFunctionParameter*, *OpVariable* | *CrossWorkgroup*, *Function*, *Generic*, *Workgroup*
+| *Image* | *OpFunctionParameter*, *OpVariable* | *OpFunctionParameter*, *OpVariable* | *Image*, *StorageBuffer*, *PhysicalStorageBuffer*, *Uniform*, *UniformConstant*
+| *Output* | *OpFunctionParameter* | *OpFunctionParameter*, *OpVariable* | *Output*
+| *Private* | *OpFunctionParameter* | *OpFunctionParameter*, *OpVariable* | *Private*
+| *StorageBuffer* | *OpFunctionParameter*, *OpVariable* | *OpFunctionParameter*, *OpVariable* | *Image*, *StorageBuffer*, *PhysicalStorageBuffer*, *Uniform*, *UniformConstant*
+| *PhysicalStorageBuffer* | *OpFunctionParameter*, *OpVariable* | *OpFunctionParameter*, *OpVariable* | *Image*, *StorageBuffer*, *PhysicalStorageBuffer*, *Uniform*, *UniformConstant*
+| *Uniform* | *OpFunctionParameter*, *OpVariable* | *OpFunctionParameter*, *OpVariable* | *Image*, *StorageBuffer*, *PhysicalStorageBuffer*, *Uniform*, *UniformConstant*
+| *UniformConstant* | *OpFunctionParameter*, *OpVariable* | *OpFunctionParameter*, *OpVariable* | *Image*, *StorageBuffer*, *PhysicalStorageBuffer*, *Uniform*, *UniformConstant*
+| *Workgroup* | *OpFunctionParameter* | *OpFunctionParameter*, *OpVariable* | *Workgroup*, *Generic*
+| *Workgroup* | *OpVariable* | *OpFunctionParameter* | *Workgroup*, *Generic*
+|========
+
+In addition to the above table, <<MemoryObjectDeclaration, memory object declarations>>
+in the *CrossWorkgroup*, *Function*, *Input*, *Output*, *Private*, or *Workgroup* storage classes must also have matching pointee types
+for aliasing to be present. In all other cases the decoration is ignored.
+
+Because aliasing, as described above, only applies to <<MemoryObjectDeclaration, memory object declarations>>,
+a consumer does not make any assumptions about whether or not memory regions of non memory object declarations overlap.
+As such, a consumer needs to perform dependency analysis on non memory object declarations if it wishes to reorder
+instructions affecting memory.
+
+The memory locations associated with an *OpFunctionParameter* memory object
+declaration are dependent on the dynamic execution of the associated function.
+A dynamic instance of an *OpFunctionParameter* <<MemoryObjectDeclaration,memory
+object declaration>> can be traced to either an *OpVariable* or an entry point
+*OpFunctionParameter*.
+During the execution of an entry point, behavior is undefined if operations on
+two distinct memory object declarations dynamically access the same memory
+locations during an intersection of the lifetimes of those two objects, with at
+least one of them performing a write, and at least one of the memory object
+declarations does not have the *Aliased* decoration (or is assumed to alias via
+the memory model).
+
+For the *PhysicalStorageBuffer* <<Storage_Class, storage class>>, *OpVariable* is understood to mean
+the *PhysicalStorageBuffer* pointer value(s) stored in the variable.
+An *Aliased* *PhysicalStorageBuffer* pointer stored in a *Function* variable can alias with other
+variables in the same function, global variables, or function parameters.
+
+It is invalid to apply both *Restrict* and *Aliased* to the same _<id>_.
+
+It is invalid to apply both *RestrictPointer* and *AliasedPointer* to the same _<id>_.
+
+==== Null pointers
+
+A "null pointer" can be formed from an <<OpConstantNull, *OpConstantNull*>> instruction with a pointer result type.
+The resulting pointer value is abstract, and will not equal the pointer value formed from any
+declared object or access chain into a declared object.
+Behavior is undefined if a load or store through *OpConstantNull* is executed.
+
+=== Derivatives
+
+Derivatives appear only in the *Fragment* <<Execution_Model, Execution Model>>. They are either implicit or explicit.
+Some <<Image, image instructions>> consume implicit derivatives, while the <<Derivative, derivative instructions>> compute explicit derivatives.
+In all cases, derivatives are well defined when the <<DerivativeGroup, derivative group>> has <<UniformControlFlow, uniform control flow>>,
+otherwise see the client API specification for what behavior is allowed.
+
+=== Code Motion
+
+Texturing instructions in the Fragment <<Execution_Model,Execution Model>> that rely on an implicit derivative
+won't be moved into control flow that is
+not known to be <<UniformControlFlow, uniform control flow>> within each <<DerivativeGroup, derivative group>>.
+
+[[Deprecation]]
+=== Deprecation
+
+A feature may be marked as deprecated by a version of the specification or extension to the specification.
+Features marked as deprecated in one version of the specification are still present in that version,
+but future versions may reduce their support or completely remove them.
+Deprecating before removing allows applications time to transition away from the deprecated feature.
+Once the feature is removed,
+all tokens used exclusively by that feature will be reserved and any use of those tokens will become invalid.
+
+////
+The full list of removed features is available in appendix Z.
+////
+
+[[Unified]]
+=== Unified Specification
+
+This document specifies all versions of *SPIR-V*.
+
+There are three kinds of entries in the tables of enumerated tokens:
+
+- *Reservation:* These say <<Unified, Reserved>> in the enabling capabilities.
+  They often contain token names only, lacking a semantic description.
+  They are invalid *SPIR-V* for any version, serving only to reserve the tokens.
+  They may identify enabling capabilities and extensions, in which case any listed extensions might add the tokens.
+  See the listed extensions for additional information.
+- *Conditional:* These say <<Unified, Missing before>> or <<Unified, Missing after>>
+  in the enabling capabilities.
+  They are invalid *SPIR-V* for the missing versions.
+  They may identify enabling capabilities and extensions, in which case any listed extensions might add the tokens
+  for some of the missing versions.
+  See the listed extensions for additional information.
+  For versions not identified as missing, the tokens are valid *SPIR-V*, subject to any listed enabling capabilities.
+- *Universal:* These have no mention of what version they are missing in, or of being reserved.
+  They are valid in all versions of *SPIR-V*.
+
+[[Uniformity]]
+=== Uniformity
+
+SPIR-V has multiple notions of uniformity of values.
+A _Result <id>_ <<Decoration, decorated>> as *Uniform* (for a particular scope) is a contract that
+all invocations within that scope compute the same value for that result,
+for a given dynamic instance of an instruction.
+This is useful to enable implementations to store results in a scalar register file (_scalarization_), for example.
+Results are assumed not to be uniform unless decorated as such.
+
+An _<id>_ is defined to be <<DynamicallyUniform, dynamically uniform>> for a dynamic instance of an instruction if all invocations
+(in an invocation group) that execute the dynamic instance have the same value for that _<id>_.
+This is not something that is explicitly decorated, it is just a property that arises.
+This property is assumed to hold for operands of certain instructions, such as the _Image_ operand of image instructions,
+unless that operand is decorated as *NonUniform*.
+Some implementations require more complex instruction expansions to handle non-dynamically uniform values in certain
+instructions, and thus it is mandatory for certain operands to be decorated as *NonUniform* if they are not
+guaranteed to be dynamically uniform.
+
+While the names may suggest otherwise, nothing forbids an _<id>_ from being decorated as both *Uniform* and *NonUniform*.
+Because _dynamically uniform_ is at a larger scope (invocation group) than the default *Uniform* scope (subgroup),
+it is even possible for the _<id>_ to be uniform at the subgroup scope but not dynamically uniform.

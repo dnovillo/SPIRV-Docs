@@ -1,0 +1,17 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+changes:
+
+=== Changes from Version 1.00, Revision 6
+
+ - Khronos SPIR-V issue #63: Be clear that *OpUndef* can be used in sequence 9 (and is preferred to be) of the <<LogicalLayout, Logical Layout>>
+   and can be part of partially-defined <<OpConstantComposite, *OpConstantComposite*>>.
+ - Khronos SPIR-V issue #70: Don't explicitly require operand truncation for integer operations when operating at <<RelaxedPrecisionSection, *RelaxedPrecision*>>.
+ - Khronos SPIR-V issue #76: Include *OpINotEqual* in the list of allowed instructions for <<OpSpecConstantOp, *OpSpecConstantOp*>>.
+ - Khronos SPIR-V issue #79: Remove implication that <<OpImageQueryLod, *OpImageQueryLod*>> should have a component for the array index.
+ - Public SPIRV-Headers issue #17: <<Decoration, Decorations>> *NoPerspective*, *Flat*, *Patch*, *Centroid*, and *Sample* can apply to a top-level member
+   that is itself a structure, so don't disallow it through restrictions to numeric types.

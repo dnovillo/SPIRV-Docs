@@ -1,0 +1,38 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+changes:
+
+=== Changes from Version 1.5, Revision 1
+
+- Khronos Issue #511: Allow non-execution non-memory scopes in the introduction to the
+  <<Scope_-id-, Scope _<id>_ section >>.
+- Khronos MR !147: Fix <<OpFNegate, *OpFNegate*>> so it handles 0.0f properly
+- Khronos Issue #502: <<OpAccessChain, *OpAccessChain*>> array indexes must be an in-bounds for logical pointer types.
+- Khronos Issue #518: Include both *VariablePointers* and *VariablePointersStorageBuffer* capabilities in the
+  <<Validation, validation>> rules when discussing variable pointer rules.
+- Khronos Issue #496: Allow *Invariant* to <<Decoration, decorate>> a block member.
+- Khronos Issue #469: Disallow *OpConstantNull* result and *OpPtrEqual*, *OpPtrNotEqual*, and *OpPtrDiff* operands
+  from being pointers into the *PhysicalStorageBuffer* storage class.
+  See the <<PhysicalValidation, *PhysicalStorageBuffer* validation rules>>.
+- Khronos Issue #425: Clarify what variables can allocate pointers, in the <<Validation, validation rules>>,
+  based on the declarations of the *VariablePointers* or *VariablePointersStorageBuffer* capabilities.
+- Khronos Issue #442: Add a note pointing out where <<UnsignedSigned, signedness>> has some semantic meaning.
+- Khronos Issue #498: Relaxed the set of allowed types for some <<Group, Group and Subgroup instructions>>.
+- Khronos Issue #500: Deprecate <<OpLessOrGreater, *OpLessOrGreater*>> in favor of <<OpFOrdNotEqual, *OpFOrdNotEqual*>>.
+- Khronos Issue #354: Rationalize <<Literal, literals>> throughout the specification.
+  Remove "immediate" as a separate definition.
+  Be more rigid about a single literal mapping to one or more operands,
+  and that the instruction description defines the type of the literal.
+- Khronos Issue #479: Disallow intermediate aggregate types that could not be used to declare global variables,
+  and disallow all types that can't be used for declaring variables.
+  See the <<ShaderValidation, shader validation>> "Type Rules".
+  Also, more strongly state that intermediate values don't form a storage class, in the introduction to
+  <<Storage_Class, storage classes>>.
+- Khronos Issue #78: Use a more correct definition of <<BackEdge, _back edge_>>.
+- Khronos Issue #492: Overflow with <<OpSDiv, **OpSDiv**>>, <<OpSRem, **OpSRem**>>, and <<OpSMod, **OpSMod**>>
+  results in undefined behavior.

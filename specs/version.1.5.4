@@ -1,0 +1,55 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+changes:
+
+=== Changes from Version 1.5, Revision 3
+
+- Reserve enumerants for the extensions
+ * SPV_INTEL_fpga_loop_controls
+ * SPV_INTEL_blocking_pipes
+ * SPV_INTEL_unstructured_loop_controls
+ * SPV_INTEL_fpga_reg
+ * SPV_INTEL_fpga_memory_attributes
+ * SPV_INTEL_kernel_attributes
+ * SPV_INTEL_function_pointers
+ * SPV_EXT_shader_image_int64
+ * SPV_KHR_fragment_shading_rate
+ * SPV_EXT_shader_atomic_float_add
+- Establish formal meanings for validity (being statically expressed) and behavior (regarding dynamic execution),
+  in <<ValidDefined, Validity and Defined Behavior>>.
+  This also changed a number of uses of these terms throughout the specifications
+  to be consistent with these definitions.
+ * Main issue for this: Khronos issue #540.
+ * Addresses Khronos issues #542, #540, #545, #546, #547, and #548.
+ * Khronos issue #491: For <<OpConvertFToU, *OpConvertFToU*>> and <<OpConvertFToS, *OpConvertFToS*>>, behavior is undefined if
+  _Result Type_ is not wide enough to hold the converted value.
+ * Khronos issue #591: Module validity does not depend on the default values of <<SpecializationSection, specialization constants>>.
+- Fix Khronos issues:
+ * #214: LoD and gather <<Image, Image Instructions>> need non-multisampled images (_MS_ of 0), while others
+   that provide a _Sample_ <<Image_Operands, Image Operand>> need a multisampled image (_MS_ of 1).
+ * #324: For several <<Capability, Capabilities>>, explicitly list the values <<OpTypeImage, *OpTypeImage*>>
+   has for _Sampled_, instead of saying sampled or unsampled.
+ * #361: Stop requiring <<OpTypeRuntimeArray, *OpTypeRuntimeArray*>> to be concrete, in the description of *OpTypeRuntimeArray*.
+   (This may still be restricted elsewhere though.)
+ * #553: Add definition of a <<TangledInstruction, tangled instruction>> and update the definitions of
+   <<DynamicInstance, dynamic instance>> and <<UniformControlFlow, uniform control flow>>.
+ * #517: Expand the <<About, About This Document>> section to also discuss versioning.
+ * #564: Depth hint for the *DepthLess* <<Execution_Mode, execution mode>> means less-than-or-equal to.
+ * #558: Explicitly say (rather than imply) that *ImageMipmap* and *ImageReadWrite* <<Capability, capabilities>> apply to kernels.
+ * #563: Delete unnecessary statement about incomplete images in <<OpImageQueryLod, *OpImageQueryLod*>>.
+ * #570: Update the definitions of the *Acquire* and *Release* <<Memory_Semantics_-id-, memory semantics>>.
+ * #560: It is not valid to make duplicate <<BuiltIn, *BuiltIn* variables>>.
+ * #566: The Client API specificies what happens with image coordinates outside the image for
+   <<OpImageRead, *OpImageRead*>>, <<OpImageWrite, *OpImageWrite*>>, and <<OpImageSparseRead, *OpImageSparseRead*>>.
+ * #573: Clarify the type read/written is scalar or vector in
+   <<OpImageRead, *OpImageRead*>>, <<OpImageWrite, *OpImageWrite*>>, and <<OpImageSparseRead, *OpImageSparseRead*>>.
+ * #595: Remove the parenthetical partial list of annotation instructions in the <<LogicalLayout, logical layout section>>.
+ * #574: Constituents of <<OpConstantComposite, *OpConstantComposite*>> must not be specialization
+   <<ConstantInstruction, constants>>.
+ * #444: Use more restrictive "only" language for what <<Decoration, decorations>> may apply to.
+ * MR !182: See the client API for how *SubpassData* coordinates are applied in <<OpImageRead, *OpImageRead*>>.

@@ -1,0 +1,35 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification Provisional
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+changes:
+
+=== Changes from Version 1.00
+
+- Moved version number to SPIR-V 1.1
+
+- New functionality:
+  * Bug 14202 named barriers:
+    ** Added the *NamedBarrier* <<Capability, Capability>>.
+    ** Added the instructions: <<OpTypeNamedBarrier,*OpTypeNamedBarrier*>>, <<OpNamedBarrierInitialize,*OpNamedBarrierInitialize*>>, and <<OpMemoryNamedBarrier,*OpMemoryNamedBarrier*>>.
+  * Bug 14201 subgroup dispatch:
+    ** Added the *SubgroupDispatch* <<Capability, Capability>>.
+    ** Added the instructions: <<OpGetKernelLocalSizeForSubgroupCount,*OpGetKernelLocalSizeForSubgroupCount*>> and <<OpGetKernelMaxNumSubgroups,*OpGetKernelMaxNumSubgroups*>>.
+    ** Added *SubgroupSize* and *SubgroupsPerWorkgroup* <<Execution_Mode, Execution Modes>>.
+  * Bug 14441 program-scope pipes:
+    ** Added the *PipeStorage*  <<Capability, Capability>>.
+    ** Added Instructions: <<OpTypePipeStorage,*OpTypePipeStorage*>>, <<OpConstantPipeStorage,*OpConstantPipeStorage*>>, and <<OpCreatePipeFromPipeStorage,*OpCreatePipeFromPipeStorage*>>.
+  * Bug 15434 Added the <<OpSizeOf,*OpSizeOf*>> instruction.
+  * Bug 15024 support for OpenCL-C++ ivdep loop attribute:
+    ** Added *DependencyInfinite* and *DependencyLength* <<Loop_Control, Loop Controls>>.
+    ** Updated <<OpLoopMerge,*OpLoopMerge*>> to support these.
+  * Bug 14022 Added *Initializer* and *Finalizer* and <<Execution_Mode, Execution Modes>>.
+  * Bug 15539 Added the *MaxByteOffset* <<Decoration, Decoration>>.
+  * Bug 15073 Added the *Kernel* <<Capability, Capability>> to the *SpecId* <<Decoration,Decoration>>.
+  * Bug 14828 Added the <<OpModuleProcessed,*OpModuleProcessed*>> instruction.
+
+- Fixed internal bugs:
+  * Bug 15481 Clarification on alignment and size operands for pipe operands

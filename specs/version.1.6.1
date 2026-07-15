@@ -1,0 +1,38 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+changes:
+
+=== Changes from Version 1.5
+
+- New Functionality:
+ * Khronos SPIR-V issue #515: The <<FP_Fast_Math_Mode, *FPFastMathMode*>> decoration may now be used with <<OpFNegate, *OpFNegate*>>,
+                              with the binary floating-point comparison instructions
+                              (including <<OpOrdered, *OpOrdered*>> and <<OpUnordered, *OpUnordered*>>),
+                              and with <<OpExtInst, *OpExtInst*>> where expressly permitted by the extended instruction set.
+ * #661: Added a *Nontemporal* <<Image_Operands,Image Operand>>.
+
+- Extensions Incorporated into SPIR-V 1.6:
+* SPV_KHR_non_semantic_info, see <<OpExtInstImport, *OpExtInstImport*>>.
+* SPV_KHR_integer_dot_product
+* SPV_KHR_terminate_invocation
+* SPV_EXT_demote_to_helper_invocation, with changes:
+  Only <<OpDemoteToHelperInvocation,*OpDemoteToHelperInvocationEXT*>> was incorporated.
+  Instead of using *OpIsHelperInvocationEXT*, modules should use *Volatile* loads of
+  the *HelperInvocation* <<BuiltIn,built-in variable>>.
+
+- Deprecations and Removals, from Khronos SPIR-V issues:
+ * Removed <<OpLessOrGreater, *OpLessOrGreater*>>.  Use <<OpFOrdNotEqual, *OpFOrdNotEqual*>> instead.
+ * #620: The *WorkgroupSize* <<BuiltIn,built-in>> is deprecated starting with version 1.6.
+ * #645: The _True Label_ and _False Label_ of an <<OpBranchConditional, *OpBranchConditional*>> must not be the same,
+         starting with version 1.6.
+ * #584: Disallow _Dim_ *Buffer* in <<OpTypeSampledImage, *OpTypeSampledImage*>> and <<OpSampledImage, *OpSampledImage*>>
+         starting with version 1.6.
+ * Deprecated <<OpKill, *OpKill*>>, in favor of <<OpTerminateInvocation, *OpTerminateInvocation*>>,
+   or <<OpDemoteToHelperInvocation, *OpDemoteToHelperInvocation*>>.
+
+- Reserve enumerants for the SPV_KHR_fragment_shader_barycentric extension.

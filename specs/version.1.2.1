@@ -1,0 +1,18 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+changes:
+
+=== Changes from Version 1.1
+
+- Moved version number to SPIR-V 1.2
+
+- New functionality:
+  * Added <<OpExecutionModeId, *OpExecutionModeId*>> to allow using an _<id>_ to set the
+    <<Execution_Mode, execution modes>> *SubgroupsPerWorkgroupId*, *LocalSizeId*, and *LocalSizeHintId*.
+  * Added <<OpDecorateId, *OpDecorateId*>> to allow using an _<id>_ to set the
+    <<Decoration, decorations>> *AlignmentId* and *MaxByteOffsetId*.

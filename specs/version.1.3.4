@@ -1,0 +1,23 @@
+// Copyright 2015-2026 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+title: SPIR-V Specification
+author: John Kessenich, Google
+author: Boaz Ouriel, Intel
+author: Raun Krisch, Intel
+changes:
+
+=== Changes from Version 1.3, Revision 3
+
+- Add enumerants for
+  * SPV_KHR_vulkan_memory_model
+
+- Fixed Issues:
+  * Typo: say <<OpMatrixTimesVector, *OpMatrixTimesVector*>> is *Matrix* X *Vector*.
+  * Update on Khronos SPIR-V issue #244: Added *Shader* and *Kernel* capabilities to the *2D* <<Dim, dimensionality>>.
+  * Khronos SPIR-V Issue #317: Clarify that the *Uniform* <<Decoration, decoration>> should apply only to objects,
+    and that the <<DynamicInstance, dynamic instance>> of the object is the same, rather than at the consumer usage.
+  * Khronos SPIR-V Issue #335: Clarify and correct <<Validation, when it is valid>> for pointers to be operands to *OpFunctionCall*.
+    Corrections are believed to be consistent with existing front-end and back-end support.
+  * Khronos SPIR-V Issue #344: don't include inactive invocations in what makes the result of
+    <<OpGroupNonUniformBallotBitExtract, *OpGroupNonUniformBallotBitExtract*>> undefined.
