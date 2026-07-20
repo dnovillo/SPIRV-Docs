@@ -13,8 +13,6 @@
 # make html
 # make docker-html
 
-.ONESHELL:
-
 all: all-specs
 
 #
@@ -62,55 +60,50 @@ header: $(SPIRVHeaderInclude_DIR)/spirv.hpp
 # build / run SPIR-V headers
 
 $(SPIRVHeaderInclude_DIR)/spirv.hpp: $(SPIRVHeaderInclude_DIR)/spirv.core.grammar.json $(BuildSpvHeaders)
-	cd $(SPIRVHeaderInclude_DIR)
+	cd $(SPIRVHeaderInclude_DIR) && \
 	$(BuildSpvHeaders) -H $(SPIRVHeaderInclude_DIR)/spirv.core.grammar.json
 
 $(SPIRVHeaderBUILD_DIR):
-	mkdir -p $(SPIRVHeaderBUILD_DIR)
-	cd $(SPIRVHeaderBUILD_DIR)
+	mkdir -p $(SPIRVHeaderBUILD_DIR) && \
+	cd $(SPIRVHeaderBUILD_DIR) && \
 	cmake ../ -DCMAKE_INSTALL_PREFIX=install
 
 $(BuildSpvHeaders): $(SPIRVHeaderBUILD_DIR)
-	cd $(SPIRVHeaderBUILD_DIR)
-	make
-	make install
+	$(MAKE) -C $(SPIRVHeaderBUILD_DIR)
+	$(MAKE) -C $(SPIRVHeaderBUILD_DIR) install
 
 build-SpvHeaders: $(BuildSpvHeaders)
 
 # build spec printer
 
 $(SPIRVSpecToolBUILD_DIR): header
-	mkdir -p $(SPIRVSpecToolBUILD_DIR)
-	cd $(SPIRVSpecToolBUILD_DIR)
+	mkdir -p $(SPIRVSpecToolBUILD_DIR) && \
+	cd $(SPIRVSpecToolBUILD_DIR) && \
 	cmake ../ -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=install
 
 $(BuildSPIRV): $(SPIRVSpecToolBUILD_DIR)
-	cd $(SPIRVSpecToolBUILD_DIR)
-	make
-	make install
+	$(MAKE) -C $(SPIRVSpecToolBUILD_DIR)
+	$(MAKE) -C $(SPIRVSpecToolBUILD_DIR) install
 
 build-printspec: $(BuildSPIRV)
 
 # build spec
 
 html: build-printspec
-	cd $(SPIRVSpec_DIR)
-	make html
+	$(MAKE) -C $(SPIRVSpec_DIR) html
 
 check:
-	cd $(SPIRVSpec_DIR)
-	make check
+	$(MAKE) -C $(SPIRVSpec_DIR) check
 
 all-specs: build-printspec
-	cd $(SPIRVSpec_DIR)
-	make all
+	$(MAKE) -C $(SPIRVSpec_DIR) all
 
 clean:
 	rm -Rf $(SPIRVSpecToolBUILD_DIR)
 	rm -Rf $(SPIRVHeaderBUILD_DIR)
 	rm -Rf diff
 	rm -Rf rel-diff
-	cd $(SPIRVSpec_DIR) && make clean
+	$(MAKE) -C $(SPIRVSpec_DIR) clean
 
 
 # Expose docker-TARGET to forward a TARGET inside a Docker container.
