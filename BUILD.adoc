@@ -66,8 +66,14 @@ This is the recommended way to build the specifications.
 
 === Native Installation
 
-1. Install Ruby 2.7 or later.
-2. Install the required gems:
+Native builds require the tools below.
+The <<depends-docker,Khronos-Provided Docker Image>> bundles all of them and is the recommended alternative.
+
+1. A C++ compiler and CMake, used to build the SPIR-V header generator (`SPIRV-Headers/tools/buildHeaders`) and the spec printer (`tools/spirv`).
+2. GNU Make.
+3. Python 3, used by the generation scripts.
+4. Git, used to clone the repository and fetch its submodules.
+5. Ruby 2.7 or later, with its development headers (some gems build native extensions), plus the required gems:
 +
 [source,bash]
 ----
