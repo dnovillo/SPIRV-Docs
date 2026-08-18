@@ -2427,19 +2427,22 @@ void ParameterizeSpec()
                                                     GENERAL_IMAGE_OPERAND;
 
     InstructionDesc[OpAccessChain].opDesc =
-        "Create a pointer into a <<CompositeType,_composite_>> object. "
+        "Create a pointer into an object, or to the object itself when _Indexes_ is empty."
         GAP RESULT_PTR "Its _Type_ operand must be the type reached by walking the "
-            "_Base's_ type hierarchy down to the last provided index in _Indexes_, and its _Storage Class_ operand must be "
-            "the same as the Storage Class of _Base_."
+            "_Base's_ type hierarchy down to the last provided index in _Indexes_ if _Indexes_ is not empty. "
+            "Otherwise, its _Type_ operand must be the same as the _Type_ operand of the type of _Base_. "
+            "Its _Storage Class_ operand must be the same as the Storage Class of _Base_."
         GAP "If _Result Type_ is an array-element pointer that is <<Decoration,decorated>> with *ArrayStride*, "
             "its _Array Stride_ must match the _Array Stride_ of the array's type. "
             "If the array's type is not decorated with *ArrayStride*, _Result Type_ also must not be decorated with *ArrayStride*."
-        GAP "_Base_ must be a pointer, pointing to the base of a composite object."
+        GAP "_Base_ must be a pointer. "
+            "If _Indexes_ is not empty, _Base_ must point to the base of a <<CompositeType,_composite_>> object."
         GAP "_Indexes_ walk the type hierarchy to the desired depth, potentially down to scalar granularity. "
             "The first index in _Indexes_ selects the top-level member/element/component/column of the base composite. "
             "All composite constituents use zero-based numbering, as described by their *OpType...* instruction. "
             "The second index applies similarly to that result, and so on. "
             "Once any non-composite type is reached, there must be no remaining (unused) indexes."
+        GAP "_Indexes_ can be empty, in which case no type hierarchy is walked and _Result_ points to the same object as _Base_."
         GAP "Each index in _Indexes_"
         GAP
         " - must have a scalar <<Integer, integer type>>\n"

@@ -11,7 +11,22 @@ changes:
 
 === Changes from Version 1.6, Revision 7
 
+- Clarifications:
+  * !382: Rewrite the <<OpControlBarrier,*OpControlBarrier*>> and
+    <<OpMemoryBarrier,*OpMemoryBarrier*>> instructions to unify how they are
+    described, clarifying that only memory operations and other barriers are
+    affected, and to enable further clarifications.
+
 - Fix Khronos SPIR-V Issues:
   * #901: Clarified the behavior of the *DenormFlushToZero* <<Execution_Mode, execution mode>>.
   * #913: Remove confusing references to a pipe data type from the <<Pipe, Pipe Instructions>>.
 
+- Fix SPIR-V Registry Issues:
+  * #394: Clarify that <<Decoration,*RelaxedPrecision*>> may be applied to instructions
+    that produce numerical types, including <<OpLoad,*OpLoad*>>.
+  * #425: Clarify that the _Indexes_ operand of <<OpAccessChain, *OpAccessChain*>> can be empty.
+
+- Fix Github SPIRV-Headers Issues:
+  * #571: Clarify that *ConstOffsets* is valid with <<OpImageSparseGather,*OpImageSparseGather*>>
+    and <<OpImageSparseDrefGather,*OpImageSparseDrefGather*>>, consistent with their non-sparse
+    counterparts <<OpImageGather,*OpImageGather*>> and <<OpImageDrefGather,*OpImageDrefGather*>>.
