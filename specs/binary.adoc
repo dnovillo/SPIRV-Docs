@@ -40,6 +40,8 @@ Used by <<OpSource,*OpSource*>>.
 | 11  a| *Slang* a|
 | 12  a| *Zig* a|
 | 13  a| *Rust* a|
+| 14  a| *Pred* a|
+| 15  a| *ApilaJai* a|
 |====
 
 [[Execution_Model]]
@@ -350,6 +352,12 @@ _y rate_ | <<Literal,_Literal_>> +
 _z rate_ a|*TileShadingQCOM*
 
 <<Unified, Reserved>>.
+| 4507  a| *SubgroupSizeHalfQCOM* 3+| a|*SubgroupSizeQCOM*
+
+<<Unified, Reserved>>.
+| 4508  a| *SubgroupSizeFullQCOM* 3+| a|*SubgroupSizeQCOM*
+
+<<Unified, Reserved>>.
 | 5017  a| *EarlyAndLateFragmentTestsAMD* 3+| a|*Shader*
 
 <<Unified, Reserved>>.
@@ -426,6 +434,9 @@ Also see extensions: {spirv}/AMD/SPV_AMD_shader_early_and_late_fragment_tests.ht
 | 5102  a| *SharesInputWithAMDX* | _<id>_ +
 _Node Name_ 2+| _<id>_ +
 _Shader Index_ a|*ShaderEnqueueAMDX*
+
+<<Unified, Reserved>>.
+| 5157  a| *ArithmeticPoisonKHR* 3+| a|*PoisonFreezeKHR*
 
 <<Unified, Reserved>>.
 | 5269  a| *OutputLinesEXT (OutputLinesNV)* 3+| a|*MeshShadingNV*, *MeshShadingEXT*
@@ -544,6 +555,10 @@ Also see extension: {spirv}/KHR/SPV_KHR_maximal_reconvergence.html[*SPV_KHR_maxi
 | 6028  a| *FPFastMathDefault* | _<id>_ +
 _Target Type_ 2+| _<id>_ +
 _Fast-Math Mode_ a|*FloatControls2*
+
+<<Unified, Reserved>>.
+| 6031  a| *OpacityMicromapIdKHR* 3+| _<id>_ +
+_Enable_ a|*RayTracingOpacityMicromapExecutionModeKHR*
 
 <<Unified, Reserved>>.
 | 6154  a| *StreamingInterfaceINTEL* 3+| <<Literal,_Literal_>> +
@@ -898,6 +913,7 @@ Used by:
 - <<OpImageSparseGather,*OpImageSparseGather*>>
 - <<OpImageSparseDrefGather,*OpImageSparseDrefGather*>>
 - <<OpImageSparseRead,*OpImageSparseRead*>>
+- <<OpImageGatherQCOM,*OpImageGatherQCOM*>>
 - <<OpImageSampleFootprintNV,*OpImageSampleFootprintNV*>>
 
 // PrintImmediateHeader
@@ -1053,6 +1069,9 @@ A declaration of a global variable or a function that exists in another module. 
 <<Unified, Reserved>>.
 
 Also see extension: {spirv}/KHR/SPV_KHR_linkonce_odr.html[*SPV_KHR_linkonce_odr*]
+| 3  a| *WeakAMD* a|*WeakLinkageAMD*
+
+<<Unified, Reserved>>.
 |====
 
 [[Access_Qualifier]]
@@ -1380,6 +1399,9 @@ _Array Stride_ a|*DescriptorHeapEXT*
 _Byte Offset_ a|*DescriptorHeapEXT*
 
 <<Unified, Reserved>>.
+| 5145  a| *UTFEncodedKHR* 3+| a|*ConstantDataKHR*
+
+<<Unified, Reserved>>.
 | 5248  a| *OverrideCoverageNV* 3+| a|*SampleMaskOverrideCoverageNV*
 
 <<Unified, Reserved>>.
@@ -1464,6 +1486,9 @@ _Bank_ a|*PushConstantBanksNV*
 
 <<Unified, Reserved>>.
 | 5401  a| *BoundImageNV* 3+| a|*BindlessTextureNV*
+
+<<Unified, Reserved>>.
+| 5440  a| *CooperativeMatrixTransposeEXT* 3+| a|*CooperativeMatrixConversionsEXT*
 
 <<Unified, Reserved>>.
 | 5599  a| *SIMTCallINTEL* 3+| <<Literal,_Literal_>> +
@@ -1727,6 +1752,10 @@ _Cache Control_ a|*CacheControlsINTEL*
 | 6443  a| *CacheControlStoreINTEL* | <<Literal,_Literal_>> +
 _Cache Level_ 2+| <<Store_Cache_Control,_Store Cache Control_>> +
 _Cache Control_ a|*CacheControlsINTEL*
+
+<<Unified, Reserved>>.
+| 7040  a| *IntrinsicSAMSUNG* 3+| <<Literal,_Literal_>> +
+_Intrinsic ID_ a|*IntrinsicSAMSUNG*
 
 <<Unified, Reserved>>.
 |====
@@ -2340,6 +2369,7 @@ This must not be used with the *DontUnroll* bit. a|<<Unified, Missing before>> *
 | 0x2000000  a| *MaxReinvocationDelayALTERA (MaxReinvocationDelayINTEL)* a|*FPGALoopControlsALTERA*
 
 <<Unified, Reserved>>.
+| 0x10000000  a| *MultipleWaitQueuesQCOM* a|
 |====
 
 [[Function_Control]]
@@ -2403,8 +2433,8 @@ Used by:
 - <<OpAtomicFMinEXT,*OpAtomicFMinEXT*>>
 - <<OpAtomicFMaxEXT,*OpAtomicFMaxEXT*>>
 - <<OpAtomicFAddEXT,*OpAtomicFAddEXT*>>
-- <<OpControlBarrierArriveINTEL,*OpControlBarrierArriveINTEL*>>
-- <<OpControlBarrierWaitINTEL,*OpControlBarrierWaitINTEL*>>
+- <<OpControlBarrierArriveEXT,*OpControlBarrierArriveEXT*>>
+- <<OpControlBarrierWaitEXT,*OpControlBarrierWaitEXT*>>
 
 // PrintImmediateHeader
 [cols="^.^4,16a,15",role="fixedtable",options="header",width = "100%"]
@@ -2485,6 +2515,8 @@ Used by:
 - <<OpCooperativeMatrixLoadTensorNV,*OpCooperativeMatrixLoadTensorNV*>>
 - <<OpCooperativeMatrixStoreTensorNV,*OpCooperativeMatrixStoreTensorNV*>>
 - <<OpSubgroupBlockPrefetchINTEL,*OpSubgroupBlockPrefetchINTEL*>>
+- <<OpPredicatedLoadINTEL,*OpPredicatedLoadINTEL*>>
+- <<OpPredicatedStoreINTEL,*OpPredicatedStoreINTEL*>>
 
 // PrintImmediateHeader
 [cols="^.^4,16a,15",role="fixedtable",options="header",width = "100%"]
@@ -2626,8 +2658,8 @@ Used by:
 - <<OpAtomicFMinEXT,*OpAtomicFMinEXT*>>
 - <<OpAtomicFMaxEXT,*OpAtomicFMaxEXT*>>
 - <<OpAtomicFAddEXT,*OpAtomicFAddEXT*>>
-- <<OpControlBarrierArriveINTEL,*OpControlBarrierArriveINTEL*>>
-- <<OpControlBarrierWaitINTEL,*OpControlBarrierWaitINTEL*>>
+- <<OpControlBarrierArriveEXT,*OpControlBarrierArriveEXT*>>
+- <<OpControlBarrierWaitEXT,*OpControlBarrierWaitEXT*>>
 - <<OpGroupIMulKHR,*OpGroupIMulKHR*>>
 - <<OpGroupFMulKHR,*OpGroupFMulKHR*>>
 - <<OpGroupBitwiseAndKHR,*OpGroupBitwiseAndKHR*>>
@@ -2984,6 +3016,21 @@ Also see extension: {spirv}/EXT/SPV_EXT_float8.html[*SPV_EXT_float8*]
 <<Unified, Reserved>>.
 
 Also see extension: {spirv}/EXT/SPV_EXT_float8.html[*SPV_EXT_float8*]
+| 4228  a| *Float6EXT* a|<<Unified, Reserved>>.
+
+Also see extension: {spirv}/EXT/SPV_EXT_ocp_microscaling_types.html[*SPV_EXT_ocp_microscaling_types*]
+| 4229  a| *Float4EXT* a|<<Unified, Reserved>>.
+
+Also see extension: {spirv}/EXT/SPV_EXT_ocp_microscaling_types.html[*SPV_EXT_ocp_microscaling_types*]
+| 4230  a| *Float8UnsignedE8M0EXT* a|<<Unified, Reserved>>.
+
+Also see extension: {spirv}/EXT/SPV_EXT_ocp_microscaling_types.html[*SPV_EXT_ocp_microscaling_types*]
+| 4231  a| *MXInt8EXT* a|<<Unified, Reserved>>.
+
+Also see extension: {spirv}/EXT/SPV_EXT_ocp_microscaling_types.html[*SPV_EXT_ocp_microscaling_types*]
+| 4232  a| *BitcastExtractEXT* a|<<Unified, Reserved>>.
+
+Also see extension: {spirv}/EXT/SPV_EXT_ocp_microscaling_types.html[*SPV_EXT_ocp_microscaling_types*]
 | 4422  a| *FragmentShadingRateKHR* a|*Shader*
 
 <<Unified, Reserved>>.
@@ -3157,6 +3204,21 @@ Also see extension: {spirv}/QCOM/SPV_QCOM_cooperative_matrix_conversion.html[*SP
 | 4498  a| *TextureBlockMatch2QCOM* a|<<Unified, Reserved>>.
 
 Also see extension: {spirv}/QCOM/SPV_QCOM_image_processing2.html[*SPV_QCOM_image_processing2*]
+| 4504  a| *BFloat16MulAddQCOM* a|<<Unified, Reserved>>.
+
+Also see extension: {spirv}/QCOM/SPV_QCOM_bfloat16_muladd.html[*SPV_QCOM_bfloat16_muladd*]
+| 4506  a| *SubgroupSizeQCOM* a|<<Unified, Reserved>>.
+
+Also see extension: {spirv}/QCOM/SPV_QCOM_subgroup_size.html[*SPV_QCOM_subgroup_size*]
+| 4539  a| *MultipleWaitQueuesQCOM* a|<<Unified, Reserved>>.
+
+Also see extension: {spirv}/QCOM/SPV_QCOM_multiple_wait_queues.html[*SPV_QCOM_multiple_wait_queues*]
+| 4543  a| *ImageGatherLinearQCOM* a|<<Unified, Reserved>>.
+
+Also see extension: {spirv}/QCOM/SPV_QCOM_image_processing3.html[*SPV_QCOM_image_processing3*]
+| 4544  a| *ImageGatherExtendedModesQCOM* a|<<Unified, Reserved>>.
+
+Also see extension: {spirv}/QCOM/SPV_QCOM_image_processing3.html[*SPV_QCOM_image_processing3*]
 | 5008  a| *Float16ImageAMD* a|*Shader*
 
 <<Unified, Reserved>>.
@@ -3182,7 +3244,7 @@ Also see extension: {spirv}/EXT/SPV_EXT_shader_stencil_export.html[*SPV_EXT_shad
 <<Unified, Reserved>>.
 
 Also see extension: {spirv}/AMD/SPV_AMD_shader_image_load_store_lod.html[*SPV_AMD_shader_image_load_store_lod*]
-| 5016  a| *Int64ImageEXT* a|*Shader*
+| 5016  a| *Int64ImageEXT* a|*Int64*
 
 <<Unified, Reserved>>.
 
@@ -3219,11 +3281,25 @@ Also see extension: {spirv}/KHR/SPV_KHR_bfloat16.html[*SPV_KHR_bfloat16*]
 <<Unified, Reserved>>.
 
 Also see extension: {spirv}/KHR/SPV_KHR_bfloat16.html[*SPV_KHR_bfloat16*]
+| 5120  a| *AbortKHR* a|<<Unified, Reserved>>.
+
+Also see extension: {spirv}/KHR/SPV_KHR_abort.html[*SPV_KHR_abort*]
 | 5128  a| *DescriptorHeapEXT* a|*UntypedPointersKHR*
 
 <<Unified, Reserved>>.
 
 Also see extension: {spirv}/EXT/SPV_EXT_descriptor_heap.html[*SPV_EXT_descriptor_heap*]
+| 5146  a| *ConstantDataKHR* a|<<Unified, Reserved>>.
+
+Also see extension: {spirv}/KHR/SPV_KHR_constant_data.html[*SPV_KHR_constant_data*]
+| 5156  a| *PoisonFreezeKHR* a|<<Unified, Reserved>>.
+
+Also see extension: {spirv}/KHR/SPV_KHR_poison_freeze.html[*SPV_KHR_poison_freeze*]
+| 5181  a| *WeakLinkageAMD* a|*Linkage*
+
+<<Unified, Reserved>>.
+
+Also see extension: {spirv}/AMD/SPV_AMD_weak_linkage.html[*SPV_AMD_weak_linkage*]
 | 5249  a| *SampleMaskOverrideCoverageNV* a|*SampleRateShading*
 
 <<Unified, Reserved>>.
@@ -3450,11 +3526,11 @@ Also see extension: {spirv}/EXT/SPV_EXT_demote_to_helper_invocation.html[*SPV_EX
 <<Unified, Reserved>>.
 
 Also see extension: {spirv}/NV/SPV_NV_displacement_micromap.html[*SPV_NV_displacement_micromap*]
-| 5381  a| *RayTracingOpacityMicromapEXT* a|*Shader*
+| 5381  a| *RayTracingOpacityMicromapKHR (RayTracingOpacityMicromapEXT)* a|*Shader*
 
 <<Unified, Reserved>>.
 
-Also see extension: {spirv}/EXT/SPV_EXT_opacity_micromap.html[*SPV_EXT_opacity_micromap*]
+Also see extensions: {spirv}/KHR/SPV_KHR_opacity_micromap.html[*SPV_KHR_opacity_micromap*], {spirv}/EXT/SPV_EXT_opacity_micromap.html[*SPV_EXT_opacity_micromap*]
 | 5383  a| *ShaderInvocationReorderNV* a|*RayTracingKHR*
 
 <<Unified, Reserved>>.
@@ -3504,15 +3580,18 @@ Also see extension: {spirv}/EXT/SPV_EXT_long_vector.html[*SPV_EXT_long_vector*]
 | 5426  a| *Shader64BitIndexingEXT* a|<<Unified, Reserved>>.
 
 Also see extension: {spirv}/EXT/SPV_EXT_shader_64bit_indexing.html[*SPV_EXT_shader_64bit_indexing*]
-| 5430  a| *CooperativeMatrixReductionsNV* a|<<Unified, Reserved>>.
+| 5429  a| *CooperativeMatrixConversionsEXT* a|<<Unified, Reserved>>.
 
-Also see extension: {spirv}/NV/SPV_NV_cooperative_matrix2.html[*SPV_NV_cooperative_matrix2*]
+Also see extension: {spirv}/EXT/SPV_EXT_cooperative_matrix_maintenance1.html[*SPV_EXT_cooperative_matrix_maintenance1*]
+| 5430  a| *CooperativeMatrixReductionsEXT (CooperativeMatrixReductionsNV)* a|<<Unified, Reserved>>.
+
+Also see extensions: {spirv}/EXT/SPV_EXT_cooperative_matrix_maintenance1.html[*SPV_EXT_cooperative_matrix_maintenance1*], {spirv}/NV/SPV_NV_cooperative_matrix2.html[*SPV_NV_cooperative_matrix2*]
 | 5431  a| *CooperativeMatrixConversionsNV* a|<<Unified, Reserved>>.
 
 Also see extension: {spirv}/NV/SPV_NV_cooperative_matrix2.html[*SPV_NV_cooperative_matrix2*]
-| 5432  a| *CooperativeMatrixPerElementOperationsNV* a|<<Unified, Reserved>>.
+| 5432  a| *CooperativeMatrixPerElementOperationsEXT (CooperativeMatrixPerElementOperationsNV)* a|<<Unified, Reserved>>.
 
-Also see extension: {spirv}/NV/SPV_NV_cooperative_matrix2.html[*SPV_NV_cooperative_matrix2*]
+Also see extensions: {spirv}/EXT/SPV_EXT_cooperative_matrix_maintenance1.html[*SPV_EXT_cooperative_matrix_maintenance1*], {spirv}/NV/SPV_NV_cooperative_matrix2.html[*SPV_NV_cooperative_matrix2*]
 | 5433  a| *CooperativeMatrixTensorAddressingNV* a|<<Unified, Reserved>>.
 
 Also see extension: {spirv}/NV/SPV_NV_cooperative_matrix2.html[*SPV_NV_cooperative_matrix2*]
@@ -3527,9 +3606,17 @@ Also see extension: {spirv}/NV/SPV_NV_cooperative_vector.html[*SPV_NV_cooperativ
 <<Unified, Reserved>>.
 
 Also see extension: {spirv}/NV/SPV_NV_cluster_acceleration_structure.html[*SPV_NV_cluster_acceleration_structure*]
+| 5438  a| *CooperativeMatrixGetCoordinateEXT* a|<<Unified, Reserved>>.
+
+Also see extension: {spirv}/EXT/SPV_EXT_cooperative_matrix_maintenance1.html[*SPV_EXT_cooperative_matrix_maintenance1*]
 | 5439  a| *TensorAddressingNV* a|<<Unified, Reserved>>.
 
 Also see extension: {spirv}/NV/SPV_NV_tensor_addressing.html[*SPV_NV_tensor_addressing*]
+| 5447  a| *CooperativeMatrixDecodeVectorNV* a|*CooperativeMatrixBlockLoadsNV*
+
+<<Unified, Reserved>>.
+
+Also see extension: {spirv}/NV/SPV_NV_cooperative_matrix_decode_vector.html[*SPV_NV_cooperative_matrix_decode_vector*]
 | 5568  a| *SubgroupShuffleINTEL* a|<<Unified, Reserved>>.
 
 Also see extension: {spirv}/INTEL/SPV_INTEL_subgroups.html[*SPV_INTEL_subgroups*]
@@ -3705,6 +3792,11 @@ Also see extension: {spirv}/KHR/SPV_KHR_float_controls2.html[*SPV_KHR_float_cont
 | 6030  a| *FMAKHR* a|<<Unified, Reserved>>.
 
 Also see extension: {spirv}/KHR/SPV_KHR_fma.html[*SPV_KHR_fma*]
+| 6032  a| *RayTracingOpacityMicromapExecutionModeKHR* a|*Shader*
+
+<<Unified, Reserved>>.
+
+Also see extension: {spirv}/KHR/SPV_KHR_opacity_micromap.html[*SPV_KHR_opacity_micromap*]
 | 6033  a| *AtomicFloat32AddEXT* a|<<Unified, Reserved>>.
 
 Also see extension: {spirv}/EXT/SPV_EXT_shader_atomic_float_add.html[*SPV_EXT_shader_atomic_float_add*]
@@ -3726,9 +3818,9 @@ Also see extension: *SPV_INTEL_debug_module*
 | 6115  a| *BFloat16ConversionINTEL* a|<<Unified, Reserved>>.
 
 Also see extension: {spirv}/INTEL/SPV_INTEL_bfloat16_conversion.html[*SPV_INTEL_bfloat16_conversion*]
-| 6141  a| *SplitBarrierINTEL* a|<<Unified, Reserved>>.
+| 6141  a| *SplitBarrierEXT (SplitBarrierINTEL)* a|<<Unified, Reserved>>.
 
-Also see extension: {spirv}/INTEL/SPV_INTEL_split_barrier.html[*SPV_INTEL_split_barrier*]
+Also see extensions: {spirv}/EXT/SPV_EXT_split_barrier.html[*SPV_EXT_split_barrier*], {spirv}/INTEL/SPV_INTEL_split_barrier.html[*SPV_INTEL_split_barrier*]
 | 6144  a| *ArithmeticFenceEXT* a|<<Unified, Reserved>>.
 
 Also see extension: {spirv}/EXT/SPV_EXT_arithmetic_fence.html[*SPV_EXT_arithmetic_fence*]
@@ -3795,6 +3887,12 @@ Also see extension: *SPV_INTEL_function_variants*
 <<Unified, Reserved>>.
 
 Also see extension: *SPV_INTEL_function_variants*
+| 6257  a| *PredicatedIOINTEL* a|<<Unified, Reserved>>.
+
+Also see extension: {spirv}/INTEL/SPV_INTEL_predicated_io.html[*SPV_INTEL_predicated_io*]
+| 6265  a| *RoundedDivideSqrtINTEL* a|<<Unified, Reserved>>.
+
+Also see extension: {spirv}/INTEL/SPV_INTEL_rounded_divide_sqrt.html[*SPV_INTEL_rounded_divide_sqrt*]
 | 6400  a| *GroupUniformArithmeticKHR* a|<<Unified, Reserved>>.
 
 Also see extension: {spirv}/KHR/SPV_KHR_uniform_group_instructions.html[*SPV_KHR_uniform_group_instructions*]
@@ -3833,6 +3931,9 @@ Also see extension: {spirv}/VALVE/SPV_VALVE_mixed_float_dot_product.html[*SPV_VA
 <<Unified, Reserved>>.
 
 Also see extension: {spirv}/VALVE/SPV_VALVE_mixed_float_dot_product.html[*SPV_VALVE_mixed_float_dot_product*]
+| 7041  a| *IntrinsicSAMSUNG* a|<<Unified, Reserved>>.
+
+Also see extension: {spirv}/SAMSUNG/SPV_SAMSUNG_intrinsic.html[*SPV_SAMSUNG_intrinsic*]
 |====
 
 [[Ray_Flags]]
@@ -3875,7 +3976,7 @@ This is a literal mask; it can be formed by combining the bits from multiple row
 | 0x200  a| *SkipAABBsKHR* a|*RayTraversalPrimitiveCullingKHR*
 
 <<Unified, Reserved>>.
-| 0x400  a| *ForceOpacityMicromap2StateEXT* a|*RayTracingOpacityMicromapEXT*
+| 0x400  a| *ForceOpacityMicromap2StateKHR (ForceOpacityMicromap2StateEXT)* a|*RayTracingOpacityMicromapKHR*
 
 <<Unified, Reserved>>.
 |====
@@ -4105,7 +4206,7 @@ Used by <<OpCooperativeMatrixMulAddKHR,*OpCooperativeMatrixMulAddKHR*>>, <<OpCoo
 
 This is a literal mask; it can be formed by combining the bits from multiple rows in the table below.
 
-Used by <<OpCooperativeMatrixReduceNV,*OpCooperativeMatrixReduceNV*>>.
+Used by <<OpCooperativeMatrixReduceEXT,*OpCooperativeMatrixReduceEXT*>>.
 // PrintImmediateHeader
 [cols="^.^4,16a,15",role="fixedtable",options="header",width = "100%"]
 |====
@@ -4144,6 +4245,9 @@ Used by <<OpCooperativeMatrixLoadTensorNV,*OpCooperativeMatrixLoadTensorNV*>> an
 
 <<Unified, Reserved>>.
 | 0x2  a| *DecodeFunc* a|*CooperativeMatrixBlockLoadsNV*
+
+<<Unified, Reserved>>.
+| 0x4  a| *DecodeVectorFunc* a|*CooperativeMatrixDecodeVectorNV*
 
 <<Unified, Reserved>>.
 |====
@@ -4333,6 +4437,26 @@ Used by <<OpTypeFloat,*OpTypeFloat*>>.
  a|*Float8EXT*
 
 <<Unified, Reserved>>.
+| 4223  a| *Float6E2M3EXT*| 
+ a|*Float6EXT*
+
+<<Unified, Reserved>>.
+| 4224  a| *Float6E3M2EXT*| 
+ a|*Float6EXT*
+
+<<Unified, Reserved>>.
+| 4225  a| *Float4E2M1EXT*| 
+ a|*Float4EXT*
+
+<<Unified, Reserved>>.
+| 4226  a| *Float8UnsignedE8M0EXT*| 
+ a|*Float8UnsignedE8M0EXT*
+
+<<Unified, Reserved>>.
+| 4227  a| *MXInt8EXT*| 
+ a|*MXInt8EXT*
+
+<<Unified, Reserved>>.
 |====
 
 [[Cooperative_Vector_Matrix_Layout]]
@@ -4368,6 +4492,18 @@ Used by <<OpTypeFloat,*OpTypeFloat*>>.
 | 1000491001  a| *UnsignedInt8PackedNV* a|<<Unified, Reserved>>.
 | 1000491002  a| *FloatE4M3NV* a|<<Unified, Reserved>>.
 | 1000491003  a| *FloatE5M2NV* a|<<Unified, Reserved>>.
+|====
+
+[[Gather_Modes]]
+==== Gather Modes
+// PrintImmediateHeader
+[cols="^.^2,16a,15",role="fixedtable",options="header",width = "100%"]
+|====
+2+^.^| Gather Modes| <<Capability,Enabling Capabilities>>
+| 0  a| *Gather4x1QCOM* a|<<Unified, Reserved>>.
+| 1  a| *GatherDQCOM* a|<<Unified, Reserved>>.
+| 2  a| *GatherH2QCOM* a|<<Unified, Reserved>>.
+| 3  a| *GatherV2QCOM* a|<<Unified, Reserved>>.
 |====
 <<<
 
@@ -4446,6 +4582,51 @@ Reserved.
  | _<id>_ +
 _Result Type_ | <<ResultId,_Result <id>_ >> | _<id>_ +
 _Type_
+
+|=====
+[%unbreakable,cols="1,2,2*3",role="fixedtable",width="100%"]
+|=====
+3+a|[[OpPoisonKHR]]*OpPoisonKHR* +
+ +
+Reserved.
+1+|<<Capability,Capability>>: +
+*PoisonFreezeKHR*
+
+
+<<Unified, Reserved>>.| 3 | 5158
+ | _<id>_ +
+_Result Type_ | <<ResultId,_Result <id>_ >> 0+|
+
+|=====
+[%unbreakable,cols="1,2,3*3",role="fixedtable",width="100%"]
+|=====
+4+a|[[OpFreezeKHR]]*OpFreezeKHR* +
+ +
+Reserved.
+1+|<<Capability,Capability>>: +
+*PoisonFreezeKHR*
+
+
+<<Unified, Reserved>>.| 4 | 5159
+ | _<id>_ +
+_Result Type_ | <<ResultId,_Result <id>_ >> | _<id>_ +
+_Value_
+
+|=====
+[%unbreakable,cols="1,2,4*3",role="fixedtable",width="100%"]
+|=====
+4+a|[[OpCooperativeMatrixGetCoordinateEXT]]*OpCooperativeMatrixGetCoordinateEXT* +
+ +
+Reserved.
+2+|<<Capability,Capability>>: +
+*CooperativeMatrixGetCoordinateEXT*
+
+
+<<Unified, Reserved>>.| 5 | 5363
+ | _<id>_ +
+_Result Type_ | <<ResultId,_Result <id>_ >> | _<id>_ +
+_Matrix_ | _<id>_ +
+_Index_
 
 |=====
 [%unbreakable,cols="1,2,1*3",role="fixedtable",width="100%"]
@@ -5874,6 +6055,36 @@ _Result Type_ | <<ResultId,_Result <id>_ >> | _<id>_ +
 _Type_
 
 |=====
+[%unbreakable,cols="3,2,3*3",role="fixedtable",width="100%"]
+|=====
+4+a|[[OpConstantDataKHR]]*OpConstantDataKHR* +
+ +
+Reserved.
+1+|<<Capability,Capability>>: +
+*ConstantDataKHR*
+
+
+<<Unified, Reserved>>.| 3 + variable | 5147
+ | _<id>_ +
+_Result Type_ | <<ResultId,_Result <id>_ >> | _Literal, Literal, ..._ +
+_Data_
+
+|=====
+[%unbreakable,cols="3,2,3*3",role="fixedtable",width="100%"]
+|=====
+4+a|[[OpSpecConstantDataKHR]]*OpSpecConstantDataKHR* +
+ +
+Reserved.
+1+|<<Capability,Capability>>: +
+*ConstantDataKHR*
+
+
+<<Unified, Reserved>>.| 3 + variable | 5148
+ | _<id>_ +
+_Result Type_ | <<ResultId,_Result <id>_ >> | _Literal, Literal, ..._ +
+_Data_
+
+|=====
 [%unbreakable,cols="3,2,1*3",role="fixedtable",width="100%"]
 |=====
 2+a|[[OpConstantCompositeContinuedINTEL]]*OpConstantCompositeContinuedINTEL* +
@@ -6620,6 +6831,43 @@ _Element Type_ | _<id>_ +
 _Length_
 
 |=====
+[%unbreakable,cols="3,2,6*3",role="fixedtable",width="100%"]
+|=====
+6+a|[[OpPredicatedLoadINTEL]]*OpPredicatedLoadINTEL* +
+ +
+Reserved.
+2+|<<Capability,Capability>>: +
+*PredicatedIOINTEL*
+
+
+<<Unified, Reserved>>.| 6 + variable | 6258
+ | _<id>_ +
+_Result Type_ | <<ResultId,_Result <id>_ >> | _<id>_ +
+_Pointer_ | _<id>_ +
+_Predicate_ | _<id>_ +
+_Default Value_ | Optional +
+<<Memory_Operands,_Memory Operands_>> +
+
+
+|=====
+[%unbreakable,cols="3,2,4*3",role="fixedtable",width="100%"]
+|=====
+4+a|[[OpPredicatedStoreINTEL]]*OpPredicatedStoreINTEL* +
+ +
+Reserved.
+2+|<<Capability,Capability>>: +
+*PredicatedIOINTEL*
+
+
+<<Unified, Reserved>>.| 4 + variable | 6259
+ | _<id>_ +
+_Pointer_ | _<id>_ +
+_Object_ | _<id>_ +
+_Predicate_ | Optional +
+<<Memory_Operands,_Memory Operands_>> +
+
+
+|=====
 [%unbreakable,cols="1,2,6*3",role="fixedtable",width="100%"]
 |=====
 6+a|[[OpMaskedGatherINTEL]]*OpMaskedGatherINTEL* +
@@ -6719,13 +6967,30 @@ _Function_ | _<id>, <id>, ..._ +
 _Argument 0, Argument 1, ..._
 
 |=====
-[%unbreakable,cols="3,2,5*3",role="fixedtable",width="100%"]
+[%unbreakable,cols="1,2,5*3",role="fixedtable",width="100%"]
 |=====
-5+a|[[OpCooperativeMatrixPerElementOpNV]]*OpCooperativeMatrixPerElementOpNV* +
+5+a|[[OpCooperativeMatrixReduceEXT]]*OpCooperativeMatrixReduceEXT (OpCooperativeMatrixReduceNV)* +
  +
 Reserved.
 2+|<<Capability,Capability>>: +
-*CooperativeMatrixPerElementOperationsNV*
+*CooperativeMatrixReductionsEXT*
+
+
+<<Unified, Reserved>>.| 6 | 5366
+ | _<id>_ +
+_Result Type_ | <<ResultId,_Result <id>_ >> | _<id>_ +
+_Matrix_ | <<Cooperative_Matrix_Reduce_Mode,_Cooperative Matrix Reduce Mode_>> +
+_Reduce_ | _<id>_ +
+_CombineFunc_
+
+|=====
+[%unbreakable,cols="3,2,5*3",role="fixedtable",width="100%"]
+|=====
+5+a|[[OpCooperativeMatrixPerElementOpEXT]]*OpCooperativeMatrixPerElementOpEXT (OpCooperativeMatrixPerElementOpNV)* +
+ +
+Reserved.
+2+|<<Capability,Capability>>: +
+*CooperativeMatrixPerElementOperationsEXT*
 
 
 <<Unified, Reserved>>.| 5 + variable | 5369
@@ -7729,6 +7994,28 @@ _Block Size_
 |=====
 [%unbreakable,cols="3,2,8*3",role="fixedtable",width="100%"]
 |=====
+7+a|[[OpImageGatherQCOM]]*OpImageGatherQCOM* +
+ +
+Reserved.
+3+|<<Capability,Capability>>: +
+*ImageGatherLinearQCOM*, *ImageGatherExtendedModesQCOM*
+
+
+<<Unified, Reserved>>.| 7 + variable | 4545
+ | _<id>_ +
+_Result Type_ | <<ResultId,_Result <id>_ >> | _<id>_ +
+_Sampled Image_ | _<id>_ +
+_Coordinate_ | _<id>_ +
+_Component_ | _<id>_ +
+_Mode_ | Optional +
+<<Image_Operands,_Image Operands_>> +
+ | Optional +
+_<id>, <id>, ..._ +
+
+
+|=====
+[%unbreakable,cols="3,2,8*3",role="fixedtable",width="100%"]
+|=====
 7+a|[[OpImageSampleFootprintNV]]*OpImageSampleFootprintNV* +
  +
 Reserved.
@@ -8097,6 +8384,22 @@ _Result Type_ | <<ResultId,_Result <id>_ >> | _<id>_ +
 _Operand_
 
 |=====
+[%unbreakable,cols="1,2,4*3",role="fixedtable",width="100%"]
+|=====
+4+a|[[OpBitcastExtractEXT]]*OpBitcastExtractEXT* +
+ +
+Reserved.
+2+|<<Capability,Capability>>: +
+*BitcastExtractEXT*
+
+
+<<Unified, Reserved>>.| 5 | 4195
+ | _<id>_ +
+_Result Type_ | <<ResultId,_Result <id>_ >> | _<id>_ +
+_Base_ | _<id>_ +
+_Offset_
+
+|=====
 [%unbreakable,cols="1,2,3*3",role="fixedtable",width="100%"]
 |=====
 4+a|[[OpBitCastArrayQCOM]]*OpBitCastArrayQCOM* +
@@ -8114,11 +8417,11 @@ _Source Array_
 |=====
 [%unbreakable,cols="1,2,3*3",role="fixedtable",width="100%"]
 |=====
-4+a|[[OpCooperativeMatrixConvertNV]]*OpCooperativeMatrixConvertNV* +
+4+a|[[OpCooperativeMatrixConvertUseEXT]]*OpCooperativeMatrixConvertUseEXT (OpCooperativeMatrixConvertNV)* +
  +
 Reserved.
 1+|<<Capability,Capability>>: +
-*CooperativeMatrixConversionsNV*
+*CooperativeMatrixConversionsEXT*, *CooperativeMatrixConversionsNV*
 
 
 <<Unified, Reserved>>.| 4 | 5293
@@ -8426,18 +8729,17 @@ _Source Array_ | _<id>_ +
 _index_
 
 |=====
-[%unbreakable,cols="3,2,3*3",role="fixedtable",width="100%"]
+[%unbreakable,cols="3,2,1*3",role="fixedtable",width="100%"]
 |=====
-4+a|[[OpCompositeConstructContinuedINTEL]]*OpCompositeConstructContinuedINTEL* +
+2+a|[[OpCompositeConstructContinuedINTEL]]*OpCompositeConstructContinuedINTEL* +
  +
 Reserved.
 1+|<<Capability,Capability>>: +
 *LongCompositesINTEL*
 
 
-<<Unified, Reserved>>.| 3 + variable | 6096
- | _<id>_ +
-_Result Type_ | <<ResultId,_Result <id>_ >> | _<id>, <id>, ..._ +
+<<Unified, Reserved>>.| 1 + variable | 6096
+ | _<id>, <id>, ..._ +
 _Constituents_
 
 |=====
@@ -9198,19 +9500,19 @@ _Cooperative Matrix Operands_
 |=====
 [%unbreakable,cols="1,2,5*3",role="fixedtable",width="100%"]
 |=====
-5+a|[[OpCooperativeMatrixReduceNV]]*OpCooperativeMatrixReduceNV* +
+5+a|[[OpBFloat16MulAddQCOM]]*OpBFloat16MulAddQCOM* +
  +
 Reserved.
 2+|<<Capability,Capability>>: +
-*CooperativeMatrixReductionsNV*
+*BFloat16MulAddQCOM*
 
 
-<<Unified, Reserved>>.| 6 | 5366
+<<Unified, Reserved>>.| 6 | 4505
  | _<id>_ +
 _Result Type_ | <<ResultId,_Result <id>_ >> | _<id>_ +
-_Matrix_ | <<Cooperative_Matrix_Reduce_Mode,_Cooperative Matrix Reduce Mode_>> +
-_Reduce_ | _<id>_ +
-_CombineFunc_
+_Operand 1_ | _<id>_ +
+_Operand 2_ | _<id>_ +
+_Operand 3_
 
 |=====
 <<<
@@ -10631,6 +10933,21 @@ This instruction is only valid in the *Fragment* <<Execution_Model, Execution Mo
  0+|
 
 |=====
+[%unbreakable,cols="1,2,2*3",role="fixedtable",width="100%"]
+|=====
+3+a|[[OpAbortKHR]]*OpAbortKHR* +
+ +
+Reserved.
+1+|<<Capability,Capability>>: +
+*AbortKHR*
+
+
+<<Unified, Reserved>>.| 3 | 5121
+ | _<id>_ +
+_Message Type_ | _<id>_ +
+_Message'_
+
+|=====
 [%unbreakable,cols="2,1",role="fixedtable",width="100%"]
 |=====
 1+a|[[OpDemoteToHelperInvocation]]*OpDemoteToHelperInvocation (OpDemoteToHelperInvocationEXT)* +
@@ -11315,11 +11632,11 @@ _Semantics_
 |=====
 [%unbreakable,cols="1,2,3*3",role="fixedtable",width="100%"]
 |=====
-4+a|[[OpControlBarrierArriveINTEL]]*OpControlBarrierArriveINTEL* +
+4+a|[[OpControlBarrierArriveEXT]]*OpControlBarrierArriveEXT (OpControlBarrierArriveINTEL)* +
  +
 Reserved.
 1+|<<Capability,Capability>>: +
-*SplitBarrierINTEL*
+*SplitBarrierEXT*
 
 
 <<Unified, Reserved>>.| 4 | 6142
@@ -11331,11 +11648,11 @@ _Semantics_
 |=====
 [%unbreakable,cols="1,2,3*3",role="fixedtable",width="100%"]
 |=====
-4+a|[[OpControlBarrierWaitINTEL]]*OpControlBarrierWaitINTEL* +
+4+a|[[OpControlBarrierWaitEXT]]*OpControlBarrierWaitEXT (OpControlBarrierWaitINTEL)* +
  +
 Reserved.
 1+|<<Capability,Capability>>: +
-*SplitBarrierINTEL*
+*SplitBarrierEXT*
 
 
 <<Unified, Reserved>>.| 4 | 6143
@@ -15697,21 +16014,23 @@ _Primitive Index_ | _<id>_ +
 _Barycentric_
 
 |=====
-[%unbreakable,cols="1,2,4*3",role="fixedtable",width="100%"]
+[%unbreakable,cols="3,2,5*3",role="fixedtable",width="100%"]
 |=====
-4+a|[[OpHitObjectRecordFromQueryEXT]]*OpHitObjectRecordFromQueryEXT* +
+5+a|[[OpHitObjectRecordFromQueryEXT]]*OpHitObjectRecordFromQueryEXT* +
  +
 Reserved.
 2+|<<Capability,Capability>>: +
 *ShaderInvocationReorderEXT*
 
 
-<<Unified, Reserved>>.| 5 | 5304
+<<Unified, Reserved>>.| 5 + variable | 5304
  | _<id>_ +
 _Hit Object_ | _<id>_ +
 _Ray Query_ | _<id>_ +
 _SBT Record Index_ | _<id>_ +
-_Hit Object Attributes_
+_Hit Object Attributes_ | Optional +
+_<id>_ +
+_Hit Kind_
 
 |=====
 [%unbreakable,cols="1,2,7*3",role="fixedtable",width="100%"]

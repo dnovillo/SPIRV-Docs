@@ -4518,6 +4518,7 @@ const char* GetOperandDesc(OperandClass operand)
     case OperandCooperativeVectorMatrixLayout: return "Cooperative Vector Matrix Layout";
     case OperandComponentType: return "Cooperative Vector Matrix Component Type";
     case OperandTensorOperands: return "Tensor Operands";
+    case OperandGatherModes:    return "Gather Modes";
     case OperandOpcode:                return "Op";
 
     default:                           return "Reserved";
