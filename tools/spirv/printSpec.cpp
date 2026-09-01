@@ -2182,7 +2182,7 @@ void ParameterizeSpec()
 
     #define IMAGE_OPERANDS           GAP "_Image Operands_ encodes what operands follow, as per <<Image_Operands, Image Operands>>. "
     #define IMAGE_LOD                IMAGE_OPERANDS "Either *Lod* or *Grad* image operands must be present. "
-    #define IMAGE_DREF               GAP "_D~ref~_ is the depth-comparison reference value. It" S_FP_32
+    #define IMAGE_DREF               GAP "_D~ref~_ is the depth-comparison reference value. It " S_FP_32
     #define IMAGE_PROJ_DREF          GAP "_D~ref~_ /_q_ is the depth-comparison reference value. _D~ref~_ " S_FP_32
 
     InstructionDesc[OpSampledImage].opDesc = "Create a <<SampledImage,sampled image>>, containing both a <<Sampler,sampler>> and an <<ImageTerm,image>>."

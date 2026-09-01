@@ -7092,7 +7092,7 @@ _Sampled Image_ must be an object whose type is <<OpTypeSampledImage,*OpTypeSamp
 
 _Coordinate_ must be a scalar or vector of  32-bit <<Floating,_floating-point type_>>. It contains (_u_[, _v_] ... [, _array layer_]) as needed by the definition of _Sampled Image_. It may be a vector larger than needed, but all unused components appear after all used components. 
 
-_D~ref~_ is the depth-comparison reference value. Itmust be a 32-bit <<Floating,_floating-point type_>> scalar. 
+_D~ref~_ is the depth-comparison reference value. It must be a 32-bit <<Floating,_floating-point type_>> scalar. 
 
 _Image Operands_ encodes what operands follow, as per <<Image_Operands, Image Operands>>. 
 
@@ -7123,7 +7123,7 @@ _Sampled Image_ must be an object whose type is <<OpTypeSampledImage,*OpTypeSamp
 
 _Coordinate_ must be a scalar or vector of  32-bit <<Floating,_floating-point type_>>. It contains (_u_[, _v_] ... [, _array layer_]) as needed by the definition of _Sampled Image_. It may be a vector larger than needed, but all unused components appear after all used components. 
 
-_D~ref~_ is the depth-comparison reference value. Itmust be a 32-bit <<Floating,_floating-point type_>> scalar. 
+_D~ref~_ is the depth-comparison reference value. It must be a 32-bit <<Floating,_floating-point type_>> scalar. 
 
 _Image Operands_ encodes what operands follow, as per <<Image_Operands, Image Operands>>. Either *Lod* or *Grad* image operands must be present. 
 3+|<<Capability,Capability>>: +
@@ -7323,7 +7323,7 @@ _Sampled Image_ must be an object whose type is <<OpTypeSampledImage,*OpTypeSamp
 
 _Coordinate_ must be a scalar or vector of  32-bit <<Floating,_floating-point type_>>. It contains (_u_[, _v_] ... [, _array layer_]) as needed by the definition of _Sampled Image_. 
 
-_D~ref~_ is the depth-comparison reference value. Itmust be a 32-bit <<Floating,_floating-point type_>> scalar. 
+_D~ref~_ is the depth-comparison reference value. It must be a 32-bit <<Floating,_floating-point type_>> scalar. 
 
 _Image Operands_ encodes what operands follow, as per <<Image_Operands, Image Operands>>. 
 2+|<<Capability,Capability>>: +
@@ -7618,7 +7618,7 @@ _Sampled Image_ must be an object whose type is <<OpTypeSampledImage,*OpTypeSamp
 
 _Coordinate_ must be a scalar or vector of  32-bit <<Floating,_floating-point type_>>. It contains (_u_[, _v_] ... [, _array layer_]) as needed by the definition of _Sampled Image_. It may be a vector larger than needed, but all unused components appear after all used components. 
 
-_D~ref~_ is the depth-comparison reference value. Itmust be a 32-bit <<Floating,_floating-point type_>> scalar. 
+_D~ref~_ is the depth-comparison reference value. It must be a 32-bit <<Floating,_floating-point type_>> scalar. 
 
 _Image Operands_ encodes what operands follow, as per <<Image_Operands, Image Operands>>. 
 
@@ -7649,7 +7649,7 @@ _Sampled Image_ must be an object whose type is <<OpTypeSampledImage,*OpTypeSamp
 
 _Coordinate_ must be a scalar or vector of  32-bit <<Floating,_floating-point type_>>. It contains (_u_[, _v_] ... [, _array layer_]) as needed by the definition of _Sampled Image_. It may be a vector larger than needed, but all unused components appear after all used components. 
 
-_D~ref~_ is the depth-comparison reference value. Itmust be a 32-bit <<Floating,_floating-point type_>> scalar. 
+_D~ref~_ is the depth-comparison reference value. It must be a 32-bit <<Floating,_floating-point type_>> scalar. 
 
 _Image Operands_ encodes what operands follow, as per <<Image_Operands, Image Operands>>. Either *Lod* or *Grad* image operands must be present. 
 3+|<<Capability,Capability>>: +
@@ -7733,7 +7733,7 @@ _Sampled Image_ must be an object whose type is <<OpTypeSampledImage,*OpTypeSamp
 
 _Coordinate_ must be a scalar or vector of  32-bit <<Floating,_floating-point type_>>. It contains (_u_[, _v_] ... [, _array layer_]) as needed by the definition of _Sampled Image_. 
 
-_D~ref~_ is the depth-comparison reference value. Itmust be a 32-bit <<Floating,_floating-point type_>> scalar. 
+_D~ref~_ is the depth-comparison reference value. It must be a 32-bit <<Floating,_floating-point type_>> scalar. 
 
 _Image Operands_ encodes what operands follow, as per <<Image_Operands, Image Operands>>. 
 2+|<<Capability,Capability>>: +
