@@ -2776,7 +2776,7 @@ Indicates that the profiling info queried is the execution time. a|*Kernel*
 ==== Capability
 Capabilities a module can declare it uses. 
 
-All used capabilities need to be declared, either explicitly with <<OpCapability, *OpCapability*>> or implicitly through the *Implicitly Declares* column: If a capability defined with <<ValidDefined, statically expressed rules>> is used,it is invalid to not declare it. If a capability defined in terms of dynamic behavior is used, <<UndefinedBehavior,behavior is undefined>> unless the capability is declared. The *Implicitly Declares* column lists additional capabilities that are all implicitly declared when the *Capability* entry is explicitly or implicitly declared. It is not necessary, but allowed, to explicitly declare an implicitly declared capability. 
+All used capabilities need to be declared, either explicitly with <<OpCapability, *OpCapability*>> or implicitly through the *Implicitly Declares* column: If a capability defined with <<ValidDefined, statically expressed rules>> is used, it is invalid to not declare it. If a capability defined in terms of dynamic behavior is used, <<UndefinedBehavior,behavior is undefined>> unless the capability is declared. The *Implicitly Declares* column lists additional capabilities that are all implicitly declared when the *Capability* entry is explicitly or implicitly declared. It is not necessary, but allowed, to explicitly declare an implicitly declared capability. 
 
 See the <<Capabilities,capabilities>> section for more detail.
 
@@ -6945,7 +6945,7 @@ _Sampled Image_ must be an object whose type is <<OpTypeSampledImage,*OpTypeSamp
 
 _Coordinate_ must be a vector of 32-bit <<Floating,_floating-point type_>>. It contains (_u_[, _v_] [, _w_], _q_), as needed by the definition of _Sampled Image_, with the _q_ component consumed for the projective division. That is, the actual sample coordinate is (_u/q_ [, _v/q_] [, _w/q_]), as needed by the definition of _Sampled Image_. It may be a vector larger than needed, but all unused components appear after all used components. 
 
-_D~ref~_ /_q_ is the depth-comparison reference value. _D~ref~_must be a 32-bit <<Floating,_floating-point type_>> scalar. 
+_D~ref~_ /_q_ is the depth-comparison reference value. _D~ref~_ must be a 32-bit <<Floating,_floating-point type_>> scalar. 
 
 _Image Operands_ encodes what operands follow, as per <<Image_Operands, Image Operands>>. 
 
@@ -6976,7 +6976,7 @@ _Sampled Image_ must be an object whose type is <<OpTypeSampledImage,*OpTypeSamp
 
 _Coordinate_ must be a vector of 32-bit <<Floating,_floating-point type_>>. It contains (_u_[, _v_] [, _w_], _q_), as needed by the definition of _Sampled Image_, with the _q_ component consumed for the projective division. That is, the actual sample coordinate is (_u/q_ [, _v/q_] [, _w/q_]), as needed by the definition of _Sampled Image_. It may be a vector larger than needed, but all unused components appear after all used components. 
 
-_D~ref~_ /_q_ is the depth-comparison reference value. _D~ref~_must be a 32-bit <<Floating,_floating-point type_>> scalar. 
+_D~ref~_ /_q_ is the depth-comparison reference value. _D~ref~_ must be a 32-bit <<Floating,_floating-point type_>> scalar. 
 
 _Image Operands_ encodes what operands follow, as per <<Image_Operands, Image Operands>>. Either *Lod* or *Grad* image operands must be present. 
 3+|<<Capability,Capability>>: +
@@ -7822,7 +7822,7 @@ Convert value numerically from floating point to signed integer, with round towa
 
 _Result Type_ must be a scalar or vector of <<Integer,_integer type_>>. <<UndefinedBehavior, Behavior is undefined>> if _Result Type_ is not wide enough to hold the converted value.
 
-_Float Value_must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. 
+_Float Value_ must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. 
 
 Results are computed per component. 
 1+|| 4 | 110
@@ -7839,7 +7839,7 @@ Convert value numerically from signed integer to floating point.
 
 _Result Type_ must be a scalar or vector of  <<Floating,_floating-point type_>>. 
 
-_Signed Value_must be a scalar or vector of <<Integer,_integer type_>>. It must have the same number of components as _Result Type_. 
+_Signed Value_ must be a scalar or vector of <<Integer,_integer type_>>. It must have the same number of components as _Result Type_. 
 
 Results are computed per component. 
 1+|| 4 | 111
@@ -7856,7 +7856,7 @@ Convert value numerically from unsigned integer to floating point.
 
 _Result Type_ must be a scalar or vector of  <<Floating,_floating-point type_>>. 
 
-_Unsigned Value_must be a scalar or vector of <<Integer,_integer type_>>. It must have the same number of components as _Result Type_. 
+_Unsigned Value_ must be a scalar or vector of <<Integer,_integer type_>>. It must have the same number of components as _Result Type_. 
 
 Results are computed per component. 
 1+|| 4 | 112
@@ -7873,7 +7873,7 @@ Convert unsigned width. This is either a truncate or a zero extend.
 
 _Result Type_ must be a scalar or vector of <<Integer,_integer type_>>, whose _Signedness_ operand is 0. 
 
-_Unsigned Value_must be a scalar or vector of <<Integer,_integer type_>>. It must have the same number of components as _Result Type_. The component width must not equal the component width in _Result Type_. 
+_Unsigned Value_ must be a scalar or vector of <<Integer,_integer type_>>. It must have the same number of components as _Result Type_. The component width must not equal the component width in _Result Type_. 
 
 Results are computed per component. 
 1+|| 4 | 113
@@ -7890,7 +7890,7 @@ Convert signed width. This is either a truncate or a sign extend.
 
 _Result Type_ must be a scalar or vector of <<Integer,_integer type_>>. 
 
-_Signed Value_must be a scalar or vector of <<Integer,_integer type_>>. It must have the same number of components as _Result Type_. The component width must not equal the component width in _Result Type_. 
+_Signed Value_ must be a scalar or vector of <<Integer,_integer type_>>. It must have the same number of components as _Result Type_. The component width must not equal the component width in _Result Type_. 
 
 Results are computed per component. 
 1+|| 4 | 114
@@ -7907,7 +7907,7 @@ Convert value numerically from one floating-point width to another width.
 
 _Result Type_ must be a scalar or vector of  <<Floating,_floating-point type_>>. 
 
-_Float Value_must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. The component type must not equal the component type in _Result Type_. 
+_Float Value_ must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. The component type must not equal the component type in _Result Type_. 
 
 Results are computed per component. 
 1+|| 4 | 115
@@ -8799,9 +8799,9 @@ Linear-algebraic _Vector X Matrix_.
 
 _Result Type_ must be a vector of <<Floating,_floating-point type_>>. 
 
-_Vector_must be a vector with the same _Component Type_ as the _Component Type_ in _Result Type_. Its number of components must equal the number of components in each column in _Matrix_.
+_Vector_ must be a vector with the same _Component Type_ as the _Component Type_ in _Result Type_. Its number of components must equal the number of components in each column in _Matrix_.
 
-_Matrix_must be a matrix with the same _Component Type_ as the _Component Type_ in _Result Type_. Its number of columns must equal the number of components in _Result Type_.
+_Matrix_ must be a matrix with the same _Component Type_ as the _Component Type_ in _Result Type_. Its number of columns must equal the number of components in _Result Type_.
 2+|<<Capability,Capability>>: +
 *Matrix*
 | 5 | 144
@@ -8819,9 +8819,9 @@ Linear-algebraic _Matrix X Vector_.
 
 _Result Type_ must be a vector of <<Floating,_floating-point type_>>. 
 
-_Matrix_must be an <<OpTypeMatrix, *OpTypeMatrix*>> whose _Column Type_ is _Result Type_. 
+_Matrix_ must be an <<OpTypeMatrix, *OpTypeMatrix*>> whose _Column Type_ is _Result Type_. 
 
-_Vector_must be a vector with the same _Component Type_ as the _Component Type_ in _Result Type_. Its number of components must equal the number of columns in _Matrix_.
+_Vector_ must be a vector with the same _Component Type_ as the _Component Type_ in _Result Type_. Its number of components must equal the number of columns in _Matrix_.
 2+|<<Capability,Capability>>: +
 *Matrix*
 | 5 | 145
@@ -8861,7 +8861,7 @@ _Result Type_ must be an <<OpTypeMatrix,*OpTypeMatrix*>> whose _Column Type_ is 
 
 _Vector 1_ must have the same type as the _Column Type_ in _Result Type_.
 
-_Vector 2_must be a vector with the same _Component Type_ as the _Component Type_ in _Result Type_. Its number of components must equal the number of columns in _Result Type_.
+_Vector 2_ must be a vector with the same _Component Type_ as the _Component Type_ in _Result Type_. Its number of components must equal the number of columns in _Result Type_.
 2+|<<Capability,Capability>>: +
 *Matrix*
 | 5 | 147
@@ -9224,7 +9224,7 @@ Shift the bits in _Base_ right by the number of bits specified in _Shift_. The m
 
 _Result Type_ must be a scalar or vector of <<Integer,_integer type_>>. 
 
-The type of each _Base_ and _Shift_must be a scalar or vector of <<Integer,_integer type_>>. _Base_ and _Shift_ must have the same number of components. The number of components and bit width of the type of _Base_ must be the same as in _Result Type_. 
+The type of each _Base_ and _Shift_ must be a scalar or vector of <<Integer,_integer type_>>. _Base_ and _Shift_ must have the same number of components. The number of components and bit width of the type of _Base_ must be the same as in _Result Type_. 
 
 _Shift_ is consumed as an unsigned integer. The resulting value is <<Poison,poison>> if _Shift_ is greater than or equal to the bit width of the components of _Base_.
 
@@ -9244,7 +9244,7 @@ Shift the bits in _Base_ right by the number of bits specified in _Shift_. The m
 
 _Result Type_ must be a scalar or vector of <<Integer,_integer type_>>. 
 
-The type of each _Base_ and _Shift_must be a scalar or vector of <<Integer,_integer type_>>. _Base_ and _Shift_ must have the same number of components. The number of components and bit width of the type of _Base_ must be the same as in _Result Type_. 
+The type of each _Base_ and _Shift_ must be a scalar or vector of <<Integer,_integer type_>>. _Base_ and _Shift_ must have the same number of components. The number of components and bit width of the type of _Base_ must be the same as in _Result Type_. 
 
 _Shift_ is treated as unsigned. The resulting value is <<Poison,poison>> if _Shift_ is greater than or equal to the bit width of the components of _Base_. 
 
@@ -9264,7 +9264,7 @@ Shift the bits in _Base_ left by the number of bits specified in _Shift_. The le
 
 _Result Type_ must be a scalar or vector of <<Integer,_integer type_>>. 
 
-The type of each _Base_ and _Shift_must be a scalar or vector of <<Integer,_integer type_>>. _Base_ and _Shift_ must have the same number of components. The number of components and bit width of the type of _Base_ must be the same as in _Result Type_. 
+The type of each _Base_ and _Shift_ must be a scalar or vector of <<Integer,_integer type_>>. _Base_ and _Shift_ must have the same number of components. The number of components and bit width of the type of _Base_ must be the same as in _Result Type_. 
 
 _Shift_ is treated as unsigned. The resulting value is <<Poison,poison>> if _Shift_ is greater than or equal to the bit width of the components of _Base_. 
 
@@ -9452,7 +9452,7 @@ Results are computed per component.
 
 _Result Type_ must be a scalar or vector of <<Integer,_integer type_>>. The components must be wide enough to hold the unsigned _Width_ of _Base_ as an unsigned value. That is, no sign bit is needed or counted when checking for a wide enough result width.
 
-_Base_must be a scalar or vector of <<Integer,_integer type_>>. It must have the same number of components as _Result Type_.
+_Base_ must be a scalar or vector of <<Integer,_integer type_>>. It must have the same number of components as _Result Type_.
 
 The result is the unsigned value that is the number of bits in _Base_ that are 1.
 1+|| 4 | 205
@@ -9520,7 +9520,7 @@ Result is *true* if _x_ is a NaN for the floating-point encoding used by the typ
 
 _Result Type_ must be a scalar or vector of <<Boolean,_Boolean type_>>. 
 
-_x_must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. 
+_x_ must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. 
 
 Results are computed per component. 
 1+|| 4 | 156
@@ -9537,7 +9537,7 @@ Result is *true* if _x_ is an Inf for the floating-point encoding used by the ty
 
 _Result Type_ must be a scalar or vector of <<Boolean,_Boolean type_>>. 
 
-_x_must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. 
+_x_ must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. 
 
 Results are computed per component. 
 1+|| 4 | 157
@@ -9554,7 +9554,7 @@ Result is *true* if _x_ is a finite number for the floating-point encoding used 
 
 _Result Type_ must be a scalar or vector of <<Boolean,_Boolean type_>>. 
 
-_x_must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. 
+_x_ must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. 
 
 Results are computed per component. 
 1+|<<Capability,Capability>>: +
@@ -9573,7 +9573,7 @@ Result is *true* if _x_ is a normal number for the floating-point encoding used 
 
 _Result Type_ must be a scalar or vector of <<Boolean,_Boolean type_>>. 
 
-_x_must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. 
+_x_ must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. 
 
 Results are computed per component. 
 1+|<<Capability,Capability>>: +
@@ -9592,7 +9592,7 @@ Result is *true* if _x_ has its sign bit set, otherwise result is *false*.
 
 _Result Type_ must be a scalar or vector of <<Boolean,_Boolean type_>>. 
 
-_x_must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. 
+_x_ must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. 
 
 Results are computed per component. 
 1+|<<Capability,Capability>>: +
@@ -9613,7 +9613,7 @@ Has the same semantics as <<OpFOrdNotEqual, *OpFOrdNotEqual*>>.
 
 _Result Type_ must be a scalar or vector of <<Boolean,_Boolean type_>>. 
 
-_x_must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. 
+_x_ must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. 
 
 _y_ must have the same type as _x_.
 
@@ -9638,7 +9638,7 @@ Result is *true* if both _x_ == _x_ and _y_ == _y_ are *true*, where <<OpFOrdEqu
 
 _Result Type_ must be a scalar or vector of <<Boolean,_Boolean type_>>. 
 
-_x_must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. 
+_x_ must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. 
 
 _y_ must have the same type as _x_.
 
@@ -9660,7 +9660,7 @@ Result is *true* if either _x_ or _y_ is an NaN for the floating-point encoding 
 
 _Result Type_ must be a scalar or vector of <<Boolean,_Boolean type_>>. 
 
-_x_must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. 
+_x_ must be a scalar or vector of  <<Floating,_floating-point type_>>. It must have the same number of components as _Result Type_. 
 
 _y_ must have the same type as _x_.
 
@@ -9781,7 +9781,7 @@ Before *version 1.4*, _Result Type_ must be a pointer, scalar, or vector. Starti
 
 The types of _Object 1_ and _Object 2_ must be the same as _Result Type_. 
 
-_Condition_must be a scalar or vector of <<Boolean,_Boolean type_>>. 
+_Condition_ must be a scalar or vector of <<Boolean,_Boolean type_>>. 
 
 If _Condition_ is a scalar and *true*, the result is _Object 1_. If _Condition_ is a scalar and *false*, the result is _Object 2_.
 
@@ -11364,7 +11364,7 @@ An invocation will not execute a <<DynamicInstance, dynamic instance>> of this i
 
 _Result Type_ must be an <<OpTypeEvent, *OpTypeEvent*>> object.
 
-_Destination_must be a pointer to a scalar or vector of <<Floating,_floating-point type_>> or <<Integer,_integer type_>>. 
+_Destination_ must be a pointer to a scalar or vector of <<Floating,_floating-point type_>> or <<Integer,_integer type_>>. 
 
 _Destination_ pointer <<Storage_Class, Storage Class>> must be *Workgroup* or *CrossWorkgroup*.
 
@@ -11482,7 +11482,7 @@ _Result Type_ must be a scalar or vector of <<Floating,_floating-point type_>>, 
 
 The type of _Value_ must be the same as _Result Type_. 
 
-_LocalId_ must be an integer datatype. It must be a scalar, a vector with 2 components,or a vector with 3 components. <<UndefinedBehavior,Behavior is undefined>> unless _LocalId_ is the same for all <<Invocation,invocations>> in the group, or if it is greater than or equal to the size of the group in any dimension.
+_LocalId_ must be an integer datatype. It must be a scalar, a vector with 2 components, or a vector with 3 components. <<UndefinedBehavior,Behavior is undefined>> unless _LocalId_ is the same for all <<Invocation,invocations>> in the group, or if it is greater than or equal to the size of the group in any dimension.
 2+|<<Capability,Capability>>: +
 *Groups*
 | 6 | 263
@@ -12494,7 +12494,7 @@ _Result Type_ must be a 32-bit <<Integer,_integer type_>> scalar. A successful e
 
 _Queue_ must be of the type <<OpTypeQueue, *OpTypeQueue*>>.
 
-_Flags_must be an <<Integer,_integer type_>> scalar.  The content of _Flags_ is interpreted as <<Kernel_Enqueue_Flags, _Kernel Enqueue Flags_>> mask.
+_Flags_ must be an <<Integer,_integer type_>> scalar.  The content of _Flags_ is interpreted as <<Kernel_Enqueue_Flags, _Kernel Enqueue Flags_>> mask.
 
 The type of _ND Range_ must be an <<OpTypeStruct, *OpTypeStruct*>> whose members are as described by the _Result Type_ of <<OpBuildNDRange, *OpBuildNDRange*>>.
 
