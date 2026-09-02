@@ -46,7 +46,11 @@ jobs:
 
   build_pr:
     runs-on: ubuntu-latest
+    # build_main only runs for pull requests, since a push to main needs no
+    # diff baseline. Without this condition a skipped build_main would skip
+    # build_pr too, which suppressed the whole workflow on every push.
     needs: build_main
+    if: ${{ !cancelled() && needs.build_main.result != 'failure' }}
     # We now refer to the container by its SHA instead of the name, to prevent
     # caching problems when updating the image.
     # container: khronosgroup/docker-images:asciidoctor-spec.20240726
@@ -75,9 +79,8 @@ jobs:
           make check
           cp specs/*.html artifact
       - name: Build PDF Specs
-        if: ${{ github.event_name == 'push'}}
         run: |
-          make pdf
+          make -C specs pdf
           cp specs/*.pdf artifact
       - name: Build diff
         if: ${{ github.event_name != 'push'}}
