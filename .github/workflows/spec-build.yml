@@ -64,6 +64,11 @@ jobs:
       - name: create artifact folder
         run: |
           mkdir artifact
+      - name: Install link checker and diff dependencies
+        run: |
+          apt-get update && apt-get install -y tidy
+          python3 -m pip install requests beautifulsoup4 utidylib
+          python3 -c "import tidy"
       - name: Build HTML Specs
         run: |
           make html

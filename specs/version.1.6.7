@@ -77,11 +77,6 @@ changes:
   * !373: Remove the _Qualifier_ operand from <<OpCreatePipeFromPipeStorage,*OpCreatePipeFromPipeStorage*>>;
     the access qualifier is already encoded in the result type.
 
-- Fix Github SPIRV-Headers Issues:
-  * #571: Clarify that *ConstOffsets* is valid with <<OpImageSparseGather,*OpImageSparseGather*>>
-    and <<OpImageSparseDrefGather,*OpImageSparseDrefGather*>>, consistent with their non-sparse
-    counterparts <<OpImageGather,*OpImageGather*>> and <<OpImageDrefGather,*OpImageDrefGather*>>.
-
 - Fix SPIR-V Registry Issues:
   * #383: Clarify that the `capabilities` list in the machine-readable grammar
     is an OR condition -- at least one of the named capabilities must be declared, not all

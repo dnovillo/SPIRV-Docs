@@ -133,7 +133,7 @@ std::set<Op> InstrPageBreaks;
 #define SAME_POINTERS      "The types of _Operand 1_ and _Operand 2_ must be <<OpTypePointer, *OpTypePointer*>> of the same type. "
 
 #define OPERAND_UNARY_INTEGER     "_Operand's_ type " SV_I
-#define OPERANDS_INTEGERS(ops)    "The type of each " ops SV_I ops " must have the same number of components. "
+#define OPERANDS_INTEGERS(ops)    "The type of each " ops " " SV_I ops " must have the same number of components. "
 #define MATCHING_BINARY_INTEGERS  "The type of _Operand 1_ and _Operand 2_ " SV_I " They must have the same number of components as _Result Type_. They must have the same component width as _Result Type_. "
 #define MATCHING_REL_BINARY_SV_I  "The type of _Operand 1_ and _Operand 2_ " SV_I " They must have the same component width, and they must have the same number of components as _Result Type_. "
 #define MATCHING_REL_BINARY_SV_FP "The type of _Operand 1_ and _Operand 2_ " SV_FP " They must have the same type, and they must have the same number of components as _Result Type_. "
@@ -337,7 +337,7 @@ void ParameterizeSpec()
         GAP
         "All used capabilities need to be declared, either explicitly with <<OpCapability, *OpCapability*>> or "
         "implicitly through the *Implicitly Declares* column: "
-        "If a capability defined with <<ValidDefined, statically expressed rules>> is used,"
+        "If a capability defined with <<ValidDefined, statically expressed rules>> is used, "
         "it is invalid to not declare it. "
         "If a capability defined in terms of dynamic behavior is used, "
         "<<UndefinedBehavior,behavior is undefined>> unless the capability is declared. "
@@ -2182,8 +2182,8 @@ void ParameterizeSpec()
 
     #define IMAGE_OPERANDS           GAP "_Image Operands_ encodes what operands follow, as per <<Image_Operands, Image Operands>>. "
     #define IMAGE_LOD                IMAGE_OPERANDS "Either *Lod* or *Grad* image operands must be present. "
-    #define IMAGE_DREF               GAP "_D~ref~_ is the depth-comparison reference value. It" S_FP_32
-    #define IMAGE_PROJ_DREF          GAP "_D~ref~_ /_q_ is the depth-comparison reference value. _D~ref~_" S_FP_32
+    #define IMAGE_DREF               GAP "_D~ref~_ is the depth-comparison reference value. It " S_FP_32
+    #define IMAGE_PROJ_DREF          GAP "_D~ref~_ /_q_ is the depth-comparison reference value. _D~ref~_ " S_FP_32
 
     InstructionDesc[OpSampledImage].opDesc = "Create a <<SampledImage,sampled image>>, containing both a <<Sampler,sampler>> and an <<ImageTerm,image>>."
                                         GAP "_Result Type_ must be <<OpTypeSampledImage,*OpTypeSampledImage*>>."
@@ -2427,19 +2427,22 @@ void ParameterizeSpec()
                                                     GENERAL_IMAGE_OPERAND;
 
     InstructionDesc[OpAccessChain].opDesc =
-        "Create a pointer into a <<CompositeType,_composite_>> object. "
+        "Create a pointer into an object, or to the object itself when _Indexes_ is empty."
         GAP RESULT_PTR "Its _Type_ operand must be the type reached by walking the "
-            "_Base's_ type hierarchy down to the last provided index in _Indexes_, and its _Storage Class_ operand must be "
-            "the same as the Storage Class of _Base_."
+            "_Base's_ type hierarchy down to the last provided index in _Indexes_ if _Indexes_ is not empty. "
+            "Otherwise, its _Type_ operand must be the same as the _Type_ operand of the type of _Base_. "
+            "Its _Storage Class_ operand must be the same as the Storage Class of _Base_."
         GAP "If _Result Type_ is an array-element pointer that is <<Decoration,decorated>> with *ArrayStride*, "
             "its _Array Stride_ must match the _Array Stride_ of the array's type. "
             "If the array's type is not decorated with *ArrayStride*, _Result Type_ also must not be decorated with *ArrayStride*."
-        GAP "_Base_ must be a pointer, pointing to the base of a composite object."
+        GAP "_Base_ must be a pointer. "
+            "If _Indexes_ is not empty, _Base_ must point to the base of a <<CompositeType,_composite_>> object."
         GAP "_Indexes_ walk the type hierarchy to the desired depth, potentially down to scalar granularity. "
             "The first index in _Indexes_ selects the top-level member/element/component/column of the base composite. "
             "All composite constituents use zero-based numbering, as described by their *OpType...* instruction. "
             "The second index applies similarly to that result, and so on. "
             "Once any non-composite type is reached, there must be no remaining (unused) indexes."
+        GAP "_Indexes_ can be empty, in which case no type hierarchy is walked and _Result_ points to the same object as _Base_."
         GAP "Each index in _Indexes_"
         GAP
         " - must have a scalar <<Integer, integer type>>\n"
@@ -2535,32 +2538,32 @@ void ParameterizeSpec()
     InstructionDesc[OpConvertFToS].opDesc =
         "Convert value numerically from floating point to signed integer, with round toward 0.0."
         GAP RESULT_SV_I "<<UndefinedBehavior, Behavior is undefined>> if _Result Type_ is not wide enough to hold the converted value."
-        GAP "_Float Value_" SV_FP SAME_COMP_RESULT
+        GAP "_Float Value_ " SV_FP SAME_COMP_RESULT
         GAP PER_COMPONENT;
 
     InstructionDesc[OpConvertSToF].opDesc = "Convert value numerically from signed integer to floating point."
                                             GAP RESULT_SV_FP
-                                            GAP "_Signed Value_" SV_I SAME_COMP_RESULT
+                                            GAP "_Signed Value_ " SV_I SAME_COMP_RESULT
                                             GAP PER_COMPONENT;
 
     InstructionDesc[OpConvertUToF].opDesc = "Convert value numerically from unsigned integer to floating point."
                                             GAP RESULT_SV_FP
-                                            GAP "_Unsigned Value_" SV_I SAME_COMP_RESULT
+                                            GAP "_Unsigned Value_ " SV_I SAME_COMP_RESULT
                                             GAP PER_COMPONENT;
 
     InstructionDesc[OpUConvert].opDesc = "Convert unsigned width. This is either a truncate or a zero extend."
                                          GAP RESULT_SV_U
-                                         GAP "_Unsigned Value_" SV_I SAME_COMP_RESULT DIFF_WIDTHS_RESULT
+                                         GAP "_Unsigned Value_ " SV_I SAME_COMP_RESULT DIFF_WIDTHS_RESULT
                                          GAP PER_COMPONENT;
 
     InstructionDesc[OpSConvert].opDesc = "Convert signed width. This is either a truncate or a sign extend."
                                          GAP RESULT_SV_I
-                                         GAP "_Signed Value_" SV_I SAME_COMP_RESULT DIFF_WIDTHS_RESULT
+                                         GAP "_Signed Value_ " SV_I SAME_COMP_RESULT DIFF_WIDTHS_RESULT
                                          GAP PER_COMPONENT;
 
     InstructionDesc[OpFConvert].opDesc = "Convert value numerically from one floating-point width to another width."
                                          GAP RESULT_SV_FP
-                                         GAP "_Float Value_" SV_FP SAME_COMP_RESULT DIFF_TYPES_RESULT
+                                         GAP "_Float Value_ " SV_FP SAME_COMP_RESULT DIFF_TYPES_RESULT
                                          GAP PER_COMPONENT;
 
     #define SATURATED_VALUE "Converted values outside the representable range of _Result Type_ are clamped to the nearest representable value of _Result Type_. "
@@ -2655,45 +2658,45 @@ void ParameterizeSpec()
 
     InstructionDesc[OpIsNan].opDesc = "Result is *true* if _x_ is a NaN for the floating-point encoding used by the type of _x_, otherwise result is *false*."
                                       GAP RESULT_SV_B
-                                      GAP "_x_" SV_FP MATCHING_COMP_COUNT
+                                      GAP "_x_ " SV_FP MATCHING_COMP_COUNT
                                       GAP PER_COMPONENT;
 
     InstructionDesc[OpIsInf].opDesc = "Result is *true* if _x_ is an Inf for the floating-point encoding used by the type of _x_, otherwise result is *false*"
                                       GAP RESULT_SV_B
-                                      GAP "_x_" SV_FP MATCHING_COMP_COUNT
+                                      GAP "_x_ " SV_FP MATCHING_COMP_COUNT
                                       GAP PER_COMPONENT;
 
     InstructionDesc[OpIsFinite].opDesc = "Result is *true* if _x_ is a finite number for the floating-point encoding used by the type of _x_, otherwise result is *false*."
                                          GAP RESULT_SV_B
-                                         GAP "_x_" SV_FP MATCHING_COMP_COUNT
+                                         GAP "_x_ " SV_FP MATCHING_COMP_COUNT
                                          GAP PER_COMPONENT;
 
     InstructionDesc[OpIsNormal].opDesc = "Result is *true* if _x_ is a normal number for the floating-point encoding used by the type of _x_, otherwise result is *false*."
                                          GAP RESULT_SV_B
-                                         GAP "_x_" SV_FP MATCHING_COMP_COUNT
+                                         GAP "_x_ " SV_FP MATCHING_COMP_COUNT
                                          GAP PER_COMPONENT;
 
     InstructionDesc[OpSignBitSet].opDesc = "Result is *true* if _x_ has its sign bit set, otherwise result is *false*."
                                            GAP RESULT_SV_B
-                                           GAP "_x_" SV_FP MATCHING_COMP_COUNT
+                                           GAP "_x_ " SV_FP MATCHING_COMP_COUNT
                                            GAP PER_COMPONENT;
 
     InstructionDesc[OpLessOrGreater].opDesc = DEPRECATED("use <<OpFOrdNotEqual, *OpFOrdNotEqual*>>")
                                               GAP "Has the same semantics as <<OpFOrdNotEqual, *OpFOrdNotEqual*>>."
                                               GAP RESULT_SV_B
-                                              GAP "_x_" SV_FP MATCHING_COMP_COUNT
+                                              GAP "_x_ " SV_FP MATCHING_COMP_COUNT
                                               GAP "_y_ must have the same type as _x_."
                                               GAP PER_COMPONENT;
 
     InstructionDesc[OpOrdered].opDesc = "Result is *true* if both _x_ == _x_ and _y_ == _y_ are *true*, where <<OpFOrdEqual, *OpFOrdEqual*>> is used as comparison, otherwise result is *false*."
                                         GAP RESULT_SV_B
-                                        GAP "_x_" SV_FP MATCHING_COMP_COUNT
+                                        GAP "_x_ " SV_FP MATCHING_COMP_COUNT
                                         GAP "_y_ must have the same type as _x_."
                                         GAP PER_COMPONENT;
 
     InstructionDesc[OpUnordered].opDesc = "Result is *true* if either _x_ or _y_ is an NaN for the floating-point encoding used by the type of _x_ and _y_, otherwise result is *false*."
                                           GAP RESULT_SV_B
-                                          GAP "_x_" SV_FP MATCHING_COMP_COUNT
+                                          GAP "_x_ " SV_FP MATCHING_COMP_COUNT
                                           GAP "_y_ must have the same type as _x_."
                                           GAP PER_COMPONENT;
 
@@ -2792,13 +2795,13 @@ void ParameterizeSpec()
 
     InstructionDesc[OpVectorTimesMatrix].opDesc = "Linear-algebraic _Vector X Matrix_."
                                                   GAP RESULT_V_FP
-                                                  GAP "_Vector_" MATCHING_VECTOR_COMPS "Its number of components must equal the number of components in each column in _Matrix_."
-                                                  GAP "_Matrix_" MATCHING_MATRIX_COMPS "Its number of columns must equal the number of components in _Result Type_.";
+                                                  GAP "_Vector_ " MATCHING_VECTOR_COMPS "Its number of components must equal the number of components in each column in _Matrix_."
+                                                  GAP "_Matrix_ " MATCHING_MATRIX_COMPS "Its number of columns must equal the number of components in _Result Type_.";
 
     InstructionDesc[OpMatrixTimesVector].opDesc = "Linear-algebraic _Matrix X Vector_."
                                                   GAP RESULT_V_FP
-                                                  GAP "_Matrix_" MATCHING_COLUMN
-                                                  GAP "_Vector_" MATCHING_VECTOR_COMPS "Its number of components must equal the number of columns in _Matrix_.";
+                                                  GAP "_Matrix_ " MATCHING_COLUMN
+                                                  GAP "_Vector_ " MATCHING_VECTOR_COMPS "Its number of components must equal the number of columns in _Matrix_.";
 
     InstructionDesc[OpMatrixTimesMatrix].opDesc = "Linear-algebraic multiply of _LeftMatrix_ X _RightMatrix_."
                                                   GAP RESULT_M_FP
@@ -2809,7 +2812,7 @@ void ParameterizeSpec()
     InstructionDesc[OpOuterProduct].opDesc = "Linear-algebraic outer product of _Vector 1_ and _Vector 2_."
                                              GAP RESULT_M_FP
                                              GAP "_Vector 1_ must have the same type as the _Column Type_ in _Result Type_."
-                                             GAP "_Vector 2_" MATCHING_VECTOR_COMPS "Its number of components must equal the number of columns in _Result Type_.";
+                                             GAP "_Vector 2_ " MATCHING_VECTOR_COMPS "Its number of components must equal the number of columns in _Result Type_.";
 
     InstructionDesc[OpDot].opDesc = "Dot product of _Vector 1_ and _Vector 2_."
                                     GAP RESULT_S_FP
@@ -2967,7 +2970,7 @@ void ParameterizeSpec()
                                                GAP PER_COMPONENT
                                                GAP RESULT_SV_I "The components must be wide enough to hold the unsigned _Width_ of _Base_ as an unsigned value. "
                                                                "That is, no sign bit is needed or counted when checking for a wide enough result width."
-                                               GAP "_Base_" SV_I "It must have the same number of components as _Result Type_."
+                                               GAP "_Base_ " SV_I "It must have the same number of components as _Result Type_."
                                                GAP "The result is the unsigned value that is the number of bits in _Base_ that are 1.";
 
     InstructionDesc[OpSelect].opDesc = "Select between two objects. "
@@ -2975,7 +2978,7 @@ void ParameterizeSpec()
                             GAP "Before *version 1.4*, _Result Type_ must be a pointer, scalar, or vector. "
                                 "Starting with *version 1.4*, _Result Type_ can additionally be a <<CompositeType, composite>> type other than a vector."
                             GAP MATCHINGS("_Object 1_ and _Object 2_")
-                            GAP "_Condition_" SV_B
+                            GAP "_Condition_ " SV_B
                             GAP "If _Condition_ is a scalar and *true*, the result is _Object 1_. If _Condition_ is a scalar and *false*, "
                                 "the result is _Object 2_."
                             GAP "If _Condition_ is a vector, _Result Type_ must be a vector with the same number of components as _Condition_ "
@@ -3464,7 +3467,7 @@ void ParameterizeSpec()
         GAP UNIFORM_CONTROL
         GAP TANGLED_EXEC_WAIT
         GAP "_Result Type_ must be an <<OpTypeEvent, *OpTypeEvent*>> object."
-        GAP "_Destination_" PSV_FP_I
+        GAP "_Destination_ " PSV_FP_I
         GAP "_Destination_ pointer <<Storage_Class, Storage Class>> must be *Workgroup* or *CrossWorkgroup*."
         GAP MATCHING_OPERANDS("_Source_", "_Destination_")
         GAP "If _Destination_ pointer <<Storage_Class, Storage Class>> is *Workgroup*, the _Source_ pointer Storage Class must be *CrossWorkgroup*. "
@@ -3509,7 +3512,7 @@ void ParameterizeSpec()
         GAP TANGLED_EXEC_WAIT
         GAP "_Result Type_ " SV_FP_I_B
         GAP MATCHING("_Value_")
-        GAP "_LocalId_ must be an integer datatype. It must be a scalar, a vector with 2 components,"
+        GAP "_LocalId_ must be an integer datatype. It must be a scalar, a vector with 2 components, "
             "or a vector with 3 components. "
             "<<UndefinedBehavior,Behavior is undefined>> unless _LocalId_ is the same for all <<Invocation,invocations>> in the group, or if it is greater than or equal to the size of the group in any dimension.";
 
@@ -3840,7 +3843,7 @@ void ParameterizeSpec()
         GAP "_Result Type_ must be a 32-bit <<Integer,_integer type_>> scalar."
             " A successful enqueue results in the value 0. A failed enqueue results in a non-0 value."
         GAP "_Queue_ must be of the type <<OpTypeQueue, *OpTypeQueue*>>."
-        GAP "_Flags_" S_I " The content of _Flags_ is interpreted as <<Kernel_Enqueue_Flags, _Kernel Enqueue Flags_>> mask."
+        GAP "_Flags_ " S_I " The content of _Flags_ is interpreted as <<Kernel_Enqueue_Flags, _Kernel Enqueue Flags_>> mask."
         GAP "The type of _ND Range_ must be an <<OpTypeStruct, *OpTypeStruct*>> whose members are as described by the _Result Type_ of <<OpBuildNDRange, *OpBuildNDRange*>>."
         GAP "_Num Events_ specifies the number of event objects in the wait list pointed to by _Wait Events_ and "
         "must be 32-bit <<Integer,_integer type_>> scalar, which is treated as an unsigned integer."
@@ -4515,6 +4518,7 @@ const char* GetOperandDesc(OperandClass operand)
     case OperandCooperativeVectorMatrixLayout: return "Cooperative Vector Matrix Layout";
     case OperandComponentType: return "Cooperative Vector Matrix Component Type";
     case OperandTensorOperands: return "Tensor Operands";
+    case OperandGatherModes:    return "Gather Modes";
     case OperandOpcode:                return "Op";
 
     default:                           return "Reserved";
